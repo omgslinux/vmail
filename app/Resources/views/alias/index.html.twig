@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Aliases list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Alias</th>
+                <th>Addresses</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for alias in aliases %}
+            <tr>
+                <td><a href="{{ path('alias_show', { 'id': alias.id }) }}">{{ alias.id }}</a></td>
+                <td>{{ alias.alias }}</td>
+                <td>{{ alias.addresses }}</td>
+                <td>{{ alias.active }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('alias_show', { 'id': alias.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('alias_edit', { 'id': alias.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('alias_new') }}">Create a new alias</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Domains list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for domain in domains %}
+            <tr>
+                <td><a href="{{ path('domain_show', { 'id': domain.id }) }}">{{ domain.id }}</a></td>
+                <td>{{ domain.name }}</td>
+                <td>{{ domain.active }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('domain_show', { 'id': domain.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('domain_edit', { 'id': domain.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('domain_new') }}">Create a new domain</a>
+        </li>
+    </ul>
+{% endblock %}
