@@ -171,4 +171,9 @@ class User
     {
         return $this->active;
     }
+
+    public function __toString()
+    {
+        $this->getUser();
+    }
 }
