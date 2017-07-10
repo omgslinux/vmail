@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use AppBundle\Entity\User;
 
 /**
  * Domains
@@ -101,4 +103,30 @@ class Domain
     {
         return $this->active;
     }
+
+    /**
+     * Get users
+     *
+     * @return ArrayCollection
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    /**
+     * Add users
+     *
+     * @param User $users
+     *
+     * @return domains
+     */
+    public function addUsers(User $user)
+    {
+        $this->users->add($user);
+        $user->setUser($user);
+
+        return $this;
+    }
+
 }
