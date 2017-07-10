@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use AppBundle\Entity\Domain;
 
 /**
  * Users
@@ -126,11 +127,11 @@ class User
     /**
      * Set domain
      *
-     * @param string $domain
+     * @param Domain $domain
      *
      * @return users
      */
-    public function setDomain($domain)
+    public function setDomain(Domain $domain)
     {
         $this->domain = $domain;
 
@@ -140,7 +141,7 @@ class User
     /**
      * Get domain
      *
-     * @return string
+     * @return Domain
      */
     public function getDomain()
     {
