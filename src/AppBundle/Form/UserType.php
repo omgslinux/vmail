@@ -16,7 +16,9 @@ class UserType extends AbstractType
         $builder
         ->add('user')
         ->add('password')
-        ->add('domain')
+        ->add('domain', EntityType::class, array (
+            'class' => 'AppBundle:Domain',
+            'label' => 'Dominio'))
         ->add('active')        ;
     }
 
