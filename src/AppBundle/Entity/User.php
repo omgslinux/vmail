@@ -167,7 +167,7 @@ class User
      *
      * @return string
      */
-    public function getActive()
+    public function isActive()
     {
         return $this->active;
     }
