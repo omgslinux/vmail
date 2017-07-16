@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Users list</h1>
+    <h1>{% trans %}Users list{% endtrans %}</h1>
 
     <table>
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Active</th>
-                <th>Actions</th>
+                <th>{% trans %}Id{% endtrans %}</th>
+                <th>{% trans %}Email{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}Actions{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
@@ -21,10 +21,10 @@
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('user_show', { 'id': user.id }) }}">show</a>
+                            <a href="{{ path('user_show', { 'id': user.id }) }}">{% trans %}show{% endtrans %}</a>
                         </li>
                         <li>
-                            <a href="{{ path('user_edit', { 'id': user.id }) }}">edit</a>
+                            <a href="{{ path('user_edit', { 'id': user.id }) }}">{% trans %}edit{% endtrans %}</a>
                         </li>
                     </ul>
                 </td>
@@ -32,10 +32,15 @@
         {% endfor %}
         </tbody>
     </table>
+    <ul>
+        <li>
+            <a href="{{ path('user_new') }}">{% trans %}Create a new user{% endtrans %}</a>
+        </li>
+    </ul>
 
     <ul>
         <li>
-            <a href="{{ path('user_new') }}">Create a new user</a>
+            <a href="{{ path('domain_index') }}">{% trans %}Domains list{% endtrans %}</a>
         </li>
     </ul>
 {% endblock %}

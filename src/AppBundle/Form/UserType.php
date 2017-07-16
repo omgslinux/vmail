@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class UserType extends AbstractType
 {
@@ -19,8 +20,11 @@ class UserType extends AbstractType
         ->add('password')
         ->add('domain', EntityType::class, array (
             'class' => 'AppBundle:Domain',
-            'label' => 'Dominio'))
-        ->add('active')        ;
+            'label' => 'Domain'))
+        ->add('active', CheckboxType::class, array(
+            'label' => 'Active'
+          ))
+        ;
     }
 
     /**

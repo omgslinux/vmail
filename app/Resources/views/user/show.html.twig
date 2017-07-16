@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>User</h1>
+    <h1>{% trans %}User{% endtrans %}</h1>
 
     <table>
         <tbody>
@@ -10,15 +10,15 @@
                 <td>{{ user.id }}</td>
             </tr>
             <tr>
-                <th>User</th>
+                <th>{% trans %}User{% endtrans %}</th>
                 <td>{{ user.user }}</td>
             </tr>
             <tr>
-                <th>Password</th>
+                <th>{% trans %}Password{% endtrans %}</th>
                 <td>{{ user.password }}</td>
             </tr>
             <tr>
-                <th>Active</th>
+                <th>{% trans %}Active{% endtrans %}</th>
                 <td>{{ user.active }}</td>
             </tr>
         </tbody>
@@ -26,14 +26,14 @@
 
     <ul>
         <li>
-            <a href="{{ path('user_index') }}">Back to the list</a>
+            <a href="{{ path('user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
         </li>
         <li>
-            <a href="{{ path('user_edit', { 'id': user.id }) }}">Edit</a>
+            <a href="{{ path('user_edit', { 'id': user.id }) }}">{% trans %}Edit{% endtrans %}</a>
         </li>
         <li>
             {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
+                <input type="submit" value="{% trans %}Delete{% endtrans %}">
             {{ form_end(delete_form) }}
         </li>
     </ul>

@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use AppBundle\Entity\Domain;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Users
@@ -12,7 +13,7 @@ use AppBundle\Entity\Domain;
  * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @var int
@@ -36,6 +37,12 @@ class User
      * @ORM\Column(name="password", type="string", length=255)
      */
     private $password;
+
+    /**
+     * @var string
+     *
+     */
+    private $plainpassword;
 
     /**
      * @var domain
@@ -125,6 +132,30 @@ class User
     }
 
     /**
+     * Set plainpassword
+     *
+     * @param string $plainpassword
+     *
+     * @return users
+     */
+    public function setPlainPassword($password)
+    {
+        $this->plainpassword = $password;
+
+        return $this;
+    }
+
+    /**
+     * Get plainpassword
+     *
+     * @return string
+     */
+    public function getPlainPassword()
+    {
+        return $this->password;
+    }
+
+    /**
      * Set domain
      *
      * @param Domain $domain
@@ -170,6 +201,44 @@ class User
     public function isActive()
     {
         return $this->active;
+    }
+
+    public function getRoles()
+    {
+        return array('ROLE_USER');
+    }
+
+    public function eraseCredentials()
+    {
+
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function getUsername()
+    {
+        return $this->getUser();
+    }
+
+    public function serialize()
+    {
+        return serialize(array(
+          $this->id,
+          $this->user,
+          $this->password
+        ));
+    }
+
+    public function unserialize($serialized)
+    {
+        list(
+          $this->id,
+          $this->user,
+          $this->password,
+        ) = userialize($serialized);
     }
 
     public function __toString()
