@@ -48,7 +48,7 @@ class User implements UserInterface
      * @var string
      *
      */
-    private $plainpassword;
+    private $plainPassword;
 
     /**
      * @var domain
@@ -57,7 +57,7 @@ class User implements UserInterface
      */
     private $domain;
 
-    private $domainname;
+    private $domainName;
 
     /**
      * @var boolean
@@ -160,7 +160,7 @@ class User implements UserInterface
      */
     public function getPlainPassword()
     {
-        return $this->password;
+        return $this->plainPassword;
     }
 
     /**
@@ -233,7 +233,7 @@ class User implements UserInterface
 
     public function getUsername()
     {
-        return $this->username; //$this->getUser() . '@' . $this->getDomain();
+        return $this->getUser() . '@' . $this->getDomainName();
     }
 
 /*    public function isAccountNonExpired()
