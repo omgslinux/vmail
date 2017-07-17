@@ -17,6 +17,7 @@ return array(
   'Actions' => 'Acciones',
   'show' => 'Mostrar',
   'Password' => 'Constraseña',
+  'Confirm password' => 'Repetir contraseña',
   'edit' => 'Editar',
   'Back to the list' => 'Volver a la lista',
   'Edit' => 'Editar',

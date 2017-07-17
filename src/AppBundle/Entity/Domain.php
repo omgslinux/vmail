@@ -31,11 +31,11 @@ class Domain
     private $name;
 
     /**
-     * @var int
+     * @var boolean
      *
-     * @ORM\Column(name="active", type="smallint", nullable=true)
+     * @ORM\Column(name="active", type="boolean")
      */
-    private $active;
+    private $active=false;
 
     /**
      * @var ArrayCollection

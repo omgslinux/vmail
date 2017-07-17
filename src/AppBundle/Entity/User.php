@@ -34,6 +34,12 @@ class User implements UserInterface
     /**
      * @var string
      *
+     */
+    private $username;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="password", type="string", length=255)
      */
     private $password;
@@ -51,12 +57,14 @@ class User implements UserInterface
      */
     private $domain;
 
+    private $domainname;
+
     /**
-     * @var string
+     * @var boolean
      *
-     * @ORM\Column(name="active", type="string", length=255)
+     * @ORM\Column(name="active", type="boolean")
      */
-    private $active;
+    private $active=false;
 
     /**
      * @var ArrayCollection
@@ -179,6 +187,11 @@ class User implements UserInterface
         return $this->domain;
     }
 
+    public function getDomainName()
+    {
+        return $this->getDomain()->getName();
+    }
+
     /**
      * Set active
      *
@@ -220,7 +233,27 @@ class User implements UserInterface
 
     public function getUsername()
     {
-        return $this->getUser();
+        return $this->username; //$this->getUser() . '@' . $this->getDomain();
+    }
+
+/*    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+*/
+    public function isEnabled()
+    {
+        return $this->isActive();
     }
 
     public function serialize()
@@ -228,7 +261,8 @@ class User implements UserInterface
         return serialize(array(
           $this->id,
           $this->user,
-          $this->password
+          $this->password,
+          $this->active
         ));
     }
 
@@ -238,6 +272,7 @@ class User implements UserInterface
           $this->id,
           $this->user,
           $this->password,
+          $this->active,
         ) = userialize($serialized);
     }
 

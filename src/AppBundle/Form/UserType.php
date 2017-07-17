@@ -4,9 +4,15 @@ namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\CallbackTransformer;
 
 class UserType extends AbstractType
 {
@@ -17,14 +23,36 @@ class UserType extends AbstractType
     {
         $builder
         ->add('user')
-        ->add('password')
+        ->add('plainpassword', RepeatedType::class, array(
+            'type' => PasswordType::class,
+            'required' => true,
+            'first_options' => array(
+                'label' => 'Password',
+            ),
+            'second_options' => array(
+                'label' => 'Confirm password',
+            )
+        ))
         ->add('domain', EntityType::class, array (
             'class' => 'AppBundle:Domain',
             'label' => 'Domain'))
         ->add('active', CheckboxType::class, array(
-            'label' => 'Active'
-          ))
-        ;
+            'label' => 'Active',
+            'required' => false,
+          )
+        );
+        $builder->get('active')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($activeAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$activeAsString;
+                 },
+                 function ($activeAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$activeAsBoolean;
+                 }
+            )
+          );
     }
 
     /**

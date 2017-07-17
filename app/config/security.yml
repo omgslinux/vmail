@@ -7,7 +7,7 @@ security:
         users:
             entity:
               class: AppBundle:User
-              property: user
+              #property: username
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -30,9 +30,11 @@ security:
             logout:
               path: /logout
               target: /
-    access_control:
-        - { path: ^/login, roles: ['IS_AUTHENTICATED_ANONYMOUSLY'] }
-        - { path: ^/user, roles: ['ROLE_USER'] }
+#    access_control:
+#        - { path: ^/login, roles: ['IS_AUTHENTICATED_ANONYMOUSLY'] }
+#        - { path: ^/user, roles: ['ROLE_USER'] }
     encoders:
       AppBundle\Entity\User:
         algorithm: bcrypt
+        cost: 7
+        # algorithm: plaintext

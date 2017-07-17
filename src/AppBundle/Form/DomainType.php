@@ -5,6 +5,8 @@ namespace AppBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\CallbackTransformer;
 
 class DomainType extends AbstractType
 {
@@ -15,9 +17,23 @@ class DomainType extends AbstractType
     {
         $builder
           ->add('name')
-          ->add('active')
-        ;
-    }
+          ->add('active', CheckboxType::class, array(
+            'label' => 'Active'
+          )
+        );
+        $builder->get('active')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($activeAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$activeAsString;
+                 },
+                 function ($activeAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$activeAsBoolean;
+                 }
+            )
+          );
+        }
 
     /**
      * {@inheritdoc}
