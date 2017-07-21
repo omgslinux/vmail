@@ -1,0 +1,4 @@
+id,name,value
+1,virtual_mailbox_base,/var/lib/vmail
+2,welcome_subject,Bienvenido
+3,welcome_body,"Este es un correo de bienvenida para crear el buzón"

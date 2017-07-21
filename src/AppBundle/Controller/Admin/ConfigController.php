@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace AppBundle\Controller\Admin;
 
 use AppBundle\Entity\Config;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Config controller.
  *
- * @Route("config")
+ * @Route("/admin/config")
  */
 class ConfigController extends Controller
 {

@@ -67,6 +67,13 @@ class User implements UserInterface
     private $active=false;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="admin", type="boolean")
+     */
+    private $admin=false;
+
+    /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Autoreply", mappedBy="user")
@@ -214,6 +221,30 @@ class User implements UserInterface
     public function isActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Set admin
+     *
+     * @param string $admin
+     *
+     * @return users
+     */
+    public function setAdmin($admin)
+    {
+        $this->admin = $admin;
+
+        return $this;
+    }
+
+    /**
+     * Is admin
+     *
+     * @return boolean
+     */
+    public function isAdmin()
+    {
+        return $this->admin;
     }
 
     public function getRoles()
