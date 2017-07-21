@@ -252,6 +252,11 @@ class User implements UserInterface
         return array('ROLE_USER');
     }
 
+    public function getRol()
+    {
+        return 'ROLE_USER';
+    }
+
     public function eraseCredentials()
     {
 

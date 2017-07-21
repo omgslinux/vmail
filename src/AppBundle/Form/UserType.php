@@ -35,24 +35,46 @@ class UserType extends AbstractType
         ))
         ->add('domain', EntityType::class, array (
             'class' => 'AppBundle:Domain',
-            'label' => 'Domain'))
+            'label' => 'Domain'
+            )
+        )
         ->add('active', CheckboxType::class, array(
             'label' => 'Active',
             'required' => false,
-          )
-        );
-        $builder->get('active')
+            )
+        )
+        ->add('admin', CheckboxType::class, array(
+            'label' => 'Admin',
+            'required' => false,
+            )
+        )
+        ;
+        $builder
+        ->get('active')
              ->addModelTransformer(new CallbackTransformer(
-                 function ($activeAsString) {
+                 function ($booleanAsString) {
                      // transform the string to boolean
-                     return (bool)(int)$activeAsString;
+                     return (bool)(int)$booleanAsString;
                  },
-                 function ($activeAsBoolean) {
+                 function ($stringAsBoolean) {
                      // transform the boolean to string
-                     return (string)(int)$activeAsBoolean;
+                     return (string)(int)$stringAsBoolean;
                  }
             )
-          );
+        )
+        ->get('admin')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($booleanAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$booleanAsString;
+                 },
+                 function ($stringAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$stringAsBoolean;
+                 }
+            )
+        )
+        ;
     }
 
     /**
