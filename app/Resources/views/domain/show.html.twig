@@ -22,10 +22,10 @@
 
     <ul>
         <li>
-            <a href="{{ path('domain_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+            <a href="{{ path('admin_domain_index') }}">{% trans %}Back to the list{% endtrans %}</a>
         </li>
         <li>
-            <a href="{{ path('domain_edit', { 'id': domain.id }) }}">{% trans %}Edit{% endtrans %}</a>
+            <a href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{% trans %}Edit{% endtrans %}</a>
         </li>
         <li>
             {{ form_start(delete_form) }}

@@ -250,12 +250,12 @@ class User implements UserInterface
     {
         return true;
     }
-*/
+
     public function isEnabled()
     {
         return $this->isActive();
     }
-
+*/
     public function serialize()
     {
         return serialize(array(

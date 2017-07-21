@@ -18,7 +18,8 @@ class DomainType extends AbstractType
         $builder
           ->add('name')
           ->add('active', CheckboxType::class, array(
-            'label' => 'Active'
+            'label' => 'Active',
+            'required' => false
           )
         );
         $builder->get('active')

@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Configs list</h1>
+    <h1>{% trans %}Configs list{% endtrans %}</h1>
 
     <table>
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Value</th>
-                <th>Actions</th>
+                <th>{% trans %}Id{% endtrans %}</th>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Value{% endtrans %}</th>
+                <th>{% trans %}Actions{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
@@ -21,10 +21,10 @@
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('config_show', { 'id': config.id }) }}">show</a>
+                            <a href="{{ path('config_show', { 'id': config.id }) }}">{% trans %}show{% endtrans %}</a>
                         </li>
                         <li>
-                            <a href="{{ path('config_edit', { 'id': config.id }) }}">edit</a>
+                            <a href="{{ path('config_edit', { 'id': config.id }) }}">{% trans %}edit{% endtrans %}</a>
                         </li>
                     </ul>
                 </td>
@@ -35,7 +35,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('config_new') }}">Create a new config</a>
+            <a href="{{ path('config_new') }}">{% trans %}Create a new config{% endtrans %}</a>
         </li>
     </ul>
 {% endblock %}

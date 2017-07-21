@@ -19,7 +19,7 @@ class DomainController extends Controller
     /**
      * Lists all domain entities.
      *
-     * @Route("/", name="admin_domains_index")
+     * @Route("/", name="admin_domain_index")
      * @Method("GET")
      */
     public function indexAction()
@@ -36,7 +36,7 @@ class DomainController extends Controller
     /**
      * Creates a new Domain entity.
      *
-     * @Route("/new", name="admin_domains_new")
+     * @Route("/new", name="admin_domain_new")
      * @Method({"GET", "POST"})
      */
     public function newAction(Request $request)
@@ -51,15 +51,19 @@ class DomainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
+            $config=$this->get('app.config');
+            $base=$config->findParameter('virtual_mailbox_base')->getValue();
+            mkdir($base.'/'.$domain->getId());
+            system("cd $base;ln -s " . $domain->getId() . " " . $domain->getName());
 
-            return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getDomain()));
+            return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
         return $this->render('default/edit.html.twig', array(
             'domain' => $domain,
-            'action' => 'Añadir dominio',
-            'backlink' => $this->generateUrl('admin_domain_show', array('id' => $domain->getDomain())),
-            'backmessage' => 'Volver al listado',
+            'action' => $this->get('translator')->trans('Create a new domain'),
+            'backlink' => $this->generateUrl('admin_domain_index'),
+            'backmessage' => 'Back',
             'create_form' => $form->createView(),
         ));
     }
@@ -72,7 +76,6 @@ class DomainController extends Controller
      */
     public function editAction(Request $request, Domain $domain)
     {
-//        $fund = $em->getRepository('AppBundle:Funds')->findOneBy(array('id' => $fundbanks->getFund()));
         $deleteForm = $this->createDeleteForm($domain);
         $editform = $this->createForm('AppBundle\Form\DomainType', $domain);
         $editform->handleRequest($request);
@@ -81,15 +84,20 @@ class DomainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
+            $config=$this->get('app.config');
+            $base=$config->findParameter('virtual_mailbox_base')->getValue();
+            system("rm -rf " . $base . "/" . $domain->getName());
+            system("cd $base;ln -sf " . $domain->getId() . " " . $domain->getName());
 
-            return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getDomain()));
+            return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
+        $t = $this->get('translator');
 
         return $this->render('default/edit.html.twig', array(
             'domain' => $domain,
-            'action' => 'Editar dominio ' . $domain,
-            'backlink' => $this->generateUrl('admin_domain_show', array('id' => $domain->getDomain())),
-            'backmessage' => 'Volver al listado',
+            'action' => $t->trans('Domain edit') . ' ' . $domain->getName(),
+            'backlink' => $this->generateUrl('admin_domain_show', array('id' => $domain->getId())),
+            'backmessage' => 'Back',
             'edit_form' => $editform->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
@@ -108,24 +116,28 @@ class DomainController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $config=$this->get('app.config');
+            $base=$config->findParameter('virtual_mailbox_base')->getValue();
+            system("rm -rf " . $base . "/" . $domain->getName());
+            rmdir($base . "/" . $domain->getId());
             $em->remove($domain);
-            $em->flush();
+            $em->flush($domain);
         }
 
-        return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getDomain()));
+        return $this->redirectToRoute('admin_domain_index');
     }
 
     /**
-     * Creates a form to delete a FundBanks entity.
+     * Creates a form to delete a Domain entity.
      *
-     * @param FundBanks $fundbanks The FundBanks entity
+     * @param Domain $domain The Domain entity
      *
      * @return \Symfony\Component\Form\Form The form
      */
     private function createDeleteForm(Domain $domain)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('admin_domain_delete', array('id' => $domain->getDomain())))
+            ->setAction($this->generateUrl('admin_domain_delete', array('id' => $domain->getId())))
             ->setMethod('DELETE')
             ->getForm()
         ;
@@ -137,14 +149,13 @@ class DomainController extends Controller
      * @Route("/{id}", name="admin_domain_show")
      * @Method({"GET", "POST"})
      */
-    public function showAction(Request $request, Domains $domain)
+    public function showAction(Request $request, Domain $domain)
     {
+        $deleteForm = $this->createDeleteForm($domain);
 
-        return $this->render('domain.html.twig', array(
+        return $this->render('domain/show.html.twig', array(
             'domain' => $domain,
-            'exists' => $exists,
-            'securitiescount' => $securitiescount,
-            'download_form' => $form
+            'delete_form' => $deleteForm->createView(),
         ));
     }
 

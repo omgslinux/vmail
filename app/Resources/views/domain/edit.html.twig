@@ -10,7 +10,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('domain_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+            <a href="{{ backlink }}">{{ backmessage|trans }}</a>
         </li>
         <li>
             {{ form_start(delete_form) }}

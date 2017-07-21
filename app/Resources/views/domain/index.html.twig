@@ -15,16 +15,16 @@
         <tbody>
         {% for domain in domains %}
             <tr>
-                <td><a href="{{ path('domain_show', { 'id': domain.id }) }}">{{ domain.id }}</a></td>
+                <td><a href="{{ path('admin_domain_show', { 'id': domain.id }) }}">{{ domain.id }}</a></td>
                 <td>{{ domain.name }}</td>
                 <td>{{ domain.active }}</td>
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('domain_show', { 'id': domain.id }) }}">{% trans %}show{% endtrans %}</a>
+                            <a href="{{ path('admin_domain_show', { 'id': domain.id }) }}">{% trans %}show{% endtrans %}</a>
                         </li>
                         <li>
-                            <a href="{{ path('domain_edit', { 'id': domain.id }) }}">{% trans %}edit{% endtrans %}</a>
+                            <a href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{% trans %}edit{% endtrans %}</a>
                         </li>
                     </ul>
                 </td>
@@ -34,7 +34,7 @@
     </table>
     <ul>
         <li>
-            <a href="{{ path('domain_new') }}">{% trans %}Create a new domain{% endtrans %}</a>
+            <a href="{{ path('admin_domain_new') }}">{% trans %}Create a new domain{% endtrans %}</a>
         </li>
     </ul>
 
