@@ -44,13 +44,8 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Búsquedas<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ path('search_funds_bybank')}}">Fondos por cedente</a></li>
-                        <li><a href="{{ path('search_funds_bymanager')}}">Fondos por gestora</a></li>
-                        <li><a href="{{ path('search_funds_byloan')}}">Fondos por préstamo hipotecario</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="{{ path('search_laws_index')}}">Leyes</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="{{ path('pdf_index')}}">Descargar PDFs</a></li>
                     </ul>
                 </li>
               </ul>
@@ -67,8 +62,6 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menú de usuario<span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                      <li><a href="{{ path('profile_tasks_index') }}">Tareas</a></li>
-                      <li><a href="{{ path('profile_user_index') }}">Perfil</a></li>
                   </ul>
                 </li>
                 {% endif %}
@@ -76,9 +69,6 @@
                 <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gestión<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ path('manage_funds_index') }}">Fondos</a></li>
-                    <li><a href="{{ path('manage_fundmanagers_index') }}">Gestoras</a></li>
-                    <li><a href="{{ path('manage_laws_index') }}">Leyes</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a href="https://drive.google.com/drive/folders/0B_Y_bq4UZLQiV3ROeHR3R3RfTjg">Enlace a csv Gdrive</a></li>
                 </ul>
@@ -88,13 +78,7 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                    <li><a href="{{ path('admin_funds_index') }}">Fondos</a></li>
-                    <li><a href="{{ path('admin_banks_index') }}">Bancos</a></li>
-                    <li><a href="{{ path('admin_bankcategories_index') }}">Categorías de bancos</a></li>
-                    <li><a href="{{ path('admin_linktypes_index') }}">Tipos de enlace</a></li>
-                    <li><a href="{{ path('admin_lawtypes_index') }}">Tipos de leyes</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="{{ path('admin_users_index') }}">Usuarios</a></li>
                   </ul>
                 </li>
                 {% endif %}
