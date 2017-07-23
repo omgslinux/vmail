@@ -1,6 +1,7 @@
 <?php
 return array(
   'User'  =>  'Usuario',
+  'Management' => 'Gestión',
   'Create a new user' => 'Crear un usuario',
   'Create a new domain' => 'Crear un dominio',
   'Create a new config' => 'Crear una nueva configuración',
@@ -12,8 +13,11 @@ return array(
   'Domain' => 'Dominio',
   'Domain edit' => 'Edición de dominio',
   'Domain creation' => 'Creación de dominio',
+  'Domain users' => 'Usuarios del dominio',
+  'Domain administration' => 'Administración de dominios',
   'User edit' => 'Edición de usuario',
   'User creation' => 'Creación de usuario',
+  'Users in domain' => 'Usuarios en el dominio',
   'Id' => 'Id',
   'Email' => 'Correo electrónico',
   'Name' => 'Nombre',
@@ -25,10 +29,13 @@ return array(
   'edit' => 'Editar',
   'Back' => 'Volver',
   'Back to the list' => 'Volver a la lista',
+  'Back to domain' => 'Volver al dominio',
   'Edit' => 'Editar',
   'Delete' => 'Borrar',
   'Create' => 'Crear',
   'Config' => 'Configuración',
   'Value' => 'Valor',
   'Save' => 'Guardar',
+  'Admin' => 'Administrador',
+  'Send welcome email' => 'Enviar correo de bienvenida',
 );

@@ -30,28 +30,6 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Enlaces<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li role="separator" class="divider"></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Búsquedas<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li role="separator" class="divider"></li>
-                        <li role="separator" class="divider"></li>
-                    </ul>
-                </li>
-              </ul>
-
-              <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Enlaces de ayuda<span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-                      <li><a href="https://docs.google.com/spreadsheets/d/1ZPleE6JWO_sQzjzViKb9SHLdFzUFHGv9g3GV-pphpak/edit" target="_blank">Hoja de cálculo</a></li>
-                  </ul>
-                </li>
                 {% if is_granted('ROLE_USER') %}
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menú de usuario<span class="caret"></span></a>
@@ -59,23 +37,27 @@
                   </ul>
                 </li>
                 {% endif %}
-            {% if is_granted('ROLE_MANAGER') %}
+              </ul>
+
+              <ul class="nav navbar-nav navbar-right">
+              {% if is_granted('ROLE_MANAGER') %}
                 <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gestión<span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans %}Management{% endtrans %}<span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li role="separator" class="divider"></li>
-                    <li><a href="https://drive.google.com/drive/folders/0B_Y_bq4UZLQiV3ROeHR3R3RfTjg">Enlace a csv Gdrive</a></li>
+                    <li><a href="{{ path('manage_user_index')}}">{% trans %}Domain users{% endtrans %}</a></li>
                 </ul>
                 </li>
-                {% endif %}
-                {% if is_granted('ROLE_ADMIN') %}
+              {% endif %}
+              {% if is_granted('ROLE_ADMIN') %}
                 <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans %}Admin{% endtrans %}<span class="caret"></span></a>
                   <ul class="dropdown-menu">
                     <li role="separator" class="divider"></li>
+                    <li><a href="{{ path('admin_domain_index')}}">{% trans %}Domain administration{% endtrans %}</a></li>
                   </ul>
                 </li>
-                {% endif %}
+              {% endif %}
                 <li>
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <a href="{{ path('logout') }}">Logout</a></li>

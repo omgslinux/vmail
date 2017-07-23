@@ -7,25 +7,28 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Entity\Domain;
 
 /**
  * User controller.
  *
- * @Route("user")
+ * @Route("/manage/user")
  */
 class UserController extends Controller
 {
     /**
      * Lists all user entities.
      *
-     * @Route("/", name="user_index")
+     * @Route("/", name="manage_user_index")
      * @Method("GET")
      */
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
 
-        $users = $em->getRepository('AppBundle:User')->findAll();
+        $user=$this->getUser();
+
+        $users = $em->getRepository('AppBundle:User')->findBy(['domain' => $user->getDomain()]);
 
         return $this->render('user/index.html.twig', array(
             'users' => $users,
@@ -35,7 +38,7 @@ class UserController extends Controller
     /**
      * Creates a new user entity.
      *
-     * @Route("/new", name="user_new")
+     * @Route("/new", name="manage_user_new")
      * @Method({"GET", "POST"})
      */
     public function newAction(Request $request)
@@ -64,7 +67,45 @@ class UserController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/{id}", name="user_show")
+     * @Route("/domain/{id}", name="manage_user_domain_show")
+     * @Method("GET")
+     */
+    public function showDomainAction(User $user)
+    {
+        $deleteForm = $this->createDeleteForm($user);
+
+        return $this->render('user/show.html.twig', array(
+            'user' => $user,
+            'delete_form' => $deleteForm->createView(),
+            'domain' => true,
+        ));
+    }
+
+    /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/show/byemail/{email}", name="manage_user_show_byemail")
+     * @Method("GET")
+     */
+    public function showByEmailAction($email)
+    {
+        $t=explode('@', $email);
+        dump($email);
+        $em = $this->getDoctrine()->getManager();
+        $domain=$em->getRepository('AppBundle:Domain')->findOneBy(['name' => $t[1]]);
+        $user=$em->getRepository('AppBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
+        $deleteForm = $this->createDeleteForm($user);
+
+        return $this->render('user/show.html.twig', array(
+            'user' => $user,
+            'delete_form' => $deleteForm->createView(),
+        ));
+    }
+
+    /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/show/byid/{id}", name="manage_user_show")
      * @Method("GET")
      */
     public function showAction(User $user)
@@ -80,18 +121,18 @@ class UserController extends Controller
     /**
      * Displays a form to edit an existing user entity.
      *
-     * @Route("/{id}/edit", name="user_edit")
+     * @Route("/{id}/edit", name="manage_user_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, User $user)
+    public function editAction(Request $request, User $user, $domain=false)
     {
         $deleteForm = $this->createDeleteForm($user);
         $editForm = $this->createForm('AppBundle\Form\UserType', $user);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
             if ($user->getPlainpassword()) {
-                $em = $this->getDoctrine()->getManager();
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
                 $user->setPassword($encodedPassword);
@@ -99,8 +140,11 @@ class UserController extends Controller
             $em->persist($user);
             $em->flush($user);
             //$this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('user_edit', array('id' => $user->getId()));
+            if ($domain) {
+                return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
+            } else {
+                return $this->redirectToRoute('manage_user_edit', array('id' => $user->getId()));
+            }
         }
 
         return $this->render('user/edit.html.twig', array(
@@ -113,7 +157,7 @@ class UserController extends Controller
     /**
      * Deletes a user entity.
      *
-     * @Route("/{id}", name="user_delete")
+     * @Route("/{id}", name="manage_user_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, User $user)
@@ -127,7 +171,7 @@ class UserController extends Controller
             $em->flush($user);
         }
 
-        return $this->redirectToRoute('user_index');
+        return $this->redirectToRoute('manage_user_index');
     }
 
     /**
@@ -140,7 +184,7 @@ class UserController extends Controller
     private function createDeleteForm(User $user)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('user_delete', array('id' => $user->getId())))
+            ->setAction($this->generateUrl('manage_user_delete', array('id' => $user->getId())))
             ->setMethod('DELETE')
             ->getForm()
         ;

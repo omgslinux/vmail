@@ -1,36 +1,41 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}Domain{% endtrans %}</h1>
+    <h1>{% trans %}Domain{% endtrans %} {{ domain }}</h1>
 
-    <table>
+    <table class="table table-bordered">
         <tbody>
             <tr>
-                <th>{% trans %}Id{% endtrans %}</th>
-                <td>{{ domain.id }}</td>
-            </tr>
-            <tr>
                 <th>{% trans %}Name{% endtrans %}</th>
-                <td>{{ domain.name }}</td>
+                <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             <tr>
-                <th>{% trans %}Active{% endtrans %}</th>
+                <td><a title="{% trans %}Edit{% endtrans %}" href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{{ domain.name }}</a></td>
                 <td>{{ domain.active }}</td>
             </tr>
         </tbody>
     </table>
 
-    <ul>
-        <li>
-            <a href="{{ path('admin_domain_index') }}">{% trans %}Back to the list{% endtrans %}</a>
-        </li>
-        <li>
-            <a href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{% trans %}Edit{% endtrans %}</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="{% trans %}Delete{% endtrans %}">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+    <h2>{% trans %}Users in domain{% endtrans %} {{ domain.name }}</h2>
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}User{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+            </tr>
+            {% for user in users %}{% set email = user.user ~ '@' ~ domain.name %}
+            <tr>
+                <td><a href="{{ path('manage_user_show_byemail', { 'email': email } ) }}">{{ email }}</td>
+                <td>{{ user.isActive ? '√' : '--' }}</td>
+                <td>{{ user.isAdmin ? '√' : '--' }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                  <a href="{{ path('admin_domain_user_new', { 'id': domain.id }) }}">{% trans %}Create a new user{% endtrans %}</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
 {% endblock %}

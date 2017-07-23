@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use AppBundle\Entity\Domain;
+use AppBundle\Entity\User;
 
 /**
  * Domain controller.
@@ -30,6 +31,41 @@ class DomainController extends Controller
 
         return $this->render('domain/index.html.twig', array(
             'domains' => $domains,
+        ));
+    }
+
+    /**
+     * Creates a new User in a Domain entity.
+     *
+     * @Route("/user/new/{id}", name="admin_domain_user_new")
+     * @Method({"GET", "POST"})
+     */
+    public function newUserAction(Request $request, Domain $domain)
+    {
+        //$em = $this->getDoctrine()->getManager();
+        //$fundbanks = $em->getRepository('AppBundle:FundBanks')->find($fund);
+        $user = new User();
+        $user->setDomain($domain);
+        $form = $this->createForm('AppBundle\Form\UserType', $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $encoder = $this->get('security.password_encoder');
+            $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
+            $user->setPassword($encodedPassword);
+            $em->persist($user);
+            $em->flush($user);
+
+            return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
+        }
+
+        return $this->render('default/edit.html.twig', array(
+            'domain' => $domain,
+            'action' => $this->get('translator')->trans('Create a new user'),
+            'backlink' => $this->generateUrl('admin_domain_index'),
+            'backmessage' => 'Back',
+            'create_form' => $form->createView(),
         ));
     }
 
@@ -146,16 +182,39 @@ class DomainController extends Controller
     /**
      * Creates a form to show a FundBanks entity.
      *
-     * @Route("/{id}", name="admin_domain_show")
+     * @Route("/show/byname/{name}", name="admin_domain_showbyname")
      * @Method({"GET", "POST"})
      */
-    public function showAction(Request $request, Domain $domain)
+    public function showByNameAction(Request $request, $name)
     {
+        $em = $this->getDoctrine()->getManager();
+        $domain=$em->getRepository('AppBundle:Domain')->findOneBy(['name' => $name]);
+        $users=$em->getRepository('AppBundle:User')->findBy(['domain' => $domain]);
         $deleteForm = $this->createDeleteForm($domain);
 
         return $this->render('domain/show.html.twig', array(
             'domain' => $domain,
             'delete_form' => $deleteForm->createView(),
+            'users' => $users,
+        ));
+    }
+
+    /**
+     * Creates a form to show a FundBanks entity.
+     *
+     * @Route("/show/byid/{id}", name="admin_domain_show")
+     * @Method({"GET", "POST"})
+     */
+    public function showAction(Request $request, Domain $domain)
+    {
+        $deleteForm = $this->createDeleteForm($domain);
+        $em = $this->getDoctrine()->getManager();
+        $users=$em->getRepository('AppBundle:User')->findBy(['domain' => $domain]);
+
+        return $this->render('domain/show.html.twig', array(
+            'domain' => $domain,
+            'delete_form' => $deleteForm->createView(),
+            'users' => $users,
         ));
     }
 

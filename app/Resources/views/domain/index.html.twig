@@ -3,44 +3,28 @@
 {% block body %}
     <h1>{% trans %}Domains list{% endtrans %}</h1>
 
-    <table>
+    <table class="table table-bordered">
         <thead>
             <tr>
-                <th>{% trans %}Id{% endtrans %}</th>
                 <th>{% trans %}Name{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
-                <th>{% trans %}Actions{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
         {% for domain in domains %}
             <tr>
-                <td><a href="{{ path('admin_domain_show', { 'id': domain.id }) }}">{{ domain.id }}</a></td>
-                <td>{{ domain.name }}</td>
+                <td><a href="{{ path('admin_domain_showbyname', { 'name': domain.name }) }}">{{ domain.name }}</td>
                 <td>{{ domain.active }}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('admin_domain_show', { 'id': domain.id }) }}">{% trans %}show{% endtrans %}</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{% trans %}edit{% endtrans %}</a>
-                        </li>
-                    </ul>
-                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    {% if is_granted('ROLE_ADMIN') %}
     <ul>
         <li>
             <a href="{{ path('admin_domain_new') }}">{% trans %}Create a new domain{% endtrans %}</a>
         </li>
     </ul>
+    {% endif %}
 
-    <ul>
-        <li>
-            <a href="{{ path('user_index') }}">{% trans %}Users list{% endtrans %}</a>
-        </li>
-    </ul>
 {% endblock %}

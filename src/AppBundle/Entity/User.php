@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\BooleanType;
 use AppBundle\Entity\Domain;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -86,6 +87,12 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="AutoreplyCache", mappedBy="user")
      */
     private $autoreplycache;
+
+    /**
+     * @var boolean
+     *
+     */
+    private $sendemail;
 
 
     /**
@@ -247,14 +254,48 @@ class User implements UserInterface
         return $this->admin;
     }
 
+    /**
+     * Set sendemail
+     *
+     * @return User
+     */
+    public function setSendemail($value)
+    {
+        $this->sendemail=$value;
+        return $this;
+    }
+
+    /**
+     * Get sendemail
+     *
+     * @return boolean
+     */
+    public function getSendemail()
+    {
+        return $this->sendemail;
+    }
+
     public function getRoles()
     {
-        return array('ROLE_USER');
+        if ($this->getDomain()->getId() === 0) {
+            return ['ROLE_ADMIN'];
+        } elseif ($this->isAdmin()) {
+            return ['ROLE_MANAGER'];
+        } elseif ($this->getId()) {
+            return ['ROLE_USER'];
+        } else {
+            return [];
+        }
     }
 
     public function getRol()
     {
-        return 'ROLE_USER';
+        $rol=$this->getRoles();
+        if (is_array($rol)) {
+          return $this->getRoles()[0];
+        } else {
+          return false;
+        }
     }
 
     public function eraseCredentials()

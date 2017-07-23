@@ -3,7 +3,7 @@
 {% block body %}
     <h1>{% trans %}User{% endtrans %}</h1>
 
-    <table>
+    <table class="table table-bordered">
         <tbody>
             <tr>
                 <th>Id</th>
@@ -19,22 +19,25 @@
             </tr>
             <tr>
                 <th>{% trans %}Active{% endtrans %}</th>
-                <td>{{ user.active }}</td>
+                <td>{{ user.isActive ? '√' : '--' }}</td>
+            </tr>
+            <tr>
+                <th>{% trans %}Admin{% endtrans %}</th>
+                <td>{{ user.isAdmin ? '√' : '--' }}</td>
             </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+            {% if domain is defined %}{% set editlink = path('manage_user_edit', { 'id': user.id }, { 'domain': domain }) %}
+            <a href="{{ path('admin_domain_show', { 'id': user.domain.id }) }}">{% trans %}Back to domain{% endtrans %}</a>
+            {% else %}{% set editlink = path('manage_user_edit', { 'id': user.id }) %}
+            <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+            {% endif %}
         </li>
         <li>
-            <a href="{{ path('user_edit', { 'id': user.id }) }}">{% trans %}Edit{% endtrans %}</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="{% trans %}Delete{% endtrans %}">
-            {{ form_end(delete_form) }}
+            <a href="{{ editlink }}">{% trans %}Edit{% endtrans %}</a>
         </li>
     </ul>
 {% endblock %}

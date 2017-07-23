@@ -25,7 +25,7 @@ class UserType extends AbstractType
         ->add('user')
         ->add('plainpassword', RepeatedType::class, array(
             'type' => PasswordType::class,
-            'required' => true,
+            'required' => false,
             'first_options' => array(
                 'label' => 'Password',
             ),
@@ -48,9 +48,13 @@ class UserType extends AbstractType
             'required' => false,
             )
         )
+        ->add('sendemail', CheckboxType::class, array(
+            'label' => 'Send welcome email',
+            'required' => false,
+            )
+        )
         ;
-        $builder
-        ->get('active')
+        $builder->get('active')
              ->addModelTransformer(new CallbackTransformer(
                  function ($booleanAsString) {
                      // transform the string to boolean
@@ -61,8 +65,8 @@ class UserType extends AbstractType
                      return (string)(int)$stringAsBoolean;
                  }
             )
-        )
-        ->get('admin')
+        );
+        $builder->get('admin')
              ->addModelTransformer(new CallbackTransformer(
                  function ($booleanAsString) {
                      // transform the string to boolean
@@ -73,8 +77,19 @@ class UserType extends AbstractType
                      return (string)(int)$stringAsBoolean;
                  }
             )
-        )
-        ;
+        );
+        $builder->get('sendemail')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($booleanAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$booleanAsString;
+                 },
+                 function ($stringAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$stringAsBoolean;
+                 }
+            )
+        );
     }
 
     /**
