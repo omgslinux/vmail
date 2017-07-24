@@ -25,7 +25,7 @@ return array(
   'Active' => 'Activo',
   'Actions' => 'Acciones',
   'show' => 'Mostrar',
-  'Password' => 'Constraseña',
+  'Password' => 'Contraseña',
   'Confirm password' => 'Repetir contraseña',
   'edit' => 'Editar',
   'Back' => 'Volver',

@@ -150,6 +150,11 @@ class UserController extends Controller
     {
         $deleteForm = $this->createDeleteForm($user);
         $editForm = $this->createForm('AppBundle\Form\UserType', $user);
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $usert=$this->getUser();
+            $user->setDomain($usert->getDomain());
+            $editForm->remove('domain');
+        }
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
