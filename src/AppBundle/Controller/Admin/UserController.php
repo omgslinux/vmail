@@ -45,6 +45,11 @@ class UserController extends Controller
     {
         $user = new User();
         $form = $this->createForm('AppBundle\Form\UserType', $user);
+        if ($this->isGranted('ROLE_MANAGER')) {
+            $usert=$this->getUser();
+            $user->setDomain($usert->getDomain());
+            $form->remove('domain');
+        }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -153,6 +158,7 @@ class UserController extends Controller
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
+                $encodedPassword = $encoder->encodePassword($user, $editForm->get('plainpassword')->getData());
                 $user->setPassword($encodedPassword);
             }
             $em->persist($user);

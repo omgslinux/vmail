@@ -42,6 +42,10 @@ class UserController extends Controller
     {
         $user=$this->getUser();
         $editForm = $this->createForm('AppBundle\Form\UserType', $user);
+        $editForm
+          ->remove('user')
+          ->remove('admin')
+          ->remove('domain');
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -50,6 +54,7 @@ class UserController extends Controller
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
+                $encodedPassword = $encoder->encodePassword($user, $editForm->get('plainpassword')->getData());
                 $user->setPassword($encodedPassword);
             }
             $em->persist($user);

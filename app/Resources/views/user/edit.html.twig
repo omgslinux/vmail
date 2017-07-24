@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}User edit{% endtrans %}</h1>
+    <h1>{% trans %}User edit{% endtrans %} {{ user.user }}@{{ user.domain }}</h1>
 
     {{ form_start(edit_form) }}
         {{ form_widget(edit_form) }}
@@ -9,9 +9,6 @@
     {{ form_end(edit_form) }}
 
     <ul>
-        <li>
-            <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
-        </li>
         {% if delete_form is defined %}
         <li>
             {{ form_start(delete_form) }}
