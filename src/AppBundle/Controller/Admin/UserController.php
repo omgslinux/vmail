@@ -45,7 +45,7 @@ class UserController extends Controller
     {
         $user = new User();
         $form = $this->createForm('AppBundle\Form\UserType', $user);
-        if ($this->isGranted('ROLE_MANAGER')) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
             $usert=$this->getUser();
             $user->setDomain($usert->getDomain());
             $form->remove('domain');
