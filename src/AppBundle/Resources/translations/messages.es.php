@@ -18,6 +18,7 @@ return array(
   'User edit' => 'Edición de usuario',
   'User creation' => 'Creación de usuario',
   'Users in domain' => 'Usuarios en el dominio',
+  'User profile' => 'Perfil del usuario',
   'Id' => 'Id',
   'Email' => 'Correo electrónico',
   'Name' => 'Nombre',

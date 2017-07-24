@@ -39,5 +39,4 @@ security:
     encoders:
       AppBundle\Entity\User:
         algorithm: bcrypt
-        cost: 7
         # algorithm: plaintext

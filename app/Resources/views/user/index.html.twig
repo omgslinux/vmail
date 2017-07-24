@@ -6,7 +6,6 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>{% trans %}Id{% endtrans %}</th>
                 <th>{% trans %}Email{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
                 <th>{% trans %}Admin{% endtrans %}</th>
@@ -14,21 +13,20 @@
         </thead>
         <tbody>
         {% for user in users %}
-            <tr>
-                <td><a href="{{ path('manage_user_show', { 'id': user.id }) }}">{{ user.id }}</a></td>
-                <td>{{ user.user }}@{{ user.domain }}</td>
-                <td>{{ user.isactive ? 'X' : 'No' }}</td>
-                <td>{{ user.isAdmin ? 'X' : 'No' }}</td>
+            <tr>{% set email = user.user ~ '@' ~ user.domain %}
+                <td><a href="{{ path('manage_user_show_byemail', { 'email': email }) }}">{{ email }}</td>
+                <td>{{ user.isactive ? '√' : '--' }}</td>
+                <td>{{ user.isAdmin ? '√' : '--' }}</td>
             </tr>
         {% endfor %}
+        {% if is_granted('ROLE_MANAGER') %}
+        <tr>
+            <td>
+                <a href="{{ path('manage_user_new') }}">{% trans %}Create a new user{% endtrans %}</a>
+            </td>
+        </tr>
         </tbody>
     </table>
-    {% if is_granted('ROLE_MANAGER') %}
-    <ul>
-        <li>
-            <a href="{{ path('manage_user_new') }}">{% trans %}Create a new user{% endtrans %}</a>
-        </li>
-    </ul>
     {% endif %}
 
 {% endblock %}

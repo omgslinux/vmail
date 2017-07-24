@@ -30,10 +30,12 @@
 
     <ul>
         <li>
-            {% if domain is defined %}{% set editlink = path('manage_user_edit', { 'id': user.id }, { 'domain': domain }) %}
+            {% if is_granted('ROLE_MANAGER') %}{% if domain is defined %}{% set editlink = path('manage_user_edit', { 'id': user.id }, { 'domain': domain }) %}
             <a href="{{ path('admin_domain_show', { 'id': user.domain.id }) }}">{% trans %}Back to domain{% endtrans %}</a>
             {% else %}{% set editlink = path('manage_user_edit', { 'id': user.id }) %}
             <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+            {% endif %}
+            {% else %}{% set editlink = path('user_self_edit') %}
             {% endif %}
         </li>
         <li>
