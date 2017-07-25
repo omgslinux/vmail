@@ -5,16 +5,16 @@ namespace AppBundle\Utils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use AppBundle\Entity\Config;
+use Doctrine\ORM\EntityManager;
 
 class ReadConfig
 {
     private $em;
     private $config;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(EntityManager $em)
     {
-        $this->container = $container;
-        $this->em = $this->container->get('doctrine.orm.entity_manager'); //   getDoctrine()->getManager();
+        $this->em = $em; //   getDoctrine()->getManager();
     }
 
     public function findParameter($parameter)

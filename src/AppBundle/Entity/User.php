@@ -68,6 +68,13 @@ class User implements UserInterface
     private $active=false;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="quota", type="integer")
+     */
+    private $quota=0;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="admin", type="boolean")
@@ -162,7 +169,7 @@ class User implements UserInterface
      */
     public function setPlainPassword($password)
     {
-        $this->plainpassword = $password;
+        $this->plainPassword = $password;
 
         return $this;
     }
@@ -228,6 +235,30 @@ class User implements UserInterface
     public function isActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Set quota
+     *
+     * @param integer $quota
+     *
+     * @return users
+     */
+    public function setQuota($quota)
+    {
+        $this->quota = $quota;
+
+        return $this;
+    }
+
+    /**
+     * Get quota
+     *
+     * @return integer
+     */
+    public function getQuota()
+    {
+        return $this->quota;
     }
 
     /**

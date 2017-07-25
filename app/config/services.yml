@@ -9,4 +9,4 @@ services:
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
     app.config:
       class: AppBundle\Utils\ReadConfig
-      arguments: ['@service_container']
+      arguments: ['@doctrine.orm.entity_manager']
