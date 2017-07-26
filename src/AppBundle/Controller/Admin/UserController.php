@@ -159,11 +159,11 @@ class UserController extends Controller
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $plainPassword = $editForm->get('plainpassword')->getData();
+            $plainPassword = $editForm->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-                $encodedPassword = $encoder->encodePassword($user, $editForm->get('plainpassword')->getData());
+                $encodedPassword = $encoder->encodePassword($user, $editForm->get('plainPassword')->getData());
                 $user->setPassword($encodedPassword);
             }
             $em->persist($user);
