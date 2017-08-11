@@ -27,19 +27,26 @@ class AutoreplyCacheController extends Controller
      */
     public function newAction(Request $request, $sender, $recipient, $body)
     {
+        //$body=file_get_contents('php://STDIN');
         $t=explode('@', $recipient);
-        //dump($email);
+
         $em = $this->getDoctrine()->getManager();
         $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
         $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
         $reply=$em->getRepository('VmailBundle:Autoreply')->findOneBy(['user' => $user, 'active' => true]);
-        if (!empty($reply)) {
 
-          $date=new \DateTime();
-          if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {
-              $lastcache=$em->getRepository('VmailBundle:AutoreplyCache')->findBy(['user'=>$user], ['order' => 'DESC'], 1);
-              $config=$this->get('app:config');
-              $delay=$config->findParameter('autoreply_delay')->getValue();
+        $deliverreply=false;
+        $date=new \DateTime();
+        if ($request->get('demo')) {
+          $deliverreply=true;
+        } else {
+          $this->get('vmail:deliver')->deliverMail($sender, $recipient, $body);
+          if (!empty($reply)) {
+            $date=new \DateTime();
+            if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {
+              $lastcache=$em->getRepository('VmailBundle:AutoreplyCache')->findBy(['user' => $user], ['order' => 'DESC'], 1);
+              $config=$this->get('vmail:config');
+              $delay=$config->findParameter('autoreply_delay');
               $lastcache->modify('+'.$delay.' h');
               if ($lastcache->format('Y-m-d H:i:s')>$date) {
                 $cache=new AutoreplyCache;
@@ -48,28 +55,22 @@ class AutoreplyCacheController extends Controller
                 $em->persist($cache);
                 $em->flush();
 
-                $this->sendReply($reply, $sender);
-
-                return $this->render('reply/newcache.html.twig', array(
-                    'item' => $reply,
-                ));
-
+                $deliverreply=true;
               }
+            }
           }
-          return $this->render('reply/show.html.twig', [
+        }
+
+        if ($deliverreply===true) {
+              $this->sendReply($reply, $sender);
+        }
+        return $this->render('reply/show.html.twig', [
             'item' => $reply
           ]
         );
-        }
 
-        $this->get('app:deliver')->deliverMail($sender, $recipient,$body);
 
         return $this->redirectToRoute('user_autoreply_show');
-    }
-
-    public function sendReply(Autoreply $reply, $body)
-    {
-
     }
 
     /**

@@ -20,7 +20,7 @@ class ReadConfig
     public function findParameter($parameter)
     {
         $this->config = $this->em->getRepository('VmailBundle:Config')->findOneBy(['name' => $parameter]);
-        return $this->config;
+        return $this->config->getValue();
     }
 
     public function findAll()
