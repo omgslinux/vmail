@@ -3,10 +3,26 @@
 {% block body %}
     <h1>{% trans %}User creation{% endtrans %}</h1>
 
-    {{ form_start(form) }}
+    {% if domain is defined %}
+    {{ form_start(create_form) }}
+    <div class="row">
+      <div class="col-md-3">
+        {{ form_row(create_form.user) }}
+        </div>
+        <div class="col-md5">@ {{ domain.name }}
+        </div>
+      </div>
+        {{ form_widget(create_form) }}
+        <input type="submit" value="{% trans %}Create{% endtrans %}" />
+    {{ form_end(create_form) }}
+
+    {% else %}
+    {{ form_start(create_form) }}
+        {{ form_widget(create_form.user) }} @ {{ user.domainName }}
         {{ form_widget(form) }}
         <input type="submit" value="{% trans %}Create{% endtrans %}" />
     {{ form_end(form) }}
+    {% endif %}
 
     <ul>
         <li>

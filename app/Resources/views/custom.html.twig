@@ -1,24 +1,116 @@
-{% extends 'base.html.twig' %}
 {% block crudform %}
 {% if create_form is defined %}
 <div class="form">
 {{ form_start(create_form) }}
 <div class="form-group">
     {{ form_widget(create_form) }}
-    <input type="submit" value="{% trans %}Save{% endtrans %}"  class="btn btn-success"/>
+    <input type="submit" value="Guardar"  class="btn btn-success"/>
 </div>
 {{ form_end(create_form) }}
 {% else %}
+  {% if edit_form is defined %}
 {{ form_start(edit_form) }}
 <div class="form-group">
     {{ form_widget(edit_form) }}
-    <input type="submit" value="{% trans %}Save{% endtrans %}"  class="btn btn-success"/>
+    <input type="submit" value="Guardar"  class="btn btn-success"/>
 </div>
 {{ form_end(edit_form) }}
 </div>
+    {% if delete_form is defined %}
 {{ form_start(delete_form) }}
     {{ form_widget(delete_form) }}
-    <input type="submit" value="{% trans %}Delete{% endtrans %}" class="btn btn-danger"/>
+    <input type="submit" value="Borrar" class="btn btn-danger"/>
 {{ form_end(delete_form) }}
+    {% endif %}
+  {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+<script type="text/javascript" src="{{ asset('shared/js/jquery-3.1.1.min.js') }}">
+</script>
+{% endblock %}
+
+{% block bootstrap %}
+        <script type="text/javascript" src="{{ asset('shared/js/bootstrap.min.js') }}">
+        </script>
+{% endblock %}
+
+{% block html5forms %}
+        <!-- Needed for Validation -->
+        <script type="text/javascript" src="{{ asset('shared/js/html5Forms.js') }}" data-webforms2-support="date" data-webforms2-force-js-validation="true" data-lang="qq">
+        </script>
+{% endblock %}
+
+
+{% block jsform %}
+{% if jsfieldname is defined %}
+<script>
+var $collectionHolder;
+
+// setup an "add a {{ jsfieldname }}" link
+var $addTagLink = $('<a href="#" class="add_{{ jsfieldname }}_link">{% trans %}Add{% endtrans %} {{ jsfieldlabel }}</a>');
+//var $addTagLink = $('<input type="submit" href="#" class="add_{{ jsfieldname }}_link">{% trans %}Add{% endtrans %} {{ jsfieldlabel }}</a>');
+var $newLinkLi = $('<li></li>').append($addTagLink);
+//var $newLinkLi = $('<td></td>').append($addTagLink);
+
+jQuery(document).ready(function() {
+    // Get the ul that holds the collection of {{ jsfieldname }}s
+    $collectionHolder = $('ul.{{ jsfieldname }}s');
+
+    // add the "add a {{ jsfieldname }}" anchor and li to the {{ jsfieldname }}s ul
+    $collectionHolder.append($newLinkLi);
+
+    // count the current form inputs we have (e.g. 2), use that as the new
+    // index when inserting a new item (e.g. 2)
+    $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+    $addTagLink.on('click', function(e) {
+        // prevent the link from creating a "#" on the URL
+        e.preventDefault();
+
+        // add a new {{ jsfieldname }} form (see next code block)
+        addTagForm($collectionHolder, $newLinkLi);
+    });
+});
+
+function addTagForm($collectionHolder, $newLinkLi) {
+    // Get the data-prototype explained earlier
+    var prototype = $collectionHolder.data('prototype');
+
+    // get the new index
+    var index = $collectionHolder.data('index');
+
+    // Replace '$$name$$' in the prototype's HTML to
+    // instead be a number based on how many items we have
+    var newForm = prototype.replace(/__name__/g, index);
+
+    // increase the index with one for the next item
+    $collectionHolder.data('index', index + 1);
+
+    // Display the form in the page in an li, before the "Add a {{ jsfieldname }}" link li
+    var $newFormLi = $('<tr></tr>').append(newForm);
+
+    // also add a remove button, just for this example
+    $newFormLi.append('<a href="#" class="remove-{{ jsfieldname }}">x</a>');
+    //$newFormLi.append('<td><div class="checkbox"> <label><input type="checkbox" id="appbundle_questions_{{ jsfieldname }}__name__delete" name="appbundle_questions[{{ jsfieldname }}][name][delete]" /></td>');
+
+    //var newFormLi = prototype.replace(/__name__/g, index);
+
+    $newLinkLi.before($newFormLi);
+
+    // handle the removal, just for this example
+    $('.remove-{{ jsfieldname }}').click(function(e) {
+        e.preventDefault();
+
+    $(this).parent().remove();
+
+    return false;
+
+    });
+
+}
+
+</script>
 {% endif %}
 {% endblock %}

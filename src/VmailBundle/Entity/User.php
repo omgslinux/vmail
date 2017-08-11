@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\BooleanType;
 use AppBundle\Entity\Domain;
+use AppBundle\Entity\Traits\ActivableEntityTrait;
+use AppBundle\Entity\Traits\UserInterfaceEntityTrait;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -16,6 +18,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    Use ActivableEntityTrait, UserInterfaceEntityTrait;
+
     /**
      * @var int
      *
@@ -35,21 +39,9 @@ class User implements UserInterface
     /**
      * @var string
      *
-     */
-    private $username;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="password", type="string", length=255)
      */
     private $password;
-
-    /**
-     * @var string
-     *
-     */
-    private $plainPassword;
 
     /**
      * @var domain
@@ -59,13 +51,6 @@ class User implements UserInterface
     private $domain;
 
     private $domainName;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="active", type="boolean")
-     */
-    private $active=false;
 
     /**
      * @var integer
@@ -86,14 +71,7 @@ class User implements UserInterface
      *
      * @ORM\OneToMany(targetEntity="Autoreply", mappedBy="user")
      */
-    private $autoreply;
-
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="AutoreplyCache", mappedBy="user")
-     */
-    private $autoreplycache;
+    private $replys;
 
     /**
      * @var boolean
@@ -161,30 +139,6 @@ class User implements UserInterface
     }
 
     /**
-     * Set plainpassword
-     *
-     * @param string $plainpassword
-     *
-     * @return users
-     */
-    public function setPlainPassword($password)
-    {
-        $this->plainPassword = $password;
-
-        return $this;
-    }
-
-    /**
-     * Get plainpassword
-     *
-     * @return string
-     */
-    public function getPlainPassword()
-    {
-        return $this->plainPassword;
-    }
-
-    /**
      * Set domain
      *
      * @param Domain $domain
@@ -213,28 +167,9 @@ class User implements UserInterface
         return $this->getDomain()->getName();
     }
 
-    /**
-     * Set active
-     *
-     * @param string $active
-     *
-     * @return users
-     */
-    public function setActive($active)
+    public function getEmail()
     {
-        $this->active = $active;
-
-        return $this;
-    }
-
-    /**
-     * Get active
-     *
-     * @return string
-     */
-    public function isActive()
-    {
-        return $this->active;
+        return $this->getUser() . '@' . $this->getDomainName();
     }
 
     /**
@@ -306,82 +241,43 @@ class User implements UserInterface
         return $this->sendemail;
     }
 
-    public function getRoles()
+    /**
+     * Get replys
+     *
+     * @return ArrayCollection
+     */
+    public function getReplys()
     {
-        if ($this->getDomain()->getId() === 0) {
-            return ['ROLE_ADMIN'];
-        } elseif ($this->isAdmin()) {
-            return ['ROLE_MANAGER'];
-        } elseif ($this->getId()) {
-            return ['ROLE_USER'];
-        } else {
-            return [];
-        }
+        return $this->replys;
     }
 
-    public function getRol()
+    /**
+     * Add reply
+     *
+     * @param Autoreply $reply
+     *
+     * @return User
+     */
+    public function addReply(Autoreply $reply)
     {
-        $rol=$this->getRoles();
-        if (is_array($rol)) {
-          return $this->getRoles()[0];
-        } else {
-          return false;
-        }
+        $this->replys->add($reply);
+        $reply->setReply($this);
+
+        return $this;
     }
 
-    public function eraseCredentials()
+    /**
+     * Remove reply
+     *
+     * @param Autoreply $reply
+     *
+     * @return User
+     */
+    public function removeReply(Autoreply $reply)
     {
+        $this->replys->removeElement($reply);
 
-    }
-
-    public function getSalt()
-    {
-        return null;
-    }
-
-    public function getUsername()
-    {
-        return $this->getUser() . '@' . $this->getDomainName();
-    }
-
-/*    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    public function isAccountNonLocked()
-    {
-        return true;
-    }
-
-    public function isCredentialsNonExpired()
-    {
-        return true;
-    }
-
-    public function isEnabled()
-    {
-        return $this->isActive();
-    }
-*/
-    public function serialize()
-    {
-        return serialize(array(
-          $this->id,
-          $this->user,
-          $this->password,
-          $this->active
-        ));
-    }
-
-    public function unserialize($serialized)
-    {
-        list(
-          $this->id,
-          $this->user,
-          $this->password,
-          $this->active,
-        ) = userialize($serialized);
+        return $this;
     }
 
     public function __toString()

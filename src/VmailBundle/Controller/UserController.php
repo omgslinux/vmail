@@ -41,31 +41,32 @@ class UserController extends Controller
     public function editAction(Request $request)
     {
         $user=$this->getUser();
-        $editForm = $this->createForm('AppBundle\Form\UserType', $user);
-        $editForm
+        $formOptions['showAutoreply']=($user->getReplys()?true:false);
+        $form = $this->createForm('AppBundle\Form\UserType', $user, $formOptions);
+        $form
           ->remove('user')
           ->remove('admin')
           ->remove('domain');
-        $editForm->handleRequest($request);
+        $form->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $plainPassword = $editForm->get('plainPassword')->getData();
+            $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-                $encodedPassword = $encoder->encodePassword($user, $editForm->get('plainPassword')->getData());
+                //$encodedPassword = $encoder->encodePassword($user, $editForm->get('plainPassword')->getData());
                 $user->setPassword($encodedPassword);
             }
             $em->persist($user);
-            $em->flush($user);
+            $em->flush();
             //$this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('user_self_show');
         }
 
         return $this->render('user/edit.html.twig', array(
             'user' => $user,
-            'edit_form' => $editForm->createView(),
+            'form' => $form->createView(),
         ));
     }
 

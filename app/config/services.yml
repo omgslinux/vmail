@@ -10,3 +10,7 @@ services:
     app.config:
       class: AppBundle\Utils\ReadConfig
       arguments: ['@doctrine.orm.entity_manager']
+
+    app.deliver:
+      class: AppBundle\Utils\DeliverMail
+      arguments: ['@doctrine.orm.entity_manager']

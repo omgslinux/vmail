@@ -1,17 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}User edit{% endtrans %} {{ user.user }}@{{ user.domain }}</h1>
+    <h1>{% trans %}Reply edit{% endtrans %} {{ user.user }}@{{ user.domain }}</h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
+    {{ form_start(edit_form) }}
+        {{ form_widget(edit_form) }}
         <input type="submit" value="{% trans %}Save{% endtrans %}" />
-    {{ form_end(form) }}
+    {{ form_end(edit_form) }}
 
-    {% if user.replys.count == 0 %}
-    <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
-
-    {% endif %}
     <ul>
         {% if delete_form is defined %}
         <li>

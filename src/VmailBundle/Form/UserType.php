@@ -8,11 +8,13 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
+use AppBundle\Form\AutoreplyType;
 
 class UserType extends AbstractType
 {
@@ -33,11 +35,6 @@ class UserType extends AbstractType
                 'label' => 'Confirm password',
             )
         ))
-        ->add('domain', EntityType::class, array (
-            'class' => 'AppBundle:Domain',
-            'label' => 'Domain'
-            )
-        )
         ->add('active', CheckboxType::class, array(
             'label' => 'Active',
             'required' => false,
@@ -54,6 +51,24 @@ class UserType extends AbstractType
             )
         )
         ;
+        if ($options['showDomain']) {
+            $builder
+            ->add('domain', EntityType::class, array (
+                'class' => 'AppBundle:Domain',
+                'label' => 'Domain'
+                )
+            )
+            ;
+        }
+        if ($options['showAutoreply']) {
+            $builder
+                ->add('replys', CollectionType::class, [
+                    'entry_type' => AutoreplyType::class,
+                    'by_reference' => false,
+                    'label' => ' '
+                ])
+            ;
+        }
         $builder->get('active')
              ->addModelTransformer(new CallbackTransformer(
                  function ($booleanAsString) {
@@ -98,7 +113,9 @@ class UserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\User'
+            'data_class' => 'AppBundle\Entity\User',
+            'showDomain' => false,
+            'showAutoreply' => false,
         ));
     }
 

@@ -44,12 +44,14 @@ class UserController extends Controller
     public function newAction(Request $request)
     {
         $user = new User();
-        $form = $this->createForm('AppBundle\Form\UserType', $user);
-        if (!$this->isGranted('ROLE_ADMIN')) {
+        $showDomain=($this->isGranted('ROLE_ADMIN'));
+/*        if (!$this->isGranted('ROLE_ADMIN')) {
             $usert=$this->getUser();
             $user->setDomain($usert->getDomain());
             $form->remove('domain');
         }
+*/
+       $form = $this->createForm('AppBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -95,7 +97,7 @@ class UserController extends Controller
     public function showByEmailAction($email)
     {
         $t=explode('@', $email);
-        dump($email);
+        //dump($email);
         $em = $this->getDoctrine()->getManager();
         $domain=$em->getRepository('AppBundle:Domain')->findOneBy(['name' => $t[1]]);
         $user=$em->getRepository('AppBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
@@ -149,21 +151,24 @@ class UserController extends Controller
     public function editAction(Request $request, User $user, $domain=false)
     {
         $deleteForm = $this->createDeleteForm($user);
-        $editForm = $this->createForm('AppBundle\Form\UserType', $user);
-        if (!$this->isGranted('ROLE_ADMIN')) {
+        $formOptions['showDomain']=$this->isGranted('ROLE_ADMIN');
+        $formOptions['showAutoreply']=($user->getReplys()?true:false);
+        $form = $this->createForm('AppBundle\Form\UserType', $user, $formOptions);
+
+        /*if (!$this->isGranted('ROLE_ADMIN')) {
             $usert=$this->getUser();
             $user->setDomain($usert->getDomain());
             $editForm->remove('domain');
-        }
-        $editForm->handleRequest($request);
+        }*/
+        $form->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $plainPassword = $editForm->get('plainPassword')->getData();
+            $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-                $encodedPassword = $encoder->encodePassword($user, $editForm->get('plainPassword')->getData());
+                //$encodedPassword = $encoder->encodePassword($user, $form->get('plainPassword')->getData());
                 $user->setPassword($encodedPassword);
             }
             $em->persist($user);
@@ -177,7 +182,7 @@ class UserController extends Controller
 
         return $this->render('user/edit.html.twig', array(
             'user' => $user,
-            'edit_form' => $editForm->createView(),
+            'form' => $form->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
     }

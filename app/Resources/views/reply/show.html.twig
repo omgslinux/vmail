@@ -22,7 +22,7 @@
                 <td>{{ user.password }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
-                <td>{% if user.replys.count %}√{% else %}<a href="{{ path('user_autoreply_new', { id: user.id }) }}">Crear{% endif %}</a></td>
+                <td>{{ user.replys.count ? '√' : '--' }}</td>
             </tr>
         </tbody>
     </table>

@@ -60,7 +60,7 @@ class DomainController extends Controller
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('default/edit.html.twig', array(
+        return $this->render('user/new.html.twig', array(
             'domain' => $domain,
             'action' => $this->get('translator')->trans('Create a new user'),
             'backlink' => $this->generateUrl('admin_domain_index'),

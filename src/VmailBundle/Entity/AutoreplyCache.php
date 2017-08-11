@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use AppBundle\Entity\Autoreply;
 
 /**
  * AutoreplyCache
@@ -22,18 +23,25 @@ class AutoreplyCache
     private $id;
 
     /**
-     * @var user
+     * @var Autoreply
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="autoreplycache")
+     * @ORM\ManyToOne(targetEntity="Autoreply", inversedBy="replys")
      */
-    private $user;
+    private $reply;
 
     /**
      * @var sender
      *
-     * @ORM\Column(name="sender", type="string")
+     * @ORM\Column(type="string", length=64)
      */
     private $sender;
+
+    /**
+     * @var sender
+     *
+     * @ORM\Column(type="string", length=64)
+     */
+    private $recipient;
 
     /**
      * @var \DateTime
@@ -42,6 +50,18 @@ class AutoreplyCache
      */
     private $datesent;
 
+    /**
+     * @var boolean
+     *
+     */
+    private $demo=false;
+
+
+    public function __construct()
+    {
+        $this->datesent=new \DateTime();
+        $this->datesent->format('Y-m-d h:i:s');
+    }
 
     /**
      * Get id
@@ -54,27 +74,28 @@ class AutoreplyCache
     }
 
     /**
-     * Set user
+     * Set reply
      *
-     * @param Users $user
+     * @param Autoreply $reply
      *
      * @return AutoreplyCache
      */
-    public function setUser(User $user)
+    public function setReply(Autoreply $reply)
     {
-        $this->user = $user;
+        $this->reply = $reply;
+        $this->setRecipient($reply->getUser()->getEmail());
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get reply
      *
      * @return string
      */
-    public function getUser()
+    public function getReply()
     {
-        return $this->user;
+        return $this->reply;
     }
 
     /**
@@ -102,6 +123,31 @@ class AutoreplyCache
     }
 
     /**
+     * Set recipient
+     *
+     * @param string $recipient
+     *
+     * @return AutoreplyCache
+     */
+    public function setRecipient($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Get recpient
+     *
+     * @return string
+     */
+    public function getRecipient()
+    {
+        return $this->sender;
+    }
+
+
+    /**
      * Set datesent
      *
      * @param \DateTime $datesent
@@ -124,4 +170,17 @@ class AutoreplyCache
     {
         return $this->datesent;
     }
+
+    public function setDemo($bool)
+    {
+        $this->demo = $bool;
+        return $this;
+    }
+
+    public function isDemo()
+    {
+        return $this->demo;
+    }
+
+
 }

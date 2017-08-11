@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use AppBundle\Entity\User;
+use AppBundle\Entity\Traits\ActivableEntityTrait;
 
 /**
  * Domains
@@ -14,6 +15,7 @@ use AppBundle\Entity\User;
  */
 class Domain
 {
+    Use ActivableEntityTrait;
     /**
      * @var int
      *
@@ -29,13 +31,6 @@ class Domain
      * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
     private $name;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="active", type="boolean", nullable=true)
-     */
-    private $active=false;
 
     /**
      * @var ArrayCollection
@@ -81,30 +76,6 @@ class Domain
     }
 
     /**
-     * Set active
-     *
-     * @param integer $active
-     *
-     * @return domains
-     */
-    public function setActive($active)
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
-    /**
-     * Get active
-     *
-     * @return int
-     */
-    public function getActive()
-    {
-        return $this->active;
-    }
-
-    /**
      * Get users
      *
      * @return ArrayCollection
@@ -119,12 +90,26 @@ class Domain
      *
      * @param User $users
      *
-     * @return domains
+     * @return Domain
      */
-    public function addUsers(User $user)
+    public function addUser(User $user)
     {
         $this->users->add($user);
-        $user->setUser($user);
+        $user->setUser($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param User $user
+     *
+     * @return Domain
+     */
+    public function removeUser(User $user)
+    {
+        $this->users->removeElement($user);
 
         return $this;
     }
