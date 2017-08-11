@@ -1,14 +1,14 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace VmailBundle\Controller;
 
-use AppBundle\Entity\User;
+use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Domain;
-use AppBundle\Entity\Autoreply;
+use VmailBundle\Entity\Domain;
+use VmailBundle\Entity\Autoreply;
 
 /**
  * Autoreply controller.
@@ -32,7 +32,7 @@ class AutoreplyController extends Controller
         }
         $reply=new Autoreply;
         $reply->setUser($user);
-        $form = $this->createForm('AppBundle\Form\AutoreplyType', $reply);
+        $form = $this->createForm('VmailBundle\Form\AutoreplyType', $reply);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -75,11 +75,11 @@ class AutoreplyController extends Controller
     {
         $user=$this->getUser();
         $em = $this->getDoctrine()->getManager();
-        $reply=$em->getRepository('AppBundle:Autoreply')->findOneBy(['user' => $user]);
+        $reply=$em->getRepository('VmailBundle:Autoreply')->findOneBy(['user' => $user]);
         if (empty($reply)) {
             return $this->redirectToRoute('user_autoreply_new');
         }
-        $editForm = $this->createForm('AppBundle\Form\AutoreplyType', $reply);
+        $editForm = $this->createForm('VmailBundle\Form\AutoreplyType', $reply);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

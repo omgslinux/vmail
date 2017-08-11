@@ -1,20 +1,20 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace VmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\BooleanType;
-use AppBundle\Entity\Domain;
-use AppBundle\Entity\Traits\ActivableEntityTrait;
-use AppBundle\Entity\Traits\UserInterfaceEntityTrait;
+use VmailBundle\Entity\Domain;
+use VmailBundle\Entity\Traits\ActivableEntityTrait;
+use VmailBundle\Entity\Traits\UserInterfaceEntityTrait;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Users
  *
  * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="VmailBundle\Repository\UserRepository")
  */
 class User implements UserInterface
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace VmailBundle\Controller;
 
-use AppBundle\Entity\User;
+use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Domain;
+use VmailBundle\Entity\Domain;
 
 /**
  * User controller.
@@ -42,7 +42,7 @@ class UserController extends Controller
     {
         $user=$this->getUser();
         $formOptions['showAutoreply']=($user->getReplys()?true:false);
-        $form = $this->createForm('AppBundle\Form\UserType', $user, $formOptions);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user, $formOptions);
         $form
           ->remove('user')
           ->remove('admin')

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Repository;
+namespace VmailBundle\Repository;
 
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\ORM\EntityRepository;
@@ -20,7 +20,7 @@ class UserRepository extends EntityRepository implements UserLoaderInterface
         $user=$a[0];
         $domain=$a[1];
         return $this->createQueryBuilder('u')
-            ->join('AppBundle:Domain', 'd', 'WITH', 'u.domain = d.id')
+            ->join('VmailBundle:Domain', 'd', 'WITH', 'u.domain = d.id')
             ->where('u.user = :user AND d.name = :domain')
             ->setParameter('user', $user)
             ->setParameter('domain', $domain)

@@ -1,9 +1,9 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace VmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use AppBundle\Entity\Autoreply;
+use VmailBundle\Entity\Autoreply;
 
 /**
  * AutoreplyCache

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Form;
+namespace VmailBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
-use AppBundle\Form\AutoreplyType;
+use VmailBundle\Form\AutoreplyType;
 
 class UserType extends AbstractType
 {
@@ -54,7 +54,7 @@ class UserType extends AbstractType
         if ($options['showDomain']) {
             $builder
             ->add('domain', EntityType::class, array (
-                'class' => 'AppBundle:Domain',
+                'class' => 'VmailBundle:Domain',
                 'label' => 'Domain'
                 )
             )
@@ -113,7 +113,7 @@ class UserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\User',
+            'data_class' => 'VmailBundle\Entity\User',
             'showDomain' => false,
             'showAutoreply' => false,
         ));

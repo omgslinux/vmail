@@ -1,10 +1,10 @@
 <?php
 
-namespace AppBundle\Utils;
+namespace VmailBundle\Utils;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-use AppBundle\Entity\Config;
+use VmailBundle\Entity\Config;
 use Doctrine\ORM\EntityManager;
 
 class DeliverMail
@@ -18,13 +18,13 @@ class DeliverMail
 
     public function findParameter($parameter)
     {
-        $this->config = $this->em->getRepository('AppBundle:Config')->findOneBy(['name' => $parameter]);
+        $this->config = $this->em->getRepository('VmailBundle:Config')->findOneBy(['name' => $parameter]);
         return $this->config;
     }
 
     public function findAll()
     {
-        $this->config = $this->em->getRepository('AppBundle\Entity\Config')->findAll();
+        $this->config = $this->em->getRepository('VmailBundle:Config')->findAll();
         return $this->config;
     }
 

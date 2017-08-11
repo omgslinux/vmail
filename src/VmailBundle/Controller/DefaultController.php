@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace VmailBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

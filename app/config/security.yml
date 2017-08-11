@@ -6,7 +6,7 @@ security:
     providers:
         users:
             entity:
-              class: AppBundle:User
+              class: VmailBundle:User
               #property: username
 
     firewalls:
@@ -41,6 +41,6 @@ security:
         ROLE_ADMIN: [ROLE_MANAGER, ROLE_USER]
         ROLE_MANAGER: [ROLE_USER]
     encoders:
-      AppBundle\Entity\User:
+      VmailBundle\Entity\User:
         algorithm: sha512
         # algorithm: plaintext

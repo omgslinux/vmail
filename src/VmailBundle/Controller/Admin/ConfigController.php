@@ -1,8 +1,8 @@
 <?php
 
-namespace AppBundle\Controller\Admin;
+namespace VmailBundle\Controller\Admin;
 
-use AppBundle\Entity\Config;
+use VmailBundle\Entity\Config;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -25,7 +25,7 @@ class ConfigController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $configs = $em->getRepository('AppBundle:Config')->findAll();
+        $configs = $em->getRepository('VmailBundle:Config')->findAll();
 
         return $this->render('config/index.html.twig', array(
             'configs' => $configs,
@@ -41,7 +41,7 @@ class ConfigController extends Controller
     public function newAction(Request $request)
     {
         $config = new Config();
-        $form = $this->createForm('AppBundle\Form\ConfigType', $config);
+        $form = $this->createForm('VmailBundle\Form\ConfigType', $config);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -83,7 +83,7 @@ class ConfigController extends Controller
     public function editAction(Request $request, Config $config)
     {
         $deleteForm = $this->createDeleteForm($config);
-        $editForm = $this->createForm('AppBundle\Form\ConfigType', $config);
+        $editForm = $this->createForm('VmailBundle\Form\ConfigType', $config);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

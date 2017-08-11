@@ -1,13 +1,13 @@
 <?php
 
-namespace AppBundle\Controller\Admin;
+namespace VmailBundle\Controller\Admin;
 
-use AppBundle\Entity\User;
+use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Domain;
+use VmailBundle\Entity\Domain;
 
 /**
  * User controller.
@@ -28,7 +28,7 @@ class UserController extends Controller
 
         $user=$this->getUser();
 
-        $users = $em->getRepository('AppBundle:User')->findBy(['domain' => $user->getDomain()]);
+        $users = $em->getRepository('VmailBundle:User')->findBy(['domain' => $user->getDomain()]);
 
         return $this->render('user/index.html.twig', array(
             'users' => $users,
@@ -51,7 +51,7 @@ class UserController extends Controller
             $form->remove('domain');
         }
 */
-       $form = $this->createForm('AppBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
+       $form = $this->createForm('VmailBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -99,8 +99,8 @@ class UserController extends Controller
         $t=explode('@', $email);
         //dump($email);
         $em = $this->getDoctrine()->getManager();
-        $domain=$em->getRepository('AppBundle:Domain')->findOneBy(['name' => $t[1]]);
-        $user=$em->getRepository('AppBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
+        $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
+        $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
         $deleteForm = $this->createDeleteForm($user);
 
         return $this->render('user/show.html.twig', array(
@@ -153,7 +153,7 @@ class UserController extends Controller
         $deleteForm = $this->createDeleteForm($user);
         $formOptions['showDomain']=$this->isGranted('ROLE_ADMIN');
         $formOptions['showAutoreply']=($user->getReplys()?true:false);
-        $form = $this->createForm('AppBundle\Form\UserType', $user, $formOptions);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user, $formOptions);
 
         /*if (!$this->isGranted('ROLE_ADMIN')) {
             $usert=$this->getUser();

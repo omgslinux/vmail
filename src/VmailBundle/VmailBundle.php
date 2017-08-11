@@ -1,9 +1,9 @@
 <?php
 
-namespace AppBundle;
+namespace VmailBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class AppBundle extends Bundle
+class VmailBundle extends Bundle
 {
 }

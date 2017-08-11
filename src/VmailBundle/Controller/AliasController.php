@@ -1,8 +1,8 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace VmailBundle\Controller;
 
-use AppBundle\Entity\Alias;
+use VmailBundle\Entity\Alias;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -25,7 +25,7 @@ class AliasController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $aliases = $em->getRepository('AppBundle:Alias')->findAll();
+        $aliases = $em->getRepository('VmailBundle:Alias')->findAll();
 
         return $this->render('alias/index.html.twig', array(
             'aliases' => $aliases,
@@ -41,7 +41,7 @@ class AliasController extends Controller
     public function newAction(Request $request)
     {
         $alias = new Alias();
-        $form = $this->createForm('AppBundle\Form\AliasType', $alias);
+        $form = $this->createForm('VmailBundle\Form\AliasType', $alias);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -83,7 +83,7 @@ class AliasController extends Controller
     public function editAction(Request $request, Alias $alias)
     {
         $deleteForm = $this->createDeleteForm($alias);
-        $editForm = $this->createForm('AppBundle\Form\AliasType', $alias);
+        $editForm = $this->createForm('VmailBundle\Form\AliasType', $alias);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

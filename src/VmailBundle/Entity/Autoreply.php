@@ -1,18 +1,18 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace VmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\Traits\ActivableEntityTrait;
-use AppBundle\Entity\AutoreplyCache;
-use AppBundle\Entity\Autoreply;
+use VmailBundle\Entity\Traits\ActivableEntityTrait;
+use VmailBundle\Entity\AutoreplyCache;
+use VmailBundle\Entity\Autoreply;
 
 /**
  * Autoreply
  *
  * @ORM\Table(name="autoreply")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="VmailBundle\Repository\UserRepository")
  */
 class Autoreply
 {

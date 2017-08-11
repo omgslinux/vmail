@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Utils;
+namespace VmailBundle\Utils;
 
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 
@@ -118,7 +118,7 @@ class ReadCSV extends ContainerAwareLoader
                                     $eval = '$classobject = new ' . $namespace .'\Entity\\'. $classname . '();';
                                     printf("eval (line %s): (%s)", __LINE__, $eval);
                                     eval($eval);
-                                    $classobject = $em->getRepository('AppBundle:' . $classname)
+                                    $classobject = $em->getRepository('VmailBundle:' . $classname)
                                         ->findOneBy(array($mappedby => $value));
                                     break;
                                 default:

@@ -1,13 +1,13 @@
 <?php
 
-namespace AppBundle\Controller\Admin;
+namespace VmailBundle\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use AppBundle\Entity\Domain;
-use AppBundle\Entity\User;
+use VmailBundle\Entity\Domain;
+use VmailBundle\Entity\User;
 
 /**
  * Domain controller.
@@ -27,7 +27,7 @@ class DomainController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $domains = $em->getRepository('AppBundle:Domain')->findAll();
+        $domains = $em->getRepository('VmailBundle:Domain')->findAll();
 
         return $this->render('domain/index.html.twig', array(
             'domains' => $domains,
@@ -43,10 +43,10 @@ class DomainController extends Controller
     public function newUserAction(Request $request, Domain $domain)
     {
         //$em = $this->getDoctrine()->getManager();
-        //$fundbanks = $em->getRepository('AppBundle:FundBanks')->find($fund);
+        //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $user = new User();
         $user->setDomain($domain);
-        $form = $this->createForm('AppBundle\Form\UserType', $user);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -78,9 +78,9 @@ class DomainController extends Controller
     public function newAction(Request $request)
     {
         //$em = $this->getDoctrine()->getManager();
-        //$fundbanks = $em->getRepository('AppBundle:FundBanks')->find($fund);
+        //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $domain = new Domain();
-        $form = $this->createForm('AppBundle\Form\DomainType', $domain);
+        $form = $this->createForm('VmailBundle\Form\DomainType', $domain);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -113,7 +113,7 @@ class DomainController extends Controller
     public function editAction(Request $request, Domain $domain)
     {
         $deleteForm = $this->createDeleteForm($domain);
-        $editform = $this->createForm('AppBundle\Form\DomainType', $domain);
+        $editform = $this->createForm('VmailBundle\Form\DomainType', $domain);
         $editform->handleRequest($request);
 
         if ($editform->isSubmitted() && $editform->isValid()) {
@@ -188,8 +188,8 @@ class DomainController extends Controller
     public function showByNameAction(Request $request, $name)
     {
         $em = $this->getDoctrine()->getManager();
-        $domain=$em->getRepository('AppBundle:Domain')->findOneBy(['name' => $name]);
-        $users=$em->getRepository('AppBundle:User')->findBy(['domain' => $domain]);
+        $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $name]);
+        $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain]);
         $deleteForm = $this->createDeleteForm($domain);
 
         return $this->render('domain/show.html.twig', array(
@@ -209,7 +209,7 @@ class DomainController extends Controller
     {
         $deleteForm = $this->createDeleteForm($domain);
         $em = $this->getDoctrine()->getManager();
-        $users=$em->getRepository('AppBundle:User')->findBy(['domain' => $domain]);
+        $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain]);
 
         return $this->render('domain/show.html.twig', array(
             'domain' => $domain,

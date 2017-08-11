@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace VmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Config
  *
  * @ORM\Table(name="config")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\ConfigRepository")
+ * @ORM\Entity(repositoryClass="VmailBundle\Repository\ConfigRepository")
  */
 class Config
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace VmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Alias
  *
  * @ORM\Table(name="alias")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\AliasRepository")
+ * @ORM\Entity(repositoryClass="VmailBundle\Repository\AliasRepository")
  */
 class Alias
 {

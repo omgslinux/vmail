@@ -1,15 +1,15 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace VmailBundle\Controller;
 
-use AppBundle\Entity\User;
+use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Domain;
-use AppBundle\Entity\Autoreply;
-use AppBundle\Entity\AutoreplyCache;
+use VmailBundle\Entity\Domain;
+use VmailBundle\Entity\Autoreply;
+use VmailBundle\Entity\AutoreplyCache;
 
 /**
  * AutoreplyCache controller.
@@ -30,14 +30,14 @@ class AutoreplyCacheController extends Controller
         $t=explode('@', $recipient);
         //dump($email);
         $em = $this->getDoctrine()->getManager();
-        $domain=$em->getRepository('AppBundle:Domain')->findOneBy(['name' => $t[1]]);
-        $user=$em->getRepository('AppBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
-        $reply=$em->getRepository('AppBundle:Autoreply')->findOneBy(['user' => $user, 'active' => true]);
+        $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
+        $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
+        $reply=$em->getRepository('VmailBundle:Autoreply')->findOneBy(['user' => $user, 'active' => true]);
         if (!empty($reply)) {
 
           $date=new \DateTime();
           if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {
-              $lastcache=$em->getRepository('AppBundle:AutoreplyCache')->findBy(['user'=>$user], ['order' => 'DESC'], 1);
+              $lastcache=$em->getRepository('VmailBundle:AutoreplyCache')->findBy(['user'=>$user], ['order' => 'DESC'], 1);
               $config=$this->get('app:config');
               $delay=$config->findParameter('autoreply_delay')->getValue();
               $lastcache->modify('+'.$delay.' h');
@@ -95,7 +95,7 @@ class AutoreplyCacheController extends Controller
      */
     public function editAction(Request $request, AutoreplyCache $cache)
     {
-        $editForm = $this->createForm('AppBundle\Form\AutoreplyType', $cache);
+        $editForm = $this->createForm('VmailBundle\Form\AutoreplyType', $cache);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

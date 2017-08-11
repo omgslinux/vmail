@@ -1,17 +1,17 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace VmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\User;
-use AppBundle\Entity\Traits\ActivableEntityTrait;
+use VmailBundle\Entity\User;
+use VmailBundle\Entity\Traits\ActivableEntityTrait;
 
 /**
  * Domains
  *
  * @ORM\Table(name="domain")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\DomainRepository")
+ * @ORM\Entity(repositoryClass="VmailBundle\Repository\DomainRepository")
  */
 class Domain
 {
