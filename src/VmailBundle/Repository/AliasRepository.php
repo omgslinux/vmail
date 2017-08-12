@@ -10,4 +10,36 @@ namespace VmailBundle\Repository;
  */
 class AliasRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findVirtualByDomain($domain)
+    {
+        //$qb = $this->get('VmailBundle:Virtual');
+        $qb = $this->createQueryBuilder('v');
+        $qb
+            ->select('v')
+            ->join('v.alias', 'u')
+            ->where('u.domain = :domain')
+            ->andWhere('u.list = 1')
+            ->setParameter('domain', $domain)
+        ;
+        $query = $qb->getQuery();
+        return $query->getResult();
+
+    }
+
+    public function findAliasByDomain($domain)
+    {
+        //$qb = $this->get('VmailBundle:Alias');
+        $qb = $this->createQueryBuilder('a');
+        $qb
+            ->select('a')
+            ->join('a.alias', 'u')
+            ->where('u.domain = :domain')
+            ->andWhere('u.list = 1')
+            ->setParameter('domain', $domain)
+        ;
+        $query = $qb->getQuery();
+        return $query->getResult();
+
+    }
+
 }

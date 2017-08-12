@@ -3,41 +3,30 @@
 {% block body %}
     <h1>Aliases list</h1>
 
-    <table>
+    <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Alias</th>
                 <th>Addresses</th>
                 <th>Active</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for alias in aliases %}
+            {% for alias in aliases %}
             <tr>
-                <td><a href="{{ path('alias_show', { 'id': alias.id }) }}">{{ alias.id }}</a></td>
-                <td>{{ alias.alias }}</td>
-                <td>{{ alias.addresses }}</td>
+                <td><a href="{{ path('alias_show', { 'id': alias.id }) }}">{{ alias.alias }}</td>
+                <td>{% for virtual in alias.virtuals %}
+                {{ virtual.address }}<br />
+                {% endfor %}</td>
                 <td>{{ alias.active }}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('alias_show', { 'id': alias.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('alias_edit', { 'id': alias.id }) }}">edit</a>
-                        </li>
-                    </ul>
-                </td>
             </tr>
-        {% endfor %}
+            {% endfor %}
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('alias_new') }}">Create a new alias</a>
+            <a href="{{ path('manage_alias_new') }}">Create a new alias</a>
         </li>
     </ul>
 {% endblock %}

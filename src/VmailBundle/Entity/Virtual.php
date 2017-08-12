@@ -6,12 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use VmailBundle\Entity\Traits\ActivableEntityTrait;
 
 /**
- * Alias
+ * Virtual
  *
- * @ORM\Table(name="alias")
+ * @ORM\Table(name="virtual_alias")
  * @ORM\Entity(repositoryClass="VmailBundle\Repository\AliasRepository")
  */
-class Alias
+class Virtual
 {
     Use ActivableEntityTrait;
     /**
@@ -26,7 +26,7 @@ class Alias
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="aliases")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="virtuals")
      */
     private $name;
 

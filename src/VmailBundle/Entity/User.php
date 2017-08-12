@@ -8,6 +8,8 @@ use Doctrine\DBAL\Types\BooleanType;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\Traits\ActivableEntityTrait;
 use VmailBundle\Entity\Traits\UserInterfaceEntityTrait;
+use VmailBundle\Entity\Virtual;
+use VmailBundle\Entity\Alias;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -32,7 +34,7 @@ class User implements UserInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="user", type="string", length=255)
+     * @ORM\Column(name="user", type="string", length=32)
      */
     private $user;
 
@@ -67,6 +69,13 @@ class User implements UserInterface
     private $admin=false;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_list", type="boolean")
+     */
+    private $list=false;
+
+    /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Autoreply", mappedBy="user")
@@ -74,11 +83,30 @@ class User implements UserInterface
     private $replys;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Alias", mappedBy="name")
+     */
+    private $aliases;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Virtual", mappedBy="name")
+     */
+    private $virtuals;
+
+    /**
      * @var boolean
      *
      */
-    private $sendemail;
+    private $sendEmail;
 
+
+    public function __construct()
+    {
+        $this->replys=new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -221,24 +249,48 @@ class User implements UserInterface
     }
 
     /**
-     * Set sendemail
+     * Set list
      *
-     * @return User
+     * @param boolean $bool
+     *
+     * @return users
      */
-    public function setSendemail($value)
+    public function setList($bool)
     {
-        $this->sendemail=$value;
+        $this->list = $bool;
+
         return $this;
     }
 
     /**
-     * Get sendemail
+     * Is list
      *
      * @return boolean
      */
-    public function getSendemail()
+    public function isList()
     {
-        return $this->sendemail;
+        return $this->list;
+    }
+
+    /**
+     * Set sendEmail
+     *
+     * @return User
+     */
+    public function setSendEmail($value)
+    {
+        $this->sendEmail=$value;
+        return $this;
+    }
+
+    /**
+     * Get sendEmail
+     *
+     * @return boolean
+     */
+    public function getSendEmail()
+    {
+        return $this->sendEmail;
     }
 
     /**
@@ -280,8 +332,86 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * Get aliases
+     *
+     * @return ArrayCollection
+     */
+    public function getAliases()
+    {
+        return $this->aliases;
+    }
+
+    /**
+     * Add alias
+     *
+     * @param Alias $alias
+     *
+     * @return User
+     */
+    public function addAlias(Alias $alias)
+    {
+        $this->aliases->add($alias);
+        $alias->setName($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove alias
+     *
+     * @param Alias $alias
+     *
+     * @return User
+     */
+    public function removeAlias(Alias $alias)
+    {
+        $this->aliases->removeElement($alias);
+
+        return $this;
+    }
+
+    /**
+     * Get virtuals
+     *
+     * @return ArrayCollection
+     */
+    public function getVirtuals()
+    {
+        return $this->virtuals;
+    }
+
+    /**
+     * Add virtual
+     *
+     * @param Virtual $alias
+     *
+     * @return User
+     */
+    public function addVirtual(Virtual $alias)
+    {
+        $this->virtuals->add($alias);
+        $alias->setName($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove virtual
+     *
+     * @param Virtual $alias
+     *
+     * @return User
+     */
+    public function removeVirtual(Virtual $alias)
+    {
+        $this->virtuals->removeElement($alias);
+
+        return $this;
+    }
+
     public function __toString()
     {
-        $this->getUser();
+        return $this->getUser();
     }
 }

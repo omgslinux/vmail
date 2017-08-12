@@ -2,6 +2,7 @@
 
 namespace VmailBundle\Controller;
 
+use VmailBundle\Entity\User;
 use VmailBundle\Entity\Alias;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -11,21 +12,23 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Alias controller.
  *
- * @Route("alias")
+ * @Route("/manage/alias")
  */
 class AliasController extends Controller
 {
     /**
      * Lists all alias entities.
      *
-     * @Route("/", name="alias_index")
+     * @Route("/", name="manage_alias_index")
      * @Method("GET")
      */
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
+        $user=$this->getUser();
+        $domain=$user->getDomainName();
 
-        $aliases = $em->getRepository('VmailBundle:Alias')->findAll();
+        $aliases = $em->getRepository('VmailBundle:Virtual')->findVirtualByDomain($domain);
 
         return $this->render('alias/index.html.twig', array(
             'aliases' => $aliases,
@@ -35,13 +38,21 @@ class AliasController extends Controller
     /**
      * Creates a new alias entity.
      *
-     * @Route("/new", name="alias_new")
+     * @Route("/new", name="manage_alias_new")
      * @Method({"GET", "POST"})
      */
     public function newAction(Request $request)
     {
-        $alias = new Alias();
-        $form = $this->createForm('VmailBundle\Form\AliasType', $alias);
+        $domain=$this->getUser()->getDomainName();
+
+        $user = new User();
+        $user->setList(true);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user, [
+          'showVirtual' => true,
+          'domain' => $domain,
+          'showList' => true,
+          ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,7 +64,7 @@ class AliasController extends Controller
         }
 
         return $this->render('alias/new.html.twig', array(
-            'alias' => $alias,
+            'domain' => $domain,
             'form' => $form->createView(),
         ));
     }
