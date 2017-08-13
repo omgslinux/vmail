@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+//use \Doctrine\ORM\EntityRepository;
 
 /**
  * Alias controller.
@@ -28,7 +29,19 @@ class AliasController extends Controller
         $user=$this->getUser();
         $domain=$user->getDomainName();
 
-        $aliases = $em->getRepository('VmailBundle:Virtual')->findVirtualByDomain($domain);
+        //$aliases = $em->getRepository('VmailBundle:User')->findByDomain($domain);
+        $qb=$em->createQueryBuilder();
+        $qb
+            ->select('u')
+            ->from('VmailBundle:User', 'u')
+            ->join('u.domain', 'd')
+            ->where('d.name = :domain')
+            ->andWhere('u.list = 1')
+            ->setParameter('domain', $domain)
+        ;
+        $aliases = $qb->getQuery()->getResult();
+        //return $query->getResult();
+
 
         return $this->render('alias/index.html.twig', array(
             'aliases' => $aliases,

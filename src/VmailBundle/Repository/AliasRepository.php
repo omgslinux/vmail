@@ -12,11 +12,11 @@ class AliasRepository extends \Doctrine\ORM\EntityRepository
 {
     public function findVirtualByDomain($domain)
     {
-        //$qb = $this->get('VmailBundle:Virtual');
-        $qb = $this->createQueryBuilder('v');
+        $qb = $this->get('VmailBundle:User');
+        $qb = $this->createQueryBuilder('u');
         $qb
-            ->select('v')
-            ->join('v.alias', 'u')
+            ->select('u')
+            ->join('u.alias', 'u')
             ->where('u.domain = :domain')
             ->andWhere('u.list = 1')
             ->setParameter('domain', $domain)

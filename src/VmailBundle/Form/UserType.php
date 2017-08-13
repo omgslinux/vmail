@@ -26,12 +26,111 @@ class UserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $userLabel='User';
+        $managePassword=true;
+        if ($options['showList']) {
+            $managePassword=false;
+            $options['showAutoreply']=false;
+            if ($options['showVirtual']) {
+                $userLabel='Alias';
+                $builder
+                  ->add('virtuals', CollectionType::class,
+                    [
+                      'entry_type' => AliasType::class,
+                      'by_reference' => false,
+                      'allow_add' => true,
+                      'allow_delete' => true
+                    ]
+                  )
+            ;
+            } else {
+                $builder
+                  ->add('aliases', CollectionType::class,
+                    [
+                      'entry_type' => AliasType::class,
+                      'by_reference' => false,
+                      'allow_add' => true,
+                      'allow_delete' => true
+                    ]
+                  )
+                ;
+            }
+        } else {
+            $builder
+            ->add('quota', IntegerType::class,
+              [
+                'label' => 'Quota',
+                'required' => false,
+              ]
+            )
+            ->add('admin', CheckboxType::class,
+              [
+                'label' => 'Admin',
+                'required' => false,
+              ]
+            )
+            ->get('admin')
+                 ->addModelTransformer(new CallbackTransformer(
+                     function ($booleanAsString) {
+                         // transform the string to boolean
+                         return (bool)(int)$booleanAsString;
+                     },
+                     function ($stringAsBoolean) {
+                         // transform the boolean to string
+                         return (string)(int)$stringAsBoolean;
+                     }
+                )
+            )
+            ->add('sendemail', CheckboxType::class,
+              [
+                'label' => 'Send welcome email',
+                'required' => false,
+              ]
+            )
+            ->get('sendemail')
+                 ->addModelTransformer(new CallbackTransformer(
+                     function ($booleanAsString) {
+                         // transform the string to boolean
+                         return (bool)(int)$booleanAsString;
+                     },
+                     function ($stringAsBoolean) {
+                         // transform the boolean to string
+                         return (string)(int)$stringAsBoolean;
+                     }
+                )
+            )
+            ;
+        }
+
+        if ($managePassword) {
+            $builder
+            ->add('plainPassword', RepeatedType::class,
+              [
+                'type' => PasswordType::class,
+                'required' => false,
+                'first_options' =>
+                [
+                  'label' => 'Password',
+                ],
+                'second_options' =>
+                [
+                  'label' => 'Confirm password',
+                ],
+              ]
+            );
+        }
+
         $builder
-        ->add('user')
-        ->add('active', CheckboxType::class, array(
+        ->add('user', TextType::class,
+          [
+            'label' => $userLabel
+          ]
+        )
+        ->add('active', CheckboxType::class,
+          [
             'label' => 'Active',
             'required' => false,
-            )
+          ]
         )
         ->get('active')
              ->addModelTransformer(new CallbackTransformer(
@@ -45,99 +144,26 @@ class UserType extends AbstractType
                  }
             )
         );
-        if ($options['showList']) {
-            $options['showAutoreply']=false;
-            if ($options['showVirtual']) {
-            $builder
-                ->add('virtuals', CollectionType::class, [
-                    'entry_type' => AliasType::class,
-                    'by_reference' => false,
-                    'allow_add' => true,
-                    'allow_delete' => true
-                  ]
-                )
-            ;
-            } else {
-              $builder
-                ->add('aliases', CollectionType::class, [
-                    'entry_type' => AliasType::class,
-                    'by_reference' => false,
-                    'allow_add' => true,
-                    'allow_delete' => true
-                  ]
-                )
-              ;
-            }
-        } else {
-        $builder
-        ->add('plainPassword', RepeatedType::class, [
-            'type' => PasswordType::class,
-            'required' => false,
-            'first_options' => array(
-                'label' => 'Password',
-            ),
-            'second_options' => [
-                'label' => 'Confirm password',
-            ]
-          ]
-        )
-        ->add('quota', IntegerType::class, array(
-            'label' => 'Quota',
-            'required' => false,
-            )
-        )
-        ->add('admin', CheckboxType::class, array(
-            'label' => 'Admin',
-            'required' => false,
-            )
-        )
-        ->add('sendemail', CheckboxType::class, array(
-            'label' => 'Send welcome email',
-            'required' => false,
-            )
-        )
-        ;
-        $builder->get('admin')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
-            )
-        );
-        $builder->get('sendemail')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
-            )
-        );
-        }
+
         if ($options['showDomain']) {
             $builder
-            ->add('domain', EntityType::class, array (
+            ->add('domain', EntityType::class,
+              [
                 'class' => 'VmailBundle:Domain',
                 'label' => 'Domain'
-                )
+              ]
             )
             ;
         }
         if ($options['showAutoreply']) {
             $builder
-                ->add('replys', CollectionType::class, [
-                    'entry_type' => AutoreplyType::class,
-                    'by_reference' => false,
-                    'label' => ' '
-                ])
+            ->add('replys', CollectionType::class,
+                [
+                  'entry_type' => AutoreplyType::class,
+                  'by_reference' => false,
+                  'label' => ' '
+                ]
+            )
             ;
         }
     }
@@ -147,14 +173,16 @@ class UserType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults(
+          [
             'data_class' => 'VmailBundle\Entity\User',
             'showDomain' => false,
             'showAutoreply' => false,
             'showList' => false,
             'showVirtual' => false,
             'domain' => false,
-        ));
+          ]
+        );
     }
 
     /**
