@@ -47,6 +47,7 @@ class AliasController extends Controller
 
         $user = new User();
         $user->setList(true);
+        $user->setPassword(false);
         $form = $this->createForm('VmailBundle\Form\UserType', $user, [
           'showVirtual' => true,
           'domain' => $domain,
@@ -57,10 +58,10 @@ class AliasController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($alias);
-            $em->flush($alias);
+            $em->persist($user);
+            $em->flush();
 
-            return $this->redirectToRoute('alias_show', array('id' => $alias->getId()));
+            return $this->redirectToRoute('manage_alias_show', array('id' => $user->getId()));
         }
 
         return $this->render('alias/new.html.twig', array(
@@ -72,48 +73,54 @@ class AliasController extends Controller
     /**
      * Finds and displays a alias entity.
      *
-     * @Route("/{id}", name="alias_show")
+     * @Route("/{id}", name="manage_alias_show")
      * @Method("GET")
      */
-    public function showAction(Alias $alias)
+    public function showAction(User $alias)
     {
-        $deleteForm = $this->createDeleteForm($alias);
 
         return $this->render('alias/show.html.twig', array(
-            'alias' => $alias,
-            'delete_form' => $deleteForm->createView(),
+            'item' => $alias,
         ));
     }
 
     /**
      * Displays a form to edit an existing alias entity.
      *
-     * @Route("/{id}/edit", name="alias_edit")
+     * @Route("/{id}/edit", name="manage_alias_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, Alias $alias)
+    public function editAction(Request $request, User $alias)
     {
+        $domain=$this->getUser()->getDomainName();
         $deleteForm = $this->createDeleteForm($alias);
-        $editForm = $this->createForm('VmailBundle\Form\AliasType', $alias);
+        $editForm = $this->createForm('VmailBundle\Form\UserType', $alias, [
+          'showVirtual' => true,
+          'domain' => $domain,
+          'showList' => true,
+          ]
+        );
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('alias_edit', array('id' => $alias->getId()));
+            return $this->redirectToRoute('mangae_alias_edit', array('id' => $alias->getId()));
         }
 
         return $this->render('alias/edit.html.twig', array(
-            'alias' => $alias,
+            'item' => $alias,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'jsfieldname' => 'virtual',
+            'jsfieldlabel' => 'correo'
         ));
     }
 
     /**
      * Deletes a alias entity.
      *
-     * @Route("/{id}", name="alias_delete")
+     * @Route("/{id}", name="manage_alias_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, Alias $alias)
@@ -137,10 +144,10 @@ class AliasController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm(Alias $alias)
+    private function createDeleteForm(User $alias)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('alias_delete', array('id' => $alias->getId())))
+            ->setAction($this->generateUrl('manage_alias_delete', array('id' => $alias->getId())))
             ->setMethod('DELETE')
             ->getForm()
         ;

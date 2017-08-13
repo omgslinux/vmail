@@ -4,18 +4,14 @@
     <h1>Alias edit</h1>
 
     {{ form_start(edit_form) }}
+        <ul class="virtuals" data-prototype="{{ form_widget(edit_form.virtuals.vars.prototype)|e('html_attr') }}">
         {{ form_widget(edit_form) }}
-        <input type="submit" value="Edit" />
+        {% block jsform %}{% endblock %}
     {{ form_end(edit_form) }}
 
     <ul>
         <li>
-            <a href="{{ path('alias_index') }}">Back to the list</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
+            <a href="{{ path('manage_alias_index') }}">Back to the list</a>
         </li>
     </ul>
 {% endblock %}

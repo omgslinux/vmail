@@ -13,8 +13,11 @@
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('vmaillogo.png') }}" sizes="16x16" />
     </head>
     <body>
-
         <nav class="navbar navbar-default">
+          {% block jquery %}{% endblock %}
+          {% block bootstrap %}{% endblock %}
+          {% block html5forms %}{% endblock %}
+
           <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -72,9 +75,6 @@
         </nav>
 
         <div class="container">
-          {% block jquery %}{% endblock %}
-          {% block bootstrap %}{% endblock %}
-          {% block html5forms %}{% endblock %}
           {% include 'custom.html.twig' %}
         {% block body %}{% endblock %}
         </div>

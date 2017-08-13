@@ -6,35 +6,23 @@
     <table>
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ alias.id }}</td>
+                <th>{% trans %}Email address{% endtrans %}</th>
+                <th>{% trans %}Addresses{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             <tr>
-                <th>Alias</th>
-                <td>{{ alias.alias }}</td>
-            </tr>
-            <tr>
-                <th>Addresses</th>
-                <td>{{ alias.addresses }}</td>
-            </tr>
-            <tr>
-                <th>Active</th>
-                <td>{{ alias.active }}</td>
+                <td><a href="{{ path('manage_alias_edit', { id: item.id }) }}">{{ item }}</a></td>
+                <td>{% for address in item.virtuals %}
+                {{ address.email }}</td>
+                {% endfor %}
+                <td>{{ item.active }}</td>
             </tr>
         </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('alias_index') }}">Back to the list</a>
-        </li>
-        <li>
-            <a href="{{ path('alias_edit', { 'id': alias.id }) }}">Edit</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
+            <a href="{{ path('manage_alias_index') }}">Back to the list</a>
         </li>
     </ul>
 {% endblock %}
