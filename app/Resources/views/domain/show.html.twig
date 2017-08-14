@@ -58,8 +58,12 @@
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-      <p>
-        <a href="{{ path('manage_domain_virtuals_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
+      <p>{% if domain.id==0 %}
+        <a href="{{ path('admin_alias_new') }}">
+      {% else %}
+        <a href="{{ path('manage_domain_virtuals_new', { 'id': domain.id }) }}">
+      {% endif %}
+        {% trans %}Create a new distribution list{% endtrans %}</a>
       </p>
 
 {% endblock %}

@@ -12,11 +12,11 @@ use VmailBundle\Entity\Domain;
 //use \Doctrine\ORM\EntityRepository;
 
 /**
- * Alias controller.
+ * Virtual controller.
  *
  * @Route("/manage/virtuals")
  */
-class AliasController extends Controller
+class VirtualController extends Controller
 {
     /**
      * Lists all alias entities.
