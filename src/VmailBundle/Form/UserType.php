@@ -27,82 +27,92 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $userLabel='User';
+        $domain=$options['domain'];
         $managePassword=true;
-        if ($options['showList']) {
+        if ($options['showVirtual'] || $options['showList']) {
             $managePassword=false;
             $options['showAutoreply']=false;
+            $userLabel='Alias';
             if ($options['showVirtual']) {
-                $userLabel='Alias';
                 $builder
                   ->add('virtuals', CollectionType::class,
                     [
                       'entry_type' => AliasType::class,
                       'by_reference' => false,
                       'allow_add' => true,
-                      'allow_delete' => true
+                      'allow_delete' => true,
+                      'entry_options' =>
+                      [
+                        'showVirtual' => true,
+                        'domain' => $domain
+                      ]
                     ]
                   )
-            ;
+                  ;
             } else {
                 $builder
-                  ->add('aliases', CollectionType::class,
+                ->add('aliases', CollectionType::class,
+                  [
+                    'entry_type' => AliasType::class,
+                    'by_reference' => false,
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'entry_options' =>
                     [
-                      'entry_type' => AliasType::class,
-                      'by_reference' => false,
-                      'allow_add' => true,
-                      'allow_delete' => true
+                      'domain' => 0
                     ]
-                  )
+                  ]
+                )
                 ;
             }
-        } else {
-            $builder
-            ->add('quota', IntegerType::class,
-              [
-                'label' => 'Quota',
-                'required' => false,
-              ]
-            )
-            ->add('admin', CheckboxType::class,
-              [
-                'label' => 'Admin',
-                'required' => false,
-              ]
-            )
-            ->get('admin')
-                 ->addModelTransformer(new CallbackTransformer(
-                     function ($booleanAsString) {
-                         // transform the string to boolean
-                         return (bool)(int)$booleanAsString;
-                     },
-                     function ($stringAsBoolean) {
-                         // transform the boolean to string
-                         return (string)(int)$stringAsBoolean;
-                     }
-                )
-            )
-            ->add('sendemail', CheckboxType::class,
-              [
-                'label' => 'Send welcome email',
-                'required' => false,
-              ]
-            )
-            ->get('sendemail')
-                 ->addModelTransformer(new CallbackTransformer(
-                     function ($booleanAsString) {
-                         // transform the string to boolean
-                         return (bool)(int)$booleanAsString;
-                     },
-                     function ($stringAsBoolean) {
-                         // transform the boolean to string
-                         return (string)(int)$stringAsBoolean;
-                     }
-                )
-            )
-            ;
         }
 
-        if ($managePassword) {
+        $builder
+        ->add('quota', IntegerType::class,
+          [
+            'label' => 'Quota',
+            'required' => false,
+          ]
+        )
+        ->add('admin', CheckboxType::class,
+          [
+            'label' => 'Admin',
+            'required' => false,
+          ]
+        )
+        ->get('admin')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($booleanAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$booleanAsString;
+                 },
+                 function ($stringAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$stringAsBoolean;
+                 }
+            )
+        )
+        ->add('sendemail', CheckboxType::class,
+          [
+            'label' => 'Send welcome email',
+            'required' => false,
+          ]
+        )
+        ->get('sendemail')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($booleanAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$booleanAsString;
+                 },
+                 function ($stringAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$stringAsBoolean;
+                 }
+            )
+        )
+        ;
+
+        if ($managePassword===true) {
             $builder
             ->add('plainPassword', RepeatedType::class,
               [
@@ -117,7 +127,8 @@ class UserType extends AbstractType
                   'label' => 'Confirm password',
                 ],
               ]
-            );
+            )
+            ;
         }
 
         $builder
@@ -143,7 +154,8 @@ class UserType extends AbstractType
                      return (string)(int)$stringAsBoolean;
                  }
             )
-        );
+        )
+        ;
 
         if ($options['showDomain']) {
             $builder
@@ -175,7 +187,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(
           [
-            'data_class' => 'VmailBundle\Entity\User',
+            //'data_class' => 'VmailBundle\Entity\User',
             'showDomain' => false,
             'showAutoreply' => false,
             'showList' => false,

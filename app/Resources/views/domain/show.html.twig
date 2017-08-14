@@ -38,4 +38,28 @@
         </tbody>
     </table>
 
+    <h2>{% trans %}Aliases in domain{% endtrans %} {{ domain.name }}</h2>
+
+    {% if lists %}
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+            </tr>
+            {% for list in lists %}{% set email = list.user ~ '@' ~ domain.name %}
+            <tr>
+                <td><a href="{{ path('manage_user_show_byemail', { 'email': list.email } ) }}">{{ email }}</td>
+                <td>{{ list.isActive ? '√' : '--' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+      <p>No hay alias definidos</p>
+    {% endif %}
+      <p>
+        <a href="{{ path('manage_domain_virtuals_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
+      </p>
+
 {% endblock %}

@@ -189,13 +189,15 @@ class DomainController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $name]);
-        $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain]);
+        $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 0]);
+        $lists=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
         $deleteForm = $this->createDeleteForm($domain);
 
         return $this->render('domain/show.html.twig', array(
             'domain' => $domain,
             'delete_form' => $deleteForm->createView(),
             'users' => $users,
+            'lists' => $lists,
         ));
     }
 

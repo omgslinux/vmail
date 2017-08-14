@@ -3,39 +3,52 @@
 namespace VmailBundle\Controller;
 
 use VmailBundle\Entity\User;
-use VmailBundle\Entity\Alias;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+use VmailBundle\Entity\Domain;
+
 //use \Doctrine\ORM\EntityRepository;
 
 /**
  * Alias controller.
  *
- * @Route("/manage/alias")
+ * @Route("/manage/virtuals")
  */
 class AliasController extends Controller
 {
     /**
      * Lists all alias entities.
      *
-     * @Route("/", name="manage_alias_index")
+     * @Route("/", name="manage_virtuals_index")
      * @Method("GET")
      */
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
         $user=$this->getUser();
-        $domain=$user->getDomainName();
+        $domain=$user->getDomain();
+
+        return $this->redirectToRoute('manage_domain_virtuals_index', ['id' => $domain->getId()]);
+    }
+
+    /**
+     * Lists all alias entities.
+     *
+     * @Route("/index/{id}", name="manage_domain_virtuals_index")
+     * @Method("GET")
+     */
+    public function domainindexAction(Domain $domain)
+    {
+        $user=$domain->getUser();
 
         //$aliases = $em->getRepository('VmailBundle:User')->findByDomain($domain);
         $qb=$em->createQueryBuilder();
         $qb
             ->select('u')
             ->from('VmailBundle:User', 'u')
-            ->join('u.domain', 'd')
-            ->where('d.name = :domain')
+            ->where('u.domain = :domain')
             ->andWhere('u.list = 1')
             ->setParameter('domain', $domain)
         ;
@@ -51,66 +64,84 @@ class AliasController extends Controller
     /**
      * Creates a new alias entity.
      *
-     * @Route("/new", name="manage_alias_new")
+     * @Route("/new/{id}", name="manage_domain_virtuals_new")
      * @Method({"GET", "POST"})
      */
-    public function newAction(Request $request)
+    public function domainnewAction(Request $request, Domain $domain=null)
     {
-        $domain=$this->getUser()->getDomainName();
+        if (is_null($domain)) {
+            $domain=$this->getUser()->getDomain();
+        }
 
-        $user = new User();
-        $user->setList(true);
-        $user->setPassword(false);
-        $form = $this->createForm('VmailBundle\Form\UserType', $user, [
+        $vuser = new User();
+        $vuser
+          ->setDomain($domain)
+          ->setList(true)
+          ->setPassword(false)
+        ;
+        $form = $this->createForm('VmailBundle\Form\UserType', $vuser, [
           'showVirtual' => true,
-          'domain' => $domain,
-          'showList' => true,
+          'domain' => $domain->getId(),
           ]
-        );
+        )
+        ;
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
+            $em->persist($vuser);
             $em->flush();
 
-            return $this->redirectToRoute('manage_alias_show', array('id' => $user->getId()));
+            return $this->redirectToRoute('manage_virtuals_show', array('id' => $vuser->getId()));
         }
 
         return $this->render('alias/new.html.twig', array(
-            'domain' => $domain,
             'form' => $form->createView(),
         ));
     }
 
     /**
+     * Creates a new alias entity.
+     *
+     * @Route("/new", name="manage_virtuals_new")
+     * @Method({"GET", "POST"})
+     */
+    public function newAction(Request $request)
+    {
+
+        $domain=$this->getUser()->getDomain();
+
+        return $this->redirectToRoute('manage__domain_virtuals_new', ['id' => $domain->getId()]);
+    }
+
+    /**
      * Finds and displays a alias entity.
      *
-     * @Route("/{id}", name="manage_alias_show")
+     * @Route("/show/{id}", name="manage_virtuals_show")
      * @Method("GET")
      */
-    public function showAction(User $alias)
+    public function showAction(User $vuser)
     {
 
         return $this->render('alias/show.html.twig', array(
-            'item' => $alias,
+            'item' => $vuser,
         ));
     }
 
     /**
      * Displays a form to edit an existing alias entity.
      *
-     * @Route("/{id}/edit", name="manage_alias_edit")
+     * @Route("/{id}/edit", name="manage_virtuals_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, User $alias)
+    public function editAction(Request $request, User $vuser)
     {
-        $domain=$this->getUser()->getDomainName();
-        $deleteForm = $this->createDeleteForm($alias);
-        $editForm = $this->createForm('VmailBundle\Form\UserType', $alias, [
+        $domain=$vuser->getDomain();
+        $deleteForm = $this->createDeleteForm($vuser);
+        $editForm = $this->createForm('VmailBundle\Form\UserType', $vuser,
+          [
           'showVirtual' => true,
-          'domain' => $domain,
-          'showList' => true,
+          'domain' => $domain->getId(),
           ]
         );
         $editForm->handleRequest($request);
@@ -118,12 +149,11 @@ class AliasController extends Controller
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('mangae_alias_edit', array('id' => $alias->getId()));
+            return $this->redirectToRoute('manage_virtuals_edit', array('id' => $vuser->getId()));
         }
 
         return $this->render('alias/edit.html.twig', array(
-            'item' => $alias,
-            'edit_form' => $editForm->createView(),
+            'form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
             'jsfieldname' => 'virtual',
             'jsfieldlabel' => 'correo'
@@ -133,34 +163,35 @@ class AliasController extends Controller
     /**
      * Deletes a alias entity.
      *
-     * @Route("/{id}", name="manage_alias_delete")
+     * @Route("/delete/{id}", name="manage_virtuals_delete")
      * @Method("DELETE")
      */
-    public function deleteAction(Request $request, Alias $alias)
+    public function deleteAction(Request $request, User $vuser)
     {
-        $form = $this->createDeleteForm($alias);
+        $domain=$vuser->getDomain();
+        $form = $this->createDeleteForm($vuser);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->remove($alias);
-            $em->flush($alias);
+            $em->remove($vuser);
+            $em->flush();
         }
 
-        return $this->redirectToRoute('alias_index');
+        return $this->redirectToRoute('manage_domain_virtuals_index', ['id' => $domain]);
     }
 
     /**
-     * Creates a form to delete a alias entity.
+     * Creates a form to delete a virtual entity.
      *
-     * @param Alias $alias The alias entity
+     * @param User $virtual The virtual user
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm(User $alias)
+    private function createDeleteForm(User $vuser)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('manage_alias_delete', array('id' => $alias->getId())))
+            ->setAction($this->generateUrl('manage_virtuals_delete', array('id' => $vuser->getId())))
             ->setMethod('DELETE')
             ->getForm()
         ;

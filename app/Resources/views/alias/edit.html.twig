@@ -3,12 +3,22 @@
 {% block body %}
     <h1>Alias edit</h1>
 
-    {{ form_start(edit_form) }}
-        <ul class="virtuals" data-prototype="{{ form_widget(edit_form.virtuals.vars.prototype)|e('html_attr') }}">
-        {{ form_widget(edit_form) }}
-        {% block jsform %}{% endblock %}
-    {{ form_end(edit_form) }}
-
+    {{ form_start(form) }}
+        <ul class="virtuals" data-prototype="{{ form_widget(form.virtuals.vars.prototype)|e('html_attr') }}">
+        <div class="row">
+          <div class="col-md-4">{% trans %}Email{% endtrans %}</div>
+          <div class="col-md-1">{% trans %}Active{% endtrans %}</div>
+          <div class="col-md-1">{% trans %}Delete?{% endtrans %}</div>
+        </div>
+        {% if form.virtuals is defined %}
+          {% for virtual in form.virtuals %}
+          {{ form_widget() }}
+          {% endfor %}
+          {{ do form.virtuals.setRendered }}
+          {% block jsform %}{% endblock %}
+        {% endif %}
+    {{ form_end(form) }}
+    {{ dumpData(form) }}
     <ul>
         <li>
             <a href="{{ path('manage_alias_index') }}">Back to the list</a>

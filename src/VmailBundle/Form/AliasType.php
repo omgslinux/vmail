@@ -18,32 +18,22 @@ class AliasType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $domain=(!empty($options['domain'])?$options['domain']:false);
-        $virtual=(!empty($options['showVirtual'])?$options['showVirtual']:false);
+        $aliastype=($options['showVirtual']?'virtuals':'aliases');
         $builder
-        ->add('address')
-        ->add('name', EntityType::class,[
+        ->add('name', EntityType::class,
+          [
             'class' => User::class,
             'label' => 'Email address',
-            'query_builder' => function (EntityRepository $er) use ($domain, $virtual) {
-              if ($virtual) {
-                $qb = $er->createQueryBuilder('u');
+            'query_builder' => function (EntityRepository $er) use ($domain) {
+                $qb = $er->createQueryBuilder('v');
                 $qb
                     ->select('u')
-                    ->join('u.domain', 'd')
-                    ->where('d.name = :domain')
+                    ->from('VmailBundle:User', 'u')
+                    //->join('VmailBundle:Virtual', 'v', 'WITH', 'u.id=v.name')
+                    ->where('u.domain = :domain')
                     ->andWhere('u.list = 0')
                     ->setParameter('domain', $domain)
                 ;
-              } else {
-                $qb = $er->createQueryBuilder('u');
-                $qb
-                    ->select('u')
-                    ->join('u.domain', 'd')
-                    ->where('u.domain = :domain')
-                    ->andWhere('u.list = 0')
-                    ->setParameter('domain', 0)
-                ;
-              }
                 return $qb;
             },
           ]
@@ -71,7 +61,7 @@ class AliasType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'VmailBundle\Entity\Alias',
+            //'data_class' => 'VmailBundle\Entity\Alias',
             'showVirtual' => false,
             'domain' => false,
         ));

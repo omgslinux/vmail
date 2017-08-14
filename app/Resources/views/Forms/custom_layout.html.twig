@@ -1,0 +1,17 @@
+{% extends 'bootstrap_3_layout.html.twig' %}
+
+{% block appbundle_alias_widget %}
+    <tr>
+        <td>{{ form_widget(form.name) }}</td>
+        <td>{{ form_widget(form.active) }}</td>
+        <td><a href="#" class="delete-alias btn btn-danger">X</a></td>
+    </tr>
+{%- endblock appbundle_alias_widget %}
+
+{% block appbundle_virtuals_widget %}
+    <tr>
+        <td>{{ form_widget(form.name) }}</td>
+        <td>{{ form_widget(form.active) }}</td>
+        <td><a href="#" class="delete-virtuals btn btn-danger">X</a></td>
+    </tr>
+{%- endblock appbundle_virtuals_widget %}
