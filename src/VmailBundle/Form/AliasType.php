@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use VmailBundle\Entity\User;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Doctrine\ORM\EntityRepository;
 
 class AliasType extends AbstractType
@@ -41,7 +42,11 @@ class AliasType extends AbstractType
         )
         ;
         $builder
-        ->add('active')
+        ->add('active', CheckboxType::class,
+          [
+            'required' => false
+          ]
+        )
         ->get('active')
              ->addModelTransformer(new CallbackTransformer(
                  function ($booleanAsString) {
