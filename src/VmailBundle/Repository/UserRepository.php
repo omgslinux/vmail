@@ -21,7 +21,7 @@ class UserRepository extends EntityRepository implements UserLoaderInterface
         $domain=$a[1];
         return $this->createQueryBuilder('u')
             ->join('VmailBundle:Domain', 'd', 'WITH', 'u.domain = d.id')
-            ->where('u.user = :user AND d.name = :domain')
+            ->where('u.name = :user AND d.name = :domain')
             ->setParameter('user', $user)
             ->setParameter('domain', $domain)
             ->getQuery()

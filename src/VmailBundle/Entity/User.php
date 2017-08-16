@@ -36,7 +36,7 @@ class User implements UserInterface
      *
      * @ORM\Column(name="user", type="string", length=32)
      */
-    private $user;
+    private $name;
 
     /**
      * @var string
@@ -119,27 +119,27 @@ class User implements UserInterface
     }
 
     /**
-     * Set user
+     * Set name
      *
-     * @param string $user
+     * @param string $name
      *
      * @return users
      */
-    public function setUser($user)
+    public function setName($user)
     {
-        $this->user = $user;
+        $this->name = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get name
      *
      * @return string
      */
-    public function getUser()
+    public function getName()
     {
-        return $this->user;
+        return $this->name;
     }
 
     /**
@@ -197,7 +197,7 @@ class User implements UserInterface
 
     public function getEmail()
     {
-        return $this->getUser() . '@' . $this->getDomainName();
+        return $this->getName() . '@' . $this->getDomainName();
     }
 
     /**
@@ -412,6 +412,6 @@ class User implements UserInterface
 
     public function __toString()
     {
-        return $this->getUser();
+        return $this->getName();
     }
 }

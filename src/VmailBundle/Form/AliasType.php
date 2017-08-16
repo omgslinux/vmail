@@ -12,13 +12,14 @@ use Doctrine\ORM\EntityRepository;
 
 class AliasType extends AbstractType
 {
+    private $type='aliases';
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $domain=(!empty($options['domain'])?$options['domain']:false);
-        $aliastype=($options['showVirtual']?'virtuals':'aliases');
+        $this->type=($options['showVirtual']?'virtuals':'aliases');
         $builder
         ->add('name', EntityType::class,
           [
@@ -72,7 +73,7 @@ class AliasType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'appbundle_alias';
+        return 'appbundle_'. $this->type;
     }
 
 

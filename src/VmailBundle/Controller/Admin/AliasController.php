@@ -31,7 +31,7 @@ class AliasController extends Controller
 
 
         return $this->render('alias/index.html.twig', array(
-            'aliases' => $aliases,
+            'items' => $aliases,
         ));
     }
 
@@ -54,6 +54,7 @@ class AliasController extends Controller
         ;
         $form = $this->createForm('VmailBundle\Form\UserType', $alias, [
           'domain' => $domain->getId(),
+          'showList' => true,
           ]
         )
         ;
@@ -99,6 +100,7 @@ class AliasController extends Controller
         $editForm = $this->createForm('VmailBundle\Form\UserType', $alias,
           [
           'domain' => $domain->getId(),
+          'showList' => true
           ]
         );
         $editForm->handleRequest($request);
@@ -109,10 +111,13 @@ class AliasController extends Controller
             return $this->redirectToRoute('admin_alias_edit', array('id' => $alias->getId()));
         }
 
+        //die(dump($editForm));
+
         return $this->render('alias/edit.html.twig', array(
+            'domain' => $domain,
             'form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-            'jsfieldname' => 'virtual',
+            'jsfieldname' => 'alias',
             'jsfieldlabel' => 'correo'
         ));
     }
@@ -120,7 +125,7 @@ class AliasController extends Controller
     /**
      * Deletes a alias entity.
      *
-     * @Route("/delete/{id}", name="manage_virtuals_delete")
+     * @Route("/delete/{id}", name="admin_alias_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, User $alias)

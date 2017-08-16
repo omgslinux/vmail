@@ -1,32 +1,50 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Aliases list</h1>
+{% block b1 %}
+  <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Alias</th>
+            <th>Addresses</th>
+            <th>Active</th>
+        </tr>
+    </thead>
+    <tbody>
+{% endblock %}
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Alias</th>
-                <th>Addresses</th>
-                <th>Active</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for alias in aliases %}
-            <tr>
-                <td><a href="{{ path('alias_show', { 'id': alias.id }) }}">{{ alias.alias }}</td>
-                <td>{% for virtual in alias.virtuals %}
-                {{ virtual.address }}<br />
-                {% endfor %}</td>
-                <td>{{ alias.active }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+{% block body %}
+    {% if domain is defined %}<h1>{% trans %}Aliases list in{% endtrans %} @{{ domain }}</h1>
+    {% set newpath = path('manage_domain_virtuals_new', { 'id': domain.id }) %}
+
+    {% else %}<h1>{% trans %}Aliases list{% endtrans %}</h1>
+    {% set newpath = path('admin_alias_new') %}
+    {% endif %}
+    {{ block('b1') }}
+
+        {% for item in items %}
+          <tr>
+          {% if domain is not defined %}
+            <td><a href="{{ path('admin_alias_show', { 'id': item.id }) }}">
+            {{ item.name }}</td>
+            <td>{% for alias in item.aliases %}
+              {{ alias.address }}<br />
+            {% endfor %}</td>
+          {% else %}
+            <td><a href="{{ path('manage_virtuals_show', { 'id': item.id }) }}">
+            {{ item.name }}</td>
+            <td>{% for alias in item.virtuals %}
+              {{ alias.address }}<br />
+            {% endfor %}</td>
+          {% endif %}
+          <td>{{ item.active }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
 
     <ul>
         <li>
-            <a href="{{ path('manage_alias_new') }}">Create a new alias</a>
+            <a href="{{ newpath }}">Create a new alias</a>
         </li>
     </ul>
 {% endblock %}

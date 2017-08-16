@@ -41,9 +41,10 @@ class VirtualController extends Controller
      */
     public function domainindexAction(Domain $domain)
     {
-        $user=$domain->getUser();
+        $user=$domain->getName();
 
         //$aliases = $em->getRepository('VmailBundle:User')->findByDomain($domain);
+        $em = $this->getDoctrine()->getManager();
         $qb=$em->createQueryBuilder();
         $qb
             ->select('u')
@@ -57,7 +58,8 @@ class VirtualController extends Controller
 
 
         return $this->render('alias/index.html.twig', array(
-            'aliases' => $aliases,
+            'domain' => $domain,
+            'items' => $aliases,
         ));
     }
 
@@ -81,10 +83,12 @@ class VirtualController extends Controller
         ;
         $form = $this->createForm('VmailBundle\Form\UserType', $vuser, [
           'showVirtual' => true,
+          'showList' => true,
           'domain' => $domain->getId(),
           ]
         )
         ;
+        $form->remove('virtuals');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -111,7 +115,7 @@ class VirtualController extends Controller
 
         $domain=$this->getUser()->getDomain();
 
-        return $this->redirectToRoute('manage__domain_virtuals_new', ['id' => $domain->getId()]);
+        return $this->redirectToRoute('manage_domain_virtuals_new', ['id' => $domain->getId()]);
     }
 
     /**
@@ -153,6 +157,7 @@ class VirtualController extends Controller
         }
 
         return $this->render('alias/edit.html.twig', array(
+            'domain' => $domain,
             'form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
             'jsfieldname' => 'virtual',

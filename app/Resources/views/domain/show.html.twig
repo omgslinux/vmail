@@ -23,7 +23,7 @@
             <tr>
                 <th>{% trans %}User{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
             </tr>
-            {% for user in users %}{% set email = user.user ~ '@' ~ domain.name %}
+            {% for user in users %}{% set email = user.name ~ '@' ~ domain.name %}
             <tr>
                 <td><a href="{{ path('manage_user_show_byemail', { 'email': email } ) }}">{{ email }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
@@ -47,9 +47,9 @@
             <tr>
                 <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
             </tr>
-            {% for list in lists %}{% set email = list.user ~ '@' ~ domain.name %}
+            {% for list in lists %}{% set email = list.name ~ '@' ~ domain.name %}
             <tr>
-                <td><a href="{{ path('manage_user_show_byemail', { 'email': list.email } ) }}">{{ email }}</td>
+                <td><a href="{{ path('manage_virtuals_show', { 'id': list.id } ) }}">{{ email }}</td>
                 <td>{{ list.isActive ? '√' : '--' }}</td>
             </tr>
             {% endfor %}

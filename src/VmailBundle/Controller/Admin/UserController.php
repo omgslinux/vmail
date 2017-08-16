@@ -100,7 +100,7 @@ class UserController extends Controller
         //dump($email);
         $em = $this->getDoctrine()->getManager();
         $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
-        $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
+        $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'name' => $t[0]]);
         $deleteForm = $this->createDeleteForm($user);
 
         return $this->render('user/show.html.twig', array(

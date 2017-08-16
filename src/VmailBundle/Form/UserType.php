@@ -3,10 +3,12 @@
 namespace VmailBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -29,6 +31,23 @@ class UserType extends AbstractType
         $userLabel='User';
         $domain=$options['domain'];
         $managePassword=true;
+        $builder
+        ->add('name', TextType::class,
+          [
+            'label' => $userLabel,
+            'attr' =>
+            [
+              'class' => 'col-md-5'
+            ]
+          ]
+        )
+        ->add('active', CheckboxType::class,
+          [
+            'label' => 'Active',
+            'required' => false,
+          ]
+        )
+        ;
         if ($options['showVirtual'] || $options['showList']) {
             $managePassword=false;
             $options['showAutoreply']=false;
@@ -65,52 +84,69 @@ class UserType extends AbstractType
                 )
                 ;
             }
-        }
+        } else {
+          $builder
+          ->add('quota', IntegerType::class,
+            [
+              'label' => 'Quota',
+              'required' => false,
+            ]
+          )
+          ->add('admin', CheckboxType::class,
+            [
+              'label' => 'Admin',
+              'required' => false,
+            ]
+          )
+          ->add('sendemail', CheckboxType::class,
+            [
+              'label' => 'Send welcome email',
+              'required' => false,
+            ]
+          )
+          ;
 
-        $builder
-        ->add('quota', IntegerType::class,
-          [
-            'label' => 'Quota',
-            'required' => false,
-          ]
-        )
-        ->add('admin', CheckboxType::class,
-          [
-            'label' => 'Admin',
-            'required' => false,
-          ]
-        )
-        ->get('admin')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
-            )
-        )
-        ->add('sendemail', CheckboxType::class,
-          [
-            'label' => 'Send welcome email',
-            'required' => false,
-          ]
-        )
-        ->get('sendemail')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
-            )
-        )
-        ;
+          $builder
+          ->get('active')
+               ->addModelTransformer(new CallbackTransformer(
+                   function ($booleanAsString) {
+                       // transform the string to boolean
+                       return (bool)(int)$booleanAsString;
+                   },
+                   function ($stringAsBoolean) {
+                       // transform the boolean to string
+                       return (string)(int)$stringAsBoolean;
+                   }
+              )
+          );
+          $builder
+          ->get('admin')
+               ->addModelTransformer(new CallbackTransformer(
+                   function ($booleanAsString) {
+                       // transform the string to boolean
+                       return (bool)(int)$booleanAsString;
+                   },
+                   function ($stringAsBoolean) {
+                       // transform the boolean to string
+                       return (string)(int)$stringAsBoolean;
+                   }
+              )
+          );
+          $builder
+          ->get('sendemail')
+               ->addModelTransformer(new CallbackTransformer(
+                   function ($booleanAsString) {
+                       // transform the string to boolean
+                       return (bool)(int)$booleanAsString;
+                   },
+                   function ($stringAsBoolean) {
+                       // transform the boolean to string
+                       return (string)(int)$stringAsBoolean;
+                   }
+              )
+          )
+          ;
+        }
 
         if ($managePassword===true) {
             $builder
@@ -130,32 +166,6 @@ class UserType extends AbstractType
             )
             ;
         }
-
-        $builder
-        ->add('user', TextType::class,
-          [
-            'label' => $userLabel
-          ]
-        )
-        ->add('active', CheckboxType::class,
-          [
-            'label' => 'Active',
-            'required' => false,
-          ]
-        )
-        ->get('active')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
-            )
-        )
-        ;
 
         if ($options['showDomain']) {
             $builder
@@ -178,6 +188,12 @@ class UserType extends AbstractType
             )
             ;
         }
+        $builder
+        ->add('submit', SubmitType::class,
+        [
+          'label' => 'Save'
+        ]
+      );
     }
 
     /**

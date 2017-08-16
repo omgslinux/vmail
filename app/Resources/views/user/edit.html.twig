@@ -1,14 +1,45 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}User edit{% endtrans %} {{ user.user }}@{{ user.domain }}</h1>
+    {% if delete_form is defined %}
+    <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
+    {% else %}
+    <h1>{% trans %}User creation{% endtrans %} @{{ user.domainName }}</h1>
+    {% endif %}
 
     {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <input type="submit" value="{% trans %}Save{% endtrans %}" />
+    <div class="row">
+      <div class="col-md-3">
+        {{ form_widget(form.name) }}
+      </div>
+      {% if form.domain is defined %}
+      <div class="col-md-3">
+        {{ form_widget(form.domain) }}
+      </div>
+      {% endif %}
+      <div class="col-md-2">
+        {{ form_widget(form.quota) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        {{ form_widget(form.admin) }}
+      </div>
+      <div class="col-md-4">
+        {{ form_widget(form.active) }}
+      </div>
+      <div class="col-md-4">
+        {{ form_widget(form.sendemail) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(form.plainPassword) }}
+      </div>
+    </div>
     {{ form_end(form) }}
 
-    {% if user.replys.count == 0 %}
+    {% if user.replys.count == 0 and form.autoreply is defined %}
     <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
 
     {% endif %}

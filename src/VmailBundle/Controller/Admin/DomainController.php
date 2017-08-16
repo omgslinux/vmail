@@ -46,7 +46,7 @@ class DomainController extends Controller
         //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $user = new User();
         $user->setDomain($domain);
-        $form = $this->createForm('VmailBundle\Form\UserType', $user);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user,['showAutoreply' => false] );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -60,12 +60,12 @@ class DomainController extends Controller
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('user/new.html.twig', array(
-            'domain' => $domain,
+        return $this->render('user/edit.html.twig', array(
+            'user' => $user,
             'action' => $this->get('translator')->trans('Create a new user'),
             'backlink' => $this->generateUrl('admin_domain_index'),
             'backmessage' => 'Back',
-            'create_form' => $form->createView(),
+            'form' => $form->createView(),
         ));
     }
 
@@ -212,6 +212,8 @@ class DomainController extends Controller
         $deleteForm = $this->createDeleteForm($domain);
         $em = $this->getDoctrine()->getManager();
         $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain]);
+
+        return $this->redirectToRoute('admin_domain_showbyname', ['name' => $domain->getName()]);
 
         return $this->render('domain/show.html.twig', array(
             'domain' => $domain,

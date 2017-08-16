@@ -95,7 +95,7 @@ class Domain
     public function addUser(User $user)
     {
         $this->users->add($user);
-        $user->setUser($this);
+        $user->setName($this);
 
         return $this;
     }
