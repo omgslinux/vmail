@@ -18,29 +18,23 @@ class AliasType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $domain=(!empty($options['domain'])?$options['domain']:false);
+        $domain=$options['domain'];
         $builder
         ->add('aliasname', EntityType::class,
           [
-            'class' => User::class,
+            'class' => 'VmailBundle:User',
             'label' => 'Alias address',
             'query_builder' => function (EntityRepository $er) use ($domain) {
-                $qb = $er->createQueryBuilder('v');
-                if ($domain===0) {
+                $qb = $er->createQueryBuilder('u');
+                if ($domain!=0) {
                   $qb
-                      ->select('u.email')
-                      ->from('VmailBundle:User', 'u')
-                      //->where('u.domain = :domain')
-                      ->andWhere('u.list = 0')
-                      //->setParameter('domain', $domain)
+                      ->where('u.list = 0')
+                      ->andWhere('u.domain = :domain')
+                      ->setParameter('domain', $domain)
                   ;
                 } else {
                   $qb
-                      ->select('u')
-                      ->from('VmailBundle:User', 'u')
-                      ->where('u.domain = :domain')
-                      ->andWhere('u.list = 0')
-                      ->setParameter('domain', $domain)
+                      ->where('u.list = 0')
                   ;
                 }
                 return $qb;

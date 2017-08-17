@@ -19,7 +19,6 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use VmailBundle\Form\AliasType;
 use VmailBundle\Form\AutoreplyType;
-use VmailBundle\Entity\Virtual;
 
 class UserType extends AbstractType
 {
