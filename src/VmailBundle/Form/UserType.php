@@ -74,19 +74,6 @@ class UserType extends AbstractType
           ;
 
           $builder
-          ->get('active')
-               ->addModelTransformer(new CallbackTransformer(
-                   function ($booleanAsString) {
-                       // transform the string to boolean
-                       return (bool)(int)$booleanAsString;
-                   },
-                   function ($stringAsBoolean) {
-                       // transform the boolean to string
-                       return (string)(int)$stringAsBoolean;
-                   }
-              )
-          );
-          $builder
           ->get('admin')
                ->addModelTransformer(new CallbackTransformer(
                    function ($booleanAsString) {
@@ -131,6 +118,19 @@ class UserType extends AbstractType
           ]
         )
         ;
+        $builder
+        ->get('active')
+             ->addModelTransformer(new CallbackTransformer(
+                 function ($booleanAsString) {
+                     // transform the string to boolean
+                     return (bool)(int)$booleanAsString;
+                 },
+                 function ($stringAsBoolean) {
+                     // transform the boolean to string
+                     return (string)(int)$stringAsBoolean;
+                 }
+            )
+        );
 
         if ($managePassword===true) {
             $builder
@@ -187,7 +187,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(
           [
-            //'data_class' => 'VmailBundle\Entity\User',
+            'data_class' => 'VmailBundle\Entity\User',
             'showDomain' => false,
             'showAutoreply' => false,
             'showList' => false,
@@ -202,7 +202,7 @@ class UserType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'appbundle_user';
+        return 'vmailbundle_user';
     }
 
 

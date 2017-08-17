@@ -13,7 +13,7 @@
             <tr>
               {% set backpath = path('manage_alias_index', { 'id': item.id }) %}
                 <td><a href="{{ path('manage_alias_edit', { id: item.id }) }}">{{ item }}</a></td>
-                <td>{% for address in item.aliases %}
+                <td>{% for address in item.aliasnames %}
                 {{ address.email }}</td>
                 {% endfor %}
                 <td>{{ item.active }}</td>

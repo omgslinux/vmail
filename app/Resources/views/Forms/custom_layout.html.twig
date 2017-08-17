@@ -1,9 +1,9 @@
 {% extends 'bootstrap_3_layout.html.twig' %}
 
-{% block vmailbundle_addressname_widget %}
+{% block _vmailbundle_user_addressnames_widget %}
     <tr>
-        <td>{{ form_widget(form.addressname) }}</td>
+        <td>{{ form_widget(form.aliasname) }}</td>
         <td>{{ form_widget(form.active) }}</td>
         <td><a href="#" class="delete-alias btn btn-danger">X</a></td>
     </tr>
-{%- endblock vmailbundle_addressname_widget %}
+{%- endblock _vmailbundle_user_addressnames_widget %}

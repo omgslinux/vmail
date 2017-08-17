@@ -85,7 +85,7 @@ class AliasType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'appbundle_alias';
+        return 'vmailbundle_alias';
     }
 
 
