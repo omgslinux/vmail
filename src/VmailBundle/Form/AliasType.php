@@ -13,29 +13,36 @@ use Doctrine\ORM\EntityRepository;
 
 class AliasType extends AbstractType
 {
-    private $type='aliases';
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $domain=(!empty($options['domain'])?$options['domain']:false);
-        $this->type=($options['showVirtual']?'virtuals':'aliases');
         $builder
-        ->add('name', EntityType::class,
+        ->add('aliasname', EntityType::class,
           [
             'class' => User::class,
-            'label' => 'Email address',
+            'label' => 'Alias address',
             'query_builder' => function (EntityRepository $er) use ($domain) {
                 $qb = $er->createQueryBuilder('v');
-                $qb
-                    ->select('u')
-                    ->from('VmailBundle:User', 'u')
-                    //->join('VmailBundle:Virtual', 'v', 'WITH', 'u.id=v.name')
-                    ->where('u.domain = :domain')
-                    ->andWhere('u.list = 0')
-                    ->setParameter('domain', $domain)
-                ;
+                if ($domain===0) {
+                  $qb
+                      ->select('u.email')
+                      ->from('VmailBundle:User', 'u')
+                      //->where('u.domain = :domain')
+                      ->andWhere('u.list = 0')
+                      //->setParameter('domain', $domain)
+                  ;
+                } else {
+                  $qb
+                      ->select('u')
+                      ->from('VmailBundle:User', 'u')
+                      ->where('u.domain = :domain')
+                      ->andWhere('u.list = 0')
+                      ->setParameter('domain', $domain)
+                  ;
+                }
                 return $qb;
             },
           ]
@@ -47,7 +54,8 @@ class AliasType extends AbstractType
             'required' => false
           ]
         )
-        ->get('active')
+        ;
+        $builder->get('active')
              ->addModelTransformer(new CallbackTransformer(
                  function ($booleanAsString) {
                      // transform the string to boolean
@@ -67,8 +75,7 @@ class AliasType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            //'data_class' => 'VmailBundle\Entity\Alias',
-            'showVirtual' => false,
+            'data_class' => 'VmailBundle\Entity\Alias',
             'domain' => false,
         ));
     }
@@ -78,7 +85,7 @@ class AliasType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'appbundle_'. $this->type;
+        return 'appbundle_alias';
     }
 
 

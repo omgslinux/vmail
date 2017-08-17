@@ -31,30 +31,13 @@ class UserType extends AbstractType
         $userLabel='User';
         $domain=$options['domain'];
         $managePassword=true;
-        $builder
-        ->add('name', TextType::class,
-          [
-            'label' => $userLabel,
-            'attr' =>
-            [
-              'class' => 'col-md-5'
-            ]
-          ]
-        )
-        ->add('active', CheckboxType::class,
-          [
-            'label' => 'Active',
-            'required' => false,
-          ]
-        )
-        ;
-        if ($options['showVirtual'] || $options['showList']) {
+        if ($options['showAlias'] || $options['showList']) {
             $managePassword=false;
             $options['showAutoreply']=false;
             $userLabel='Alias';
-            if ($options['showVirtual']) {
+            if ($options['showAlias']) {
                 $builder
-                  ->add('virtuals', CollectionType::class,
+                  ->add('addressnames', CollectionType::class,
                     [
                       'entry_type' => AliasType::class,
                       'by_reference' => false,
@@ -62,27 +45,11 @@ class UserType extends AbstractType
                       'allow_delete' => true,
                       'entry_options' =>
                       [
-                        'showVirtual' => true,
                         'domain' => $domain
                       ]
                     ]
                   )
                   ;
-            } else {
-                $builder
-                ->add('aliases', CollectionType::class,
-                  [
-                    'entry_type' => AliasType::class,
-                    'by_reference' => false,
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'entry_options' =>
-                    [
-                      'domain' => 0
-                    ]
-                  ]
-                )
-                ;
             }
         } else {
           $builder
@@ -147,6 +114,23 @@ class UserType extends AbstractType
           )
           ;
         }
+        $builder
+        ->add('name', TextType::class,
+          [
+            'label' => $userLabel,
+            'attr' =>
+            [
+              'class' => 'col-md-5'
+            ]
+          ]
+        )
+        ->add('active', CheckboxType::class,
+          [
+            'label' => 'Active',
+            'required' => false,
+          ]
+        )
+        ;
 
         if ($managePassword===true) {
             $builder
@@ -207,7 +191,7 @@ class UserType extends AbstractType
             'showDomain' => false,
             'showAutoreply' => false,
             'showList' => false,
-            'showVirtual' => false,
+            'showAlias' => false,
             'domain' => false,
           ]
         );

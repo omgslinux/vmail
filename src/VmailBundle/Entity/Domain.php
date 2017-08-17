@@ -6,11 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use VmailBundle\Entity\User;
 use VmailBundle\Entity\Traits\ActivableEntityTrait;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * Domains
  *
- * @ORM\Table(name="domain")
+ * @ORM\Table(name="domain", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"name", "id"})})
  * @ORM\Entity(repositoryClass="VmailBundle\Repository\DomainRepository")
  */
 class Domain
@@ -40,6 +41,10 @@ class Domain
     private $users;
 
 
+    public function __construct()
+    {
+        $this->users=new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -56,7 +61,7 @@ class Domain
      *
      * @param string $name
      *
-     * @return domains
+     * @return Domain
      */
     public function setName($name)
     {

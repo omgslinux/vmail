@@ -11,17 +11,11 @@
                 <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             <tr>
-              {% if item.domain.id == 0%}{% set backpath = path('admin_alias_index') %}
-                <td><a href="{{ path('admin_alias_edit', { id: item.id }) }}">{{ item }}</a></td>
+              {% set backpath = path('manage_alias_index', { 'id': item.id }) %}
+                <td><a href="{{ path('manage_alias_edit', { id: item.id }) }}">{{ item }}</a></td>
                 <td>{% for address in item.aliases %}
                 {{ address.email }}</td>
                 {% endfor %}
-              {% else %}{% set backpath = path('manage_virtuals_index', { 'id': item.domain }) %}
-                <td><a href="{{ path('manage_virtuals_edit', { id: item.id }) }}">{{ item }}</a></td>
-                <td>{% for address in item.virtuals %}
-                {{ address.email }}</td>
-                {% endfor %}
-              {% endif %}
                 <td>{{ item.active }}</td>
             </tr>
         </tbody>

@@ -1,30 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block b1 %}
-  <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Alias</th>
-            <th>Addresses</th>
-            <th>Active</th>
-        </tr>
-    </thead>
-    <tbody>
-{% endblock %}
-
 {% block body %}
     {% if domain is defined %}<h1>{% trans %}Aliases list in{% endtrans %} @{{ domain }}</h1>
-    {% set newpath = path('manage_domain_virtuals_new', { 'id': domain.id }) %}
-
+    {% set newpath = path('manage_domain_alias_new', { 'id': domain.id }) %}
     {% else %}<h1>{% trans %}Aliases list{% endtrans %}</h1>
-    {% set newpath = path('admin_alias_new') %}
+    {% set newpath = path('manage_alias_new', { 'id': 0 }) %}
     {% endif %}
-    {{ block('b1') }}
-
+    <table class="table table-bordered">
+      <thead>
+          <tr>
+              <th>Alias</th>
+              <th>Addresses</th>
+              <th>Active</th>
+          </tr>
+      </thead>
+      <tbody>
         {% for item in items %}
           <tr>
           {% if domain is not defined %}
-            <td><a href="{{ path('admin_alias_show', { 'id': item.id }) }}">
+            <td><a href="{{ path('manage_alias_show', { 'id': item.id }) }}">
             {{ item.name }}</td>
             <td>{% for alias in item.aliases %}
               {{ alias.address }}<br />

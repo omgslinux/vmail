@@ -8,15 +8,15 @@ use Doctrine\DBAL\Types\BooleanType;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\Traits\ActivableEntityTrait;
 use VmailBundle\Entity\Traits\UserInterfaceEntityTrait;
-use VmailBundle\Entity\Virtual;
 use VmailBundle\Entity\Alias;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * Users
+ * User
  *
- * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="VmailBundle\Repository\UserRepository")
+ * @ORM\Table(name="user", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"user", "domain_id"})})
  */
 class User implements UserInterface
 {
@@ -85,16 +85,16 @@ class User implements UserInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Alias", mappedBy="name")
+     * @ORM\OneToMany(targetEntity="Alias", mappedBy="aliasname")
      */
-    private $aliases;
+    private $aliasnames;
 
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Virtual", mappedBy="name")
+     * @ORM\OneToMany(targetEntity="Alias", mappedBy="addressname")
      */
-    private $virtuals;
+    private $addressnames;
 
     /**
      * @var boolean
@@ -106,6 +106,8 @@ class User implements UserInterface
     public function __construct()
     {
         $this->replys=new ArrayCollection();
+        $this->aliasnames=new ArrayCollection();
+        $this->addresses=new ArrayCollection();
     }
 
     /**
@@ -176,6 +178,8 @@ class User implements UserInterface
     public function setDomain(Domain $domain)
     {
         $this->domain = $domain;
+        //$this->domainName=$domain->getName();
+        $this->setDomainName($domain->getName());
 
         return $this;
     }
@@ -190,8 +194,16 @@ class User implements UserInterface
         return $this->domain;
     }
 
+    public function setDomainName($name)
+    {
+        $this->domainName=$name;
+
+        return $this;
+    }
+
     public function getDomainName()
     {
+        //return $this->domainName;
         return $this->getDomain()->getName();
     }
 
@@ -337,9 +349,9 @@ class User implements UserInterface
      *
      * @return ArrayCollection
      */
-    public function getAliases()
+    public function getAliasnames()
     {
-        return $this->aliases;
+        return $this->aliasnames;
     }
 
     /**
@@ -349,10 +361,10 @@ class User implements UserInterface
      *
      * @return User
      */
-    public function addAlias(Alias $alias)
+    public function addAliasname(Alias $alias)
     {
-        $this->aliases->add($alias);
-        $alias->setName($this);
+        $this->aliasnames->add($alias);
+        $aliasname->setAliasName($this);
 
         return $this;
     }
@@ -364,48 +376,48 @@ class User implements UserInterface
      *
      * @return User
      */
-    public function removeAlias(Alias $alias)
+    public function removeAliasname(Alias $alias)
     {
-        $this->aliases->removeElement($alias);
+        $this->aliasnames->removeElement($alias);
 
         return $this;
     }
 
     /**
-     * Get virtuals
+     * Get addresnames
      *
      * @return ArrayCollection
      */
-    public function getVirtuals()
+    public function getAddressnames()
     {
-        return $this->virtuals;
+        return $this->addressnames;
     }
 
     /**
-     * Add virtual
+     * Add addressname
      *
-     * @param Virtual $alias
+     * @param Alias $addressname
      *
      * @return User
      */
-    public function addVirtual(Virtual $alias)
+    public function addAddressname(Alias $alias)
     {
-        $this->virtuals->add($alias);
-        $alias->setName($this);
+        $this->addressnames->add($alias);
+        $alias->setAddressname($this);
 
         return $this;
     }
 
     /**
-     * Remove virtual
+     * Remove addressname
      *
-     * @param Virtual $alias
+     * @param Alias $alias
      *
      * @return User
      */
-    public function removeVirtual(Virtual $alias)
+    public function removeAddressname(Alias $alias)
     {
-        $this->virtuals->removeElement($alias);
+        $this->addressnames->removeElement($alias);
 
         return $this;
     }

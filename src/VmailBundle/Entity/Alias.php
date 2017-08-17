@@ -26,16 +26,16 @@ class Alias
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="aliases")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="aliasnames",cascade={"persist"})
      */
-    private $name;
+    private $aliasname;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="address", type="string", length=64)
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="addressnames",cascade={"persist"})
      */
-    private $address;
+    private $addressname;
 
 
 
@@ -50,52 +50,57 @@ class Alias
     }
 
     /**
-     * Set name
+     * Set aliasname
      *
-     * @param User $name
+     * @param User $aliasname
      *
-     * @return Aliases
+     * @return Alias
      */
-    public function setName(User $alias)
+    public function setAliasname(User $user)
     {
-        $this->name = $alias;
-        $alias->setList(true);
+        $this->aliasname = $user;
+        $user->setList(true);
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get aliasname
      *
-     * @return string
+     * @return User
      */
-    public function getName()
+    public function getAliasname()
     {
-        return $this->name;
+        return $this->aliasname;
     }
 
     /**
-     * Set address
+     * Set addressname
      *
-     * @param string $address
+     * @param User $address
      *
-     * @return aliases
+     * @return Alias
      */
-    public function setAddress($address)
+    public function setAddressname(User $address)
     {
-        $this->address = $address;
+        $this->addressname = $address;
 
         return $this;
     }
 
     /**
-     * Get address
+     * Get addressname
      *
-     * @return string
+     * @return User
      */
-    public function getAddress()
+    public function getAddressname()
     {
-        return $this->address;
+        return $this->addressname;
+    }
+
+    public function __toString()
+    {
+        return $this->getAliasname()->getEmail() .'/'. $this->getAddressname()->getEmail();
     }
 
 }

@@ -1,17 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block b1 %}
-<thead>
-    <tr>
-        <th>{% trans %}Email{% endtrans %}</th>
-        <th>{% trans %}Active{% endtrans %}</th>
-        <th>{% trans %}Delete?{% endtrans %}</th>
-    </tr>
-</thead>
-{% endblock %}
-
 {% block body %}
-    <h1>{% trans %}Alias edit{% endtrans %}</h1>
+    <h1>{{ title|trans }}</h1>
 
     {{ form_start(form) }}
         <div class="row">
@@ -20,33 +10,34 @@
             </div>
         </div>
 
-        {% if domain.id == 0 %}{% set backpath = path('admin_alias_index') %}
-            <h3>{% trans %}Aliases{% endtrans %} <a href="#" id="add-alias" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
-        <table id="aliases-container" class="table table-bordered" data-prototype="{{ form_widget(form.aliases.vars.prototype)|e('html_attr') }}">
-        {% else %}{% set backpath = path('manage_virtuals_index', { 'id': domain.id }) %}
-            <h3>{% trans %}Virtuals{% endtrans %} <a href="#" id="add-virtual" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
-        <table id="virtuals-container" class="table table-bordered" data-prototype="{{ form_widget(form.virtuals.vars.prototype)|e('html_attr') }}">
+        {% if domain is defined %}{% set backpath = path('manage_alias_index', { 'id': domain.id }) %}
+        {% else %}{% set backpath = path('manage_alias_index', { 'id': 0 }) %}
         {% endif %}
-        {{ block('b1') }}
-      <tbody>
-        {% if domain.id == 0 %}{% set assetjs = asset('/shared/js/user-aliases.js') %}
-          {% for virtual in form.aliases %}
-            {{ form_widget(alias) }}
-          {% endfor %}
-          {# do form.aliases.setRendered #}
-        {% else %}{% set assetjs = asset('/shared/js/user-virtuals.js') %}
-          {% for virtual in form.virtuals %}
-            {{ form_widget(virtual) }}
-          {% endfor %}
-          {# do form.name.setRendered #}
+        {% if form.addressnames is defined and domain is defined %}
+          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-addressname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
+          <table id="addressnames-container" class="table table-bordered"
+            data-prototype="{{ form_widget(form.addressnames.vars.prototype)|e('html_attr') }}">
+            <thead>
+              <tr>
+                  <th>{% trans %}Email{% endtrans %}</th>
+                  <th>{% trans %}Active{% endtrans %}</th>
+                  <th>{% trans %}Delete?{% endtrans %}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% set assetjs = asset('/shared/js/user-aliases.js') %}
+              {% for address in form.addressnames %}
+                {{ form_widget(address) }}
+              {% endfor %}
+              {# do form.addressnames.setRendered #}
+            </tbody>
+          </table>
+          <script type="text/javascript" src="{{ assetjs }}"></script>
         {% endif %}
-      </tbody>
-    </table>
     {{ form_end(form) }}
     <ul>
         <li>
             <a href="{{ backpath }}">{% trans %}Back to the list{% endtrans %}</a>
         </li>
     </ul>
-      <script type="text/javascript" src="{{ assetjs }}"></script>
 {% endblock %}

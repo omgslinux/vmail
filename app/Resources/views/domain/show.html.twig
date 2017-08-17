@@ -49,7 +49,7 @@
             </tr>
             {% for list in lists %}{% set email = list.name ~ '@' ~ domain.name %}
             <tr>
-                <td><a href="{{ path('manage_virtuals_show', { 'id': list.id } ) }}">{{ email }}</td>
+                <td><a href="{{ path('manage_alias_show', { 'id': list.id } ) }}">{{ email }}</td>
                 <td>{{ list.isActive ? '√' : '--' }}</td>
             </tr>
             {% endfor %}
@@ -58,12 +58,7 @@
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-      <p>{% if domain.id==0 %}
-        <a href="{{ path('admin_alias_new') }}">
-      {% else %}
-        <a href="{{ path('manage_domain_virtuals_new', { 'id': domain.id }) }}">
-      {% endif %}
-        {% trans %}Create a new distribution list{% endtrans %}</a>
+      <p><a href="{{ path('manage_alias_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
       </p>
 
 {% endblock %}
