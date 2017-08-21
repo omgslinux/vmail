@@ -18,7 +18,7 @@ jQuery(document).ready(function() {
         $collectionHolder.append($newRow);
     });
 
-    $collectionHolder.on('click', '.delete-addressname', function(e) {
+    $collectionHolder.on('click', '.delete-alias', function(e) {
         e.preventDefault();
 
         $(this).parents('tr').remove();

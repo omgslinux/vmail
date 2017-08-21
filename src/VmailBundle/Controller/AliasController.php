@@ -7,8 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\Alias;
+use VmailBundle\Entity\Domain;
 
 //use \Doctrine\ORM\EntityRepository;
 
@@ -184,7 +184,7 @@ class AliasController extends Controller
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em=$this->getDoctrine()->getManager();
             $em->persist($alias);
-            foreach($alias->getAliases() as $users) {
+            foreach($alias->getAliasNames() as $users) {
                 $a=new Alias();
                 $a->setAliasName($alias);
                 //$a->setAddress($users->getN);

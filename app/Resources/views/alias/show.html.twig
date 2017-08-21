@@ -3,27 +3,41 @@
 {% block body %}
     <h1>{% trans %}Alias{% endtrans %} {{ item ~ '@' ~ item.domainName }}</h1>
 
-    <table>
+    <table class="table table-bordered">
         <tbody>
             <tr>
                 <th>{% trans %}Email address{% endtrans %}</th>
-                <th>{% trans %}Addresses{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             <tr>
-              {% set backpath = path('manage_alias_index', { 'id': item.id }) %}
+              {% set backpath = path('manage_alias_index', { 'id': item.domain.id }) %}
                 <td><a href="{{ path('manage_alias_edit', { id: item.id }) }}">{{ item }}</a></td>
-                <td>{% for address in item.aliasnames %}
-                {{ address.email }}</td>
-                {% endfor %}
                 <td>{{ item.active }}</td>
             </tr>
         </tbody>
     </table>
 
+    {% if item.addressnames.count > 0 %}
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}Alias address{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+            </tr>
+            {%- for address in item.addressnames -%}
+            <tr>
+                <td>{{ address.aliasname.email }}</td>
+                <td>{{ item.active }}</td>
+            </tr>
+            {%- endfor -%}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <p>{{ item.addressnames.count }} direcciones para el alias</p>
     <ul>
         <li>
-            <a href="{{ backpath }}">Back to the list</a>
+            <a href="{{ backpath }}">{% trans %}Back to the list{% endtrans %}</a>
         </li>
     </ul>
 {% endblock %}

@@ -9,10 +9,10 @@ use VmailBundle\Entity\Traits\ActivableEntityTrait;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * Domains
+ * Domain
  *
- * @ORM\Table(name="domain", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"name", "id"})})
  * @ORM\Entity(repositoryClass="VmailBundle\Repository\DomainRepository")
+ * @ORM\Table(name="domain", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"name", "id"})})
  */
 class Domain
 {

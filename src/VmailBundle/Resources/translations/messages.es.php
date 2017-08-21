@@ -2,6 +2,8 @@
 return array(
   'User'  =>  'Usuario',
   'Management' => 'Gestión',
+  'Address' => 'Dirección',
+  'Addresses' => 'Direcciones',
   'Create a new user' => 'Crear un usuario',
   'Create a new domain' => 'Crear un dominio',
   'Create a new config' => 'Crear una nueva configuración',

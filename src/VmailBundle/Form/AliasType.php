@@ -26,23 +26,18 @@ class AliasType extends AbstractType
             'label' => 'Alias address',
             'query_builder' => function (EntityRepository $er) use ($domain) {
                 $qb = $er->createQueryBuilder('u');
+                $qb
+                ->where('u.list = 0');
                 if ($domain!=0) {
-                  $qb
-                      ->where('u.list = 0')
+                    $qb
                       ->andWhere('u.domain = :domain')
                       ->setParameter('domain', $domain)
-                  ;
-                } else {
-                  $qb
-                      ->where('u.list = 0')
-                  ;
+                    ;
                 }
                 return $qb;
             },
           ]
         )
-        ;
-        $builder
         ->add('active', CheckboxType::class,
           [
             'required' => false
@@ -70,7 +65,7 @@ class AliasType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'VmailBundle\Entity\Alias',
-            'domain' => false,
+            'domain' => 0,
         ));
     }
 

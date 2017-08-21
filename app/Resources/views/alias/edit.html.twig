@@ -29,7 +29,8 @@
               {% for address in form.addressnames %}
                 {{ form_widget(address) }}
               {% endfor %}
-              {# do form.addressnames.setRendered #}
+              {# form.addressnames.block_prefixes #}
+              {# do form.vmailbundle_alias.block.setRendered #}
             </tbody>
           </table>
           <script type="text/javascript" src="{{ assetjs }}"></script>

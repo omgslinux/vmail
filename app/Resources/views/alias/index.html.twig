@@ -20,7 +20,7 @@
           {% if domain is not defined %}
             <td><a href="{{ path('manage_alias_show', { 'id': item.id }) }}">
             {{ item.name }}</td>
-            <td>{% for alias in item.aliases %}
+            <td>{% for alias in item.aliasnames %}
               {{ alias.address }}<br />
             {% endfor %}</td>
           {% else %}

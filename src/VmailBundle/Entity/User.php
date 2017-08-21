@@ -92,7 +92,7 @@ class User implements UserInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Alias", mappedBy="addressname")
+     * @ORM\OneToMany(targetEntity="Alias", mappedBy="addressname", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private $addressnames;
 
