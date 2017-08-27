@@ -27,7 +27,7 @@ class ConfigController extends Controller
 
         $configs = $em->getRepository('VmailBundle:Config')->findAll();
 
-        return $this->render('config/index.html.twig', array(
+        return $this->render('@vmail/config/index.html.twig', array(
             'configs' => $configs,
         ));
     }
@@ -52,7 +52,7 @@ class ConfigController extends Controller
             return $this->redirectToRoute('config_show', array('id' => $config->getId()));
         }
 
-        return $this->render('config/new.html.twig', array(
+        return $this->render('@vmail/config/new.html.twig', array(
             'config' => $config,
             'form' => $form->createView(),
         ));
@@ -68,7 +68,7 @@ class ConfigController extends Controller
     {
         $deleteForm = $this->createDeleteForm($config);
 
-        return $this->render('config/show.html.twig', array(
+        return $this->render('@vmail/config/show.html.twig', array(
             'config' => $config,
             'delete_form' => $deleteForm->createView(),
         ));
@@ -92,7 +92,7 @@ class ConfigController extends Controller
             return $this->redirectToRoute('config_edit', array('id' => $config->getId()));
         }
 
-        return $this->render('config/edit.html.twig', array(
+        return $this->render('@vmail/config/edit.html.twig', array(
             'config' => $config,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),

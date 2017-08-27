@@ -29,7 +29,7 @@ class DomainController extends Controller
 
         $domains = $em->getRepository('VmailBundle:Domain')->findAll();
 
-        return $this->render('domain/index.html.twig', array(
+        return $this->render('@vmail/domain/index.html.twig', array(
             'domains' => $domains,
         ));
     }
@@ -60,7 +60,7 @@ class DomainController extends Controller
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('user/edit.html.twig', array(
+        return $this->render('@vmail/user/edit.html.twig', array(
             'user' => $user,
             'action' => $this->get('translator')->trans('Create a new user'),
             'backlink' => $this->generateUrl('admin_domain_index'),
@@ -95,7 +95,7 @@ class DomainController extends Controller
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('default/edit.html.twig', array(
+        return $this->render('@vmail/default/edit.html.twig', array(
             'domain' => $domain,
             'action' => $this->get('translator')->trans('Create a new domain'),
             'backlink' => $this->generateUrl('admin_domain_index'),
@@ -129,7 +129,7 @@ class DomainController extends Controller
         }
         $t = $this->get('translator');
 
-        return $this->render('default/edit.html.twig', array(
+        return $this->render('@vmail/default/edit.html.twig', array(
             'domain' => $domain,
             'action' => $t->trans('Domain edit') . ' ' . $domain->getName(),
             'backlink' => $this->generateUrl('admin_domain_show', array('id' => $domain->getId())),
@@ -193,7 +193,7 @@ class DomainController extends Controller
         $lists=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
         $deleteForm = $this->createDeleteForm($domain);
 
-        return $this->render('domain/show.html.twig', array(
+        return $this->render('@vmail/domain/show.html.twig', array(
             'domain' => $domain,
             'delete_form' => $deleteForm->createView(),
             'users' => $users,
@@ -215,7 +215,7 @@ class DomainController extends Controller
 
         return $this->redirectToRoute('admin_domain_showbyname', ['name' => $domain->getName()]);
 
-        return $this->render('domain/show.html.twig', array(
+        return $this->render('@vmail/domain/show.html.twig', array(
             'domain' => $domain,
             'delete_form' => $deleteForm->createView(),
             'users' => $users,

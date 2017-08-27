@@ -64,7 +64,7 @@ class AutoreplyCacheController extends Controller
         if ($deliverreply===true) {
               $this->sendReply($reply, $sender);
         }
-        return $this->render('reply/show.html.twig', [
+        return $this->render('@vmail/reply/show.html.twig', [
             'item' => $reply
           ]
         );
@@ -83,7 +83,7 @@ class AutoreplyCacheController extends Controller
     {
         $user=$this->getUser();
 
-        return $this->render('reply/show.html.twig', array(
+        return $this->render('@vmail/reply/show.html.twig', array(
             'item' => $cache,
         ));
     }
@@ -106,7 +106,7 @@ class AutoreplyCacheController extends Controller
             return $this->redirectToRoute('user_autoreplycache_show');
         }
 
-        return $this->render('reply/edit.html.twig', array(
+        return $this->render('@vmail/reply/edit.html.twig', array(
             'item' => $reply,
             'form' => $editForm->createView(),
         ));

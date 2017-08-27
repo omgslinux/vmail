@@ -40,7 +40,8 @@ class AliasType extends AbstractType
         )
         ->add('active', CheckboxType::class,
           [
-            'required' => false
+            'required' => false,
+            'label' => false
           ]
         )
         ;
@@ -74,7 +75,8 @@ class AliasType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'vmailbundle_alias';
+        //return 'vmailbundle_alias';
+        return 'pepito_alias';
     }
 
 

@@ -30,7 +30,7 @@ class UserController extends Controller
 
         $users = $em->getRepository('VmailBundle:User')->findBy(['domain' => $user->getDomain()]);
 
-        return $this->render('user/index.html.twig', array(
+        return $this->render('@vmail/user/index.html.twig', array(
             'users' => $users,
         ));
     }
@@ -65,7 +65,7 @@ class UserController extends Controller
             return $this->redirectToRoute('manage_user_show', array('id' => $user->getId()));
         }
 
-        return $this->render('user/new.html.twig', array(
+        return $this->render('@vmail/user/new.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
         ));
@@ -81,7 +81,7 @@ class UserController extends Controller
     {
         $deleteForm = $this->createDeleteForm($user);
 
-        return $this->render('user/show.html.twig', array(
+        return $this->render('@vmail/user/show.html.twig', array(
             'user' => $user,
             'delete_form' => $deleteForm->createView(),
             'domain' => true,
@@ -103,7 +103,7 @@ class UserController extends Controller
         $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'name' => $t[0]]);
         $deleteForm = $this->createDeleteForm($user);
 
-        return $this->render('user/show.html.twig', array(
+        return $this->render('@vmail/user/show.html.twig', array(
             'user' => $user,
             'delete_form' => $deleteForm->createView(),
         ));
@@ -120,7 +120,7 @@ class UserController extends Controller
         $user=$this->getUser();
         $deleteForm = $this->createDeleteForm($user);
 
-        return $this->render('user/show.html.twig', array(
+        return $this->render('@vmail/user/show.html.twig', array(
             'user' => $user,
             'delete_form' => $deleteForm->createView(),
         ));
@@ -136,7 +136,7 @@ class UserController extends Controller
     {
         $deleteForm = $this->createDeleteForm($user);
 
-        return $this->render('user/show.html.twig', array(
+        return $this->render('@vmail/user/show.html.twig', array(
             'user' => $user,
             'delete_form' => $deleteForm->createView(),
         ));
@@ -180,7 +180,7 @@ class UserController extends Controller
             }
         }
 
-        return $this->render('user/edit.html.twig', array(
+        return $this->render('@vmail/user/edit.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
             'delete_form' => $deleteForm->createView(),

@@ -42,7 +42,7 @@ class AutoreplyController extends Controller
             return $this->redirectToRoute('user_autoreply_show');
         }
 
-        return $this->render('reply/new.html.twig', array(
+        return $this->render('@vmail/reply/new.html.twig', array(
             'item' => $reply,
             'user' => $user,
             'form' => $form->createView(),
@@ -60,7 +60,7 @@ class AutoreplyController extends Controller
     {
         $user=$this->getUser();
 
-        return $this->render('reply/show.html.twig', array(
+        return $this->render('@vmail/reply/show.html.twig', array(
             'user' => $user,
         ));
     }
@@ -89,7 +89,7 @@ class AutoreplyController extends Controller
             return $this->redirectToRoute('user_autoreply_show');
         }
 
-        return $this->render('reply/edit.html.twig', array(
+        return $this->render('@vmail/reply/edit.html.twig', array(
             'item' => $reply,
             'user' => $user,
             'form' => $editForm->createView(),

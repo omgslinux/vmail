@@ -34,7 +34,7 @@ class AliasController extends Controller
 
         $aliases = $em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
 
-        return $this->render('alias/index.html.twig', array(
+        return $this->render('@vmail/alias/index.html.twig', array(
             'items' => $aliases,
         ));
     }
@@ -53,7 +53,7 @@ class AliasController extends Controller
         }
         $aliases = $em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
 
-        return $this->render('alias/index.html.twig', array(
+        return $this->render('@vmail/alias/index.html.twig', array(
             'domain' => $domain,
             'items' => $aliases,
         ));
@@ -96,7 +96,7 @@ class AliasController extends Controller
             return $this->redirectToRoute('manage_alias_show', array('id' => $alias->getId()));
         }
 
-        return $this->render('alias/edit.html.twig',
+        return $this->render('@vmail/alias/edit.html.twig',
           [
             'form' => $form->createView(),
             'title' => 'Alias creation'
@@ -141,7 +141,7 @@ class AliasController extends Controller
             return $this->redirectToRoute('manage_alias_show', array('id' => $alias->getId()));
         }
 
-        return $this->render('alias/edit.html.twig', array(
+        return $this->render('@vmail/alias/edit.html.twig', array(
             'domain' => $domain,
             'form' => $form->createView(),
             'title' => 'Alias creation'
@@ -157,7 +157,7 @@ class AliasController extends Controller
     public function showAction(User $alias)
     {
 
-        return $this->render('alias/show.html.twig', array(
+        return $this->render('@vmail/alias/show.html.twig', array(
             'item' => $alias,
         ));
     }
@@ -199,7 +199,7 @@ class AliasController extends Controller
 
         //die(dump($editForm));
 
-        return $this->render('alias/edit.html.twig', array(
+        return $this->render('@vmail/alias/edit.html.twig', array(
             'domain' => $domain,
             'title' => 'Alias edit',
             'form' => $editForm->createView(),

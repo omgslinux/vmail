@@ -27,7 +27,7 @@ class UserController extends Controller
     {
         $user=$this->getUser();
 
-        return $this->render('user/show.html.twig', array(
+        return $this->render('@vmail/user/show.html.twig', array(
             'user' => $user,
         ));
     }
@@ -64,7 +64,7 @@ class UserController extends Controller
             return $this->redirectToRoute('user_self_show');
         }
 
-        return $this->render('user/edit.html.twig', array(
+        return $this->render('@vmail/user/edit.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
         ));
