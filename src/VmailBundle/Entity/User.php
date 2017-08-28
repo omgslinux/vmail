@@ -57,14 +57,14 @@ class User implements UserInterface
     /**
      * @var integer
      *
-     * @ORM\Column(name="quota", type="integer")
+     * @ORM\Column(type="integer")
      */
     private $quota=0;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="admin", type="boolean")
+     * @ORM\Column(name="is_admin", type="boolean")
      */
     private $admin=false;
 

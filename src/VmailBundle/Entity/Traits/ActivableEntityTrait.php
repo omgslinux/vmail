@@ -10,7 +10,7 @@ trait ActivableEntityTrait
     /**
      * @var bool
      *
-     * @ORM\Column(name="active", type="boolean")
+     * @ORM\Column(name="is_active", type="boolean")
      */
     private $active=false;
 
