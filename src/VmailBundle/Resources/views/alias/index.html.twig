@@ -21,7 +21,7 @@
             <td><a href="{{ path('manage_alias_show', { 'id': item.id }) }}">
             {{ item.name }}</td>
             <td>{% for alias in item.aliasnames %}
-              {{ alias.address }}<br />
+              {{ alias.addressname.email }}<br />
             {% endfor %}</td>
           {% else %}
             <td><a href="{{ path('manage_virtuals_show', { 'id': item.id }) }}">

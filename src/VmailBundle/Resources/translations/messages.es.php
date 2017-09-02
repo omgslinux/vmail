@@ -47,5 +47,6 @@ return array(
   'Save' => 'Guardar',
   'Admin' => 'Administrador',
   'Send welcome email' => 'Enviar correo de bienvenida',
+  'Autoreply' => 'Respuesta automática',
   'Create autoreply' => 'Crear respuesta automática',
 );

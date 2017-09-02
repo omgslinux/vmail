@@ -39,10 +39,13 @@
     </div>
     {{ form_end(form) }}
 
-    {% if user.replys.count == 0 and form.autoreply is defined %}
-    <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
-
-    {% endif %}
+    {% if form.replys is defined %}
+      {% if user.replys|length == 0 %}
+        <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+      {% else %}
+        {% do form.replys.setRendered %}
+        {% endif %}
+      {% endif %}
     <ul>
         {% if delete_form is defined %}
         <li>

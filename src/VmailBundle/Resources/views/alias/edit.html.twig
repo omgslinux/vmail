@@ -5,18 +5,22 @@
 
     {{ form_start(form) }}
         <div class="row">
-            <div class="col-md-6">
-                {{ form_row(form.name) }}
+            <div class="col-md-4">
+              {{ form_widget(form.name) }}
+            </div>
+            <div class="col-md-2">@{% if domain.id ==0 %}$my_destination{% else %}{{ domain.name }}{% endif %}
+            </div>
+            <div class="col-md-2">{{ form_widget(form.active) }}
             </div>
         </div>
 
         {% if domain is defined %}{% set backpath = path('manage_alias_index', { 'id': domain.id }) %}
         {% else %}{% set backpath = path('manage_alias_index', { 'id': 0 }) %}
         {% endif %}
-        {% if form.addressnames is defined and domain is defined %}
-          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-addressname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
-          <table id="addressnames-container" class="table table-bordered"
-            data-prototype="{{ form_widget(form.addressnames.vars.prototype)|e('html_attr') }}">
+        {% if form.aliasnames is defined and domain is defined %}
+          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
+          <table id="aliasnames-container" class="table table-bordered"
+            data-prototype="{{ form_widget(form.aliasnames.vars.prototype)|e('html_attr') }}">
             <thead>
               <tr>
                   <th>{% trans %}Email{% endtrans %}</th>
@@ -25,11 +29,11 @@
               </tr>
             </thead>
             <tbody>
-            {% set assetjs = asset('/shared/js/user-aliases.js') %}
-              {% for address in form.addressnames %}
+            {% set assetjs = asset('/shared/js/user-aliasnames.js') %}
+              {% for address in form.aliasnames %}
                 {{ form_widget(address) }}
               {% endfor %}
-              {% do form.addressnames.setRendered %}
+              {% do form.aliasnames.setRendered %}
             </tbody>
           </table>
           <script type="text/javascript" src="{{ assetjs }}"></script>

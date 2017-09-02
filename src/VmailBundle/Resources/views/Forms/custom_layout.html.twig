@@ -1,9 +1,9 @@
 {% extends 'bootstrap_3_layout.html.twig' %}
 
-{% block pepito_alias_widget %}
+{% block vmailbundle_alias_widget %}
     <tr>
-        <td>{{ form_widget(form.aliasname) }}</td>
-        <td>{{ form_widget(form.active) }}{% do form.active.setRendered %}</td>
-        <td><a href="#" class="delete-alias btn btn-danger">X</a></td>
+        <td>{{ form_widget(form.addressname) }}</td>
+        <td>{{ form_widget(form.active) }}</td>
+        <td><a href="#" class="delete-aliasname btn btn-danger">X</a></td>
     </tr>
-{%- endblock pepito_alias_widget %}
+{%- endblock vmailbundle_alias_widget %}

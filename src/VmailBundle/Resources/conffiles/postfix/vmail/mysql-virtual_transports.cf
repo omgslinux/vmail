@@ -1,0 +1,7 @@
+# Este fichero es, en principio, un duplicado de domains, por ser en principio lo mismo.
+user = {{ dbuser }}
+password = {{ dbpass }}
+dbname = {{ dbname }}
+hosts = {{ dbhost }}
+#query = SELECT user FROM alias WHERE address='%s' AND active != 0
+query = SELECT name FROM domain WHERE name='%s' AND id !=0 AND is_active=1

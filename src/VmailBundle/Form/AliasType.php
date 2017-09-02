@@ -20,7 +20,7 @@ class AliasType extends AbstractType
     {
         $domain=$options['domain'];
         $builder
-        ->add('aliasname', EntityType::class,
+        ->add('addressname', EntityType::class,
           [
             'class' => 'VmailBundle:User',
             'label' => 'Alias address',
@@ -75,8 +75,7 @@ class AliasType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        //return 'vmailbundle_alias';
-        return 'pepito_alias';
+        return 'vmailbundle_alias';
     }
 
 

@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  * User
  *
  * @ORM\Entity(repositoryClass="VmailBundle\Repository\UserRepository")
- * @ORM\Table(name="user", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"user", "domain_id"})})
+ * @ORM\Table(name="user", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"domain_id", "user"})})
  */
 class User implements UserInterface
 {
@@ -85,7 +85,7 @@ class User implements UserInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Alias", mappedBy="aliasname")
+     * @ORM\OneToMany(targetEntity="Alias", mappedBy="aliasname", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private $aliasnames;
 
@@ -364,7 +364,7 @@ class User implements UserInterface
     public function addAliasname(Alias $alias)
     {
         $this->aliasnames->add($alias);
-        $aliasname->setAliasName($this);
+        $alias->setAliasName($this);
 
         return $this;
     }

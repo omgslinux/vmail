@@ -36,7 +36,7 @@ class UserType extends AbstractType
             $userLabel='Alias';
             if ($options['showAlias']) {
                 $builder
-                  ->add('addressnames', CollectionType::class,
+                  ->add('aliasnames', CollectionType::class,
                     [
                       'entry_type' => AliasType::class,
                       'by_reference' => false,
@@ -166,7 +166,7 @@ class UserType extends AbstractType
                 [
                   'entry_type' => AutoreplyType::class,
                   'by_reference' => false,
-                  'label' => ' '
+                  'label' => 'Autoreply'
                 ]
             )
             ;

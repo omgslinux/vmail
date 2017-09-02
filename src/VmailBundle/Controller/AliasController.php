@@ -67,8 +67,6 @@ class AliasController extends Controller
      */
     public function newAction(Request $request, Domain $domain)
     {
-        //$em = $this->getDoctrine()->getManager();
-        //$domain = $em->getRepository('VmailBundle:Domain')->findOneBy(['id' => $domain]);
         $em = $this->getDoctrine()->getManager();
         if (!($this->isGranted('ROLE_ADMIN') && $domain->getId()==0)) {
             $this->redirectToRoute('manage_domain_alias_new', ['id' => $domain->getId()]);
@@ -98,6 +96,7 @@ class AliasController extends Controller
 
         return $this->render('@vmail/alias/edit.html.twig',
           [
+            'domain' => $domain,
             'form' => $form->createView(),
             'title' => 'Alias creation'
           ]
@@ -184,20 +183,10 @@ class AliasController extends Controller
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em=$this->getDoctrine()->getManager();
             $em->persist($alias);
-            foreach($alias->getAliasNames() as $users) {
-                $a=new Alias();
-                $a->setAliasName($alias);
-                //$a->setAddress($users->getN);
-                $em->persist($a);
-                //dump($users);
-            }
-            $em->flush($alias);
-            //die(dump($alias));
+            $em->flush();
 
             return $this->redirectToRoute('manage_alias_show', array('id' => $alias->getId()));
         }
-
-        //die(dump($editForm));
 
         return $this->render('@vmail/alias/edit.html.twig', array(
             'domain' => $domain,
@@ -231,9 +220,9 @@ class AliasController extends Controller
     }
 
     /**
-     * Creates a form to delete a virtual entity.
+     * Creates a form to delete an alias entity.
      *
-     * @param User $virtual The virtual user
+     * @param User $alias The alias
      *
      * @return \Symfony\Component\Form\Form The form
      */

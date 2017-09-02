@@ -17,24 +17,24 @@
         </tbody>
     </table>
 
-    {% if item.addressnames.count > 0 %}
+    {% if item.aliasnames.count > 0 %}
     <table class="table table-bordered">
         <tbody>
             <tr>
                 <th>{% trans %}Alias address{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
             </tr>
-            {%- for address in item.addressnames -%}
+            {%- for aliasname in item.aliasnames -%}
             <tr>
-                <td>{{ address.aliasname.email }}</td>
-                <td>{{ item.active }}</td>
+                <td>{{ aliasname.addressname.email }}</td>
+                <td>{{ aliasname.active }}</td>
             </tr>
             {%- endfor -%}
         </tbody>
     </table>
     {% endif %}
 
-    <p>{{ item.addressnames.count }} direcciones para el alias</p>
+    <p>{{ item.aliasnames.count }} direcciones para el alias</p>
     <ul>
         <li>
             <a href="{{ backpath }}">{% trans %}Back to the list{% endtrans %}</a>

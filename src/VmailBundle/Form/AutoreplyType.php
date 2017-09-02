@@ -42,7 +42,7 @@ class AutoreplyType extends AbstractType
           'label' => 'Fecha de fin',
         ))
         ->add('active', CheckboxType::class, array(
-            'label' => 'Active',
+            'label' => 'Autoreply active',
             'required' => false,
             )
         )

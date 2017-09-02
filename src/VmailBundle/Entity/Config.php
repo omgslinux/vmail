@@ -35,6 +35,13 @@ class Config
      */
     private $value;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $description;
+
 
     /**
      * Get id
@@ -92,5 +99,29 @@ class Config
     public function getValue()
     {
         return $this->value;
+    }
+    
+    /**
+     * Set description
+     *
+     * @param string $value
+     *
+     * @return config
+     */
+    public function setDescription($value)
+    {
+        $this->description = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 }

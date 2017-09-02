@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
-    var $aliasesTable = $('#addressnames-container');
+    var $aliasesTable = $('#aliasnames-container');
     var $collectionHolder = $aliasesTable.find('tbody');
-    var $addLink = $('#add-addressname');
+    var $addLink = $('#add-aliasname');
 
     $collectionHolder.data('index', $collectionHolder.find('tr').length);
 
@@ -18,7 +18,7 @@ jQuery(document).ready(function() {
         $collectionHolder.append($newRow);
     });
 
-    $collectionHolder.on('click', '.delete-alias', function(e) {
+    $collectionHolder.on('click', '.delete-aliasname', function(e) {
         e.preventDefault();
 
         $(this).parents('tr').remove();
