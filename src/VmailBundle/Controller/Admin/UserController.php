@@ -26,12 +26,24 @@ class UserController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $user=$this->getUser();
+        $domain=$this->getUser()->getDomain();
+        $users=[];
+        $lists=[];
 
-        $users = $em->getRepository('VmailBundle:User')->findBy(['domain' => $user->getDomain()]);
+        foreach ($domain->getUsers() as $user) {
+            if ($user->isList()) {
+                $lists[]=$user;
+            } else {
+                $users[]=$user;
+            }
+        }
+
+        //$users = $em->getRepository('VmailBundle:User')->findBy(['domain' => $user->getDomain()]);
 
         return $this->render('@vmail/user/index.html.twig', array(
+            'domain' => $domain,
             'users' => $users,
+            'lists' => $lists
         ));
     }
 

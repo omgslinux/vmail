@@ -27,11 +27,11 @@ class AliasController extends Controller
      */
     public function indexAction(Domain $domain)
     {
-        $em = $this->getDoctrine()->getManager();
-        if (!($this->isGranted('ROLE_ADMIN') && $domain->getId()==0)) {
-            $this->redirectToRoute('manage_domain_alias_index', ['id' => $domain->getId()]);
+        if (!($this->isGranted('ROLE_ADMIN')) && $domain->getId()===0) {
+            return $this->redirectToRoute('manage_domain_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
+        $em = $this->getDoctrine()->getManager();
         $aliases = $em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
 
         return $this->render('@vmail/alias/index.html.twig', array(
@@ -47,10 +47,11 @@ class AliasController extends Controller
      */
     public function domainindexAction(Domain $domain)
     {
-        $em = $this->getDoctrine()->getManager();
         if ($domain->getId==0) {
-          $this->redirectToRoute('manage_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
+          return $this->redirectToRoute('manage_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
         }
+
+        $em = $this->getDoctrine()->getManager();
         $aliases = $em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
 
         return $this->render('@vmail/alias/index.html.twig', array(
@@ -67,10 +68,11 @@ class AliasController extends Controller
      */
     public function newAction(Request $request, Domain $domain)
     {
-        $em = $this->getDoctrine()->getManager();
-        if (!($this->isGranted('ROLE_ADMIN') && $domain->getId()==0)) {
-            $this->redirectToRoute('manage_domain_alias_new', ['id' => $domain->getId()]);
+        if (!($this->isGranted('ROLE_ADMIN')) && $domain->getId()===0) {
+            return $this->redirectToRoute('manage_domain_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
         }
+
+        $em = $this->getDoctrine()->getManager();
 
         $alias = new User();
         $alias
@@ -111,10 +113,8 @@ class AliasController extends Controller
      */
     public function domainnewAction(Request $request, Domain $domain)
     {
-        //$em = $this->getDoctrine()->getManager();
-        //$domain = $em->getRepository('VmailBundle:Domain')->findOneBy(['id' => $domain]);
-        if ($domain->getId==0) {
-          $this->redirectToRoute('manage_domain_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
+        if ($domain->getId()===0) {
+          return $this->redirectToRoute('manage_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
         $alias = new User();

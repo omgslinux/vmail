@@ -87,20 +87,20 @@ class DomainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
-            $config=$this->get('app.config');
-            $base=$config->findParameter('virtual_mailbox_base')->getValue();
+            $config=$this->get('vmail.config');
+            $base=$config->findParameter('virtual_mailbox_base');
             mkdir($base.'/'.$domain->getId());
             system("cd $base;ln -s " . $domain->getId() . " " . $domain->getName());
 
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('@vmail/default/edit.html.twig', array(
+        return $this->render('@vmail/domain/edit.html.twig', array(
             'domain' => $domain,
             'action' => $this->get('translator')->trans('Create a new domain'),
             'backlink' => $this->generateUrl('admin_domain_index'),
             'backmessage' => 'Back',
-            'create_form' => $form->createView(),
+            'form' => $form->createView(),
         ));
     }
 
@@ -120,7 +120,7 @@ class DomainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
-            $config=$this->get('app.config');
+            $config=$this->get('vmail.config');
             $base=$config->findParameter('virtual_mailbox_base')->getValue();
             system("rm -rf " . $base . "/" . $domain->getName());
             system("cd $base;ln -sf " . $domain->getId() . " " . $domain->getName());
@@ -129,12 +129,12 @@ class DomainController extends Controller
         }
         $t = $this->get('translator');
 
-        return $this->render('@vmail/default/edit.html.twig', array(
+        return $this->render('@vmail/domain/edit.html.twig', array(
             'domain' => $domain,
             'action' => $t->trans('Domain edit') . ' ' . $domain->getName(),
             'backlink' => $this->generateUrl('admin_domain_show', array('id' => $domain->getId())),
             'backmessage' => 'Back',
-            'edit_form' => $editform->createView(),
+            'form' => $editform->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
     }
@@ -152,8 +152,8 @@ class DomainController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $config=$this->get('app.config');
-            $base=$config->findParameter('virtual_mailbox_base')->getValue();
+            $config=$this->get('vmail.config');
+            $base=$config->findParameter('virtual_mailbox_base');
             system("rm -rf " . $base . "/" . $domain->getName());
             rmdir($base . "/" . $domain->getId());
             $em->remove($domain);
