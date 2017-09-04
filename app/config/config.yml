@@ -7,6 +7,7 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale:  es
+    vmail.conffiles: "%kernel.root_dir%/../src/VmailBundle/Resources/conffiles"
 
 framework:
     #esi:             ~
@@ -44,6 +45,7 @@ twig:
         # resources: ['bootstrap_3_horizontal_layout.html.twig']
     paths:
         "%kernel.root_dir%/../src/VmailBundle/Resources/views": vmail
+        "%vmail.conffiles%": conffiles
 
 # Doctrine Configuration
 doctrine:
