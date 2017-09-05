@@ -42,5 +42,5 @@ security:
         ROLE_MANAGER: [ROLE_USER]
     encoders:
       VmailBundle\Entity\User:
-        algorithm: sha512
+        algorithm: %vmail.algorithm%
         # algorithm: plaintext

@@ -1,6 +1,6 @@
 #MYSQL_USER_TABLE	user
 MYSQL_LOGIN_FIELD user
-#MYSQL_CRYPT_PWFIELD	CONCAT('{{ '{' ~ enctype ~ '} }}',password)
+#MYSQL_CRYPT_PWFIELD	CONCAT('{{ '{' ~ enctype ~ '}' }}',password)
 # MYSQL_CLEAR_PWFIELD	clear
 MYSQL_HOME_FIELD "{{ virtual_mailbox_base }}"
 MYSQL_QUOTA_FIELD quota
@@ -8,7 +8,7 @@ MYSQL_QUOTA_FIELD quota
 MYSQL_SERVER		{{ dbhost }}
 MYSQL_USERNAME	{{ dbuser }}
 MYSQL_PASSWORD	{{ dbpass }}
-MYSQL_PORT		  {{ dbport }}
+MYSQL_PORT		  {{ params['port'] }}
 MYSQL_OPT		0
 MYSQL_DATABASE	{{ dbname }}
 
@@ -27,7 +27,7 @@ DEFAULT_DOMAIN		mailtest.org
 # fixed string that is appended to the WHERE clause of our query
 #
 # MYSQL_WHERE_CLAUSE	server='mailhost.example.com'
-MYSQL_SELECT_CLAUSE     SELECT CONCAT(u.user, '@', d.name), CONCAT('{{ '{' ~ enctype ~ '} }}',password), '', {{ UID }}, {{ GID }}, \
+MYSQL_SELECT_CLAUSE     SELECT CONCAT(u.user, '@', d.name), CONCAT('{{ '{' ~ enctype ~ '}' }}',password), '', {{ UID }}, {{ GID }}, \
 	"{{ virtual_mailbox_base }}", CONCAT(d.name, '/', u.user), quota,'','' \
 	FROM user u JOIN domain d ON u.domain_id=d.id \
 	WHERE u.user='$(local_part)' AND d.name='$(domain)'
