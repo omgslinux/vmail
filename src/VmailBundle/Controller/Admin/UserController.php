@@ -78,7 +78,7 @@ class UserController extends Controller
         }
 
         return $this->render('@vmail/user/edit.html.twig', array(
-            'domain' => $this->getUser()->getDomain(),
+            'user' => $user,
             'form' => $form->createView(),
         ));
     }
