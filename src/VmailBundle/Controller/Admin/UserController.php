@@ -24,7 +24,7 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        //$em = $this->getDoctrine()->getManager();
 
         $domain=$this->getUser()->getDomain();
         $users=[];
@@ -37,8 +37,6 @@ class UserController extends Controller
                 $users[]=$user;
             }
         }
-
-        //$users = $em->getRepository('VmailBundle:User')->findBy(['domain' => $user->getDomain()]);
 
         return $this->render('@vmail/user/index.html.twig', array(
             'domain' => $domain,
@@ -63,6 +61,8 @@ class UserController extends Controller
             $form->remove('domain');
         }
 */
+        $user->setDomain($this->getUser()->getDomain());
+
        $form = $this->createForm('VmailBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
         $form->handleRequest($request);
 
@@ -77,8 +77,8 @@ class UserController extends Controller
             return $this->redirectToRoute('manage_user_show', array('id' => $user->getId()));
         }
 
-        return $this->render('@vmail/user/new.html.twig', array(
-            'user' => $user,
+        return $this->render('@vmail/user/edit.html.twig', array(
+            'domain' => $this->getUser()->getDomain(),
             'form' => $form->createView(),
         ));
     }
@@ -113,23 +113,6 @@ class UserController extends Controller
         $em = $this->getDoctrine()->getManager();
         $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
         $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'name' => $t[0]]);
-        $deleteForm = $this->createDeleteForm($user);
-
-        return $this->render('@vmail/user/show.html.twig', array(
-            'user' => $user,
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Finds and displays a user entity.
-     *
-     * @Route("/show/self", name="user_self_show")
-     * @Method("GET")
-     */
-    public function showSelfAction()
-    {
-        $user=$this->getUser();
         $deleteForm = $this->createDeleteForm($user);
 
         return $this->render('@vmail/user/show.html.twig', array(

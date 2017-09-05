@@ -26,7 +26,6 @@ class AutoreplyController extends Controller
      */
     public function newAction(Request $request, User $user=null)
     {
-        $em = $this->getDoctrine()->getManager();
         if (is_null($user)) {
             $user=$this->getUser();
         }
@@ -36,14 +35,18 @@ class AutoreplyController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
             $em->persist($reply);
-            $em->flush($reply);
-            //$this->getDoctrine()->getManager()->flush();
-            return $this->redirectToRoute('user_autoreply_show');
+            $em->flush();
+            if ($this->isGranted('ROLE_MANAGER')) {
+                return $this->redirectToRoute('manage_user_edit', ['id' => $user->getId()]);
+            } else {
+                return $this->redirectToRoute('user_self_edit');
+            }
         }
 
         return $this->render('@vmail/reply/new.html.twig', array(
-            'item' => $reply,
+            //'item' => $reply,
             'user' => $user,
             'form' => $form->createView(),
         ));
@@ -53,12 +56,14 @@ class AutoreplyController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/show", name="user_autoreply_show")
+     * @Route("/show/{id}", name="user_autoreply_show")
      * @Method("GET")
      */
-    public function showAction()
+    public function showAction(User $user=null)
     {
-        $user=$this->getUser();
+        if (is_null($user)) {
+            $user=$this->getUser();
+        }
 
         return $this->render('@vmail/reply/show.html.twig', array(
             'user' => $user,

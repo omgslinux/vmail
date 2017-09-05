@@ -29,10 +29,14 @@
 
     <ul>
         <li>
-            {% if is_granted('ROLE_MANAGER') %}
+            {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('admin_domain_show', { 'id': user.domain.id }) }}">{% trans %}Back to domain{% endtrans %}</a>
             {% else %}
-            <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+              {% if is_granted('ROLE_MANAGER') %}
+              <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+              {% else %}
+              <a href="{{ path('user_self_edit') }}">{% trans %}Back{% endtrans %}</a>
+              {% endif %}
             {% endif %}
         </li>
     </ul>

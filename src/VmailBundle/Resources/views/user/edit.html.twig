@@ -4,7 +4,7 @@
     {% if delete_form is defined %}
     <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
     {% else %}
-    <h1>{% trans %}User creation{% endtrans %} @{{ user.domainName }}</h1>
+    <h1>{% trans %}User creation{% endtrans %} @{{ user.domain.name }}</h1>
     {% endif %}
 
     {{ form_start(form) }}
@@ -37,7 +37,6 @@
         {{ form_widget(form.plainPassword) }}
       </div>
     </div>
-    {{ form_end(form) }}
 
     {% if form.replys is defined %}
       {% if user.replys|length == 0 %}
@@ -46,13 +45,15 @@
         {% do form.replys.setRendered %}
         {% endif %}
       {% endif %}
+    {{ form_end(form) }}
+
+      {% if delete_form is defined %}
     <ul>
-        {% if delete_form is defined %}
         <li>
             {{ form_start(delete_form) }}
                 <input type="submit" value="{% trans %}Delete{% endtrans %}">
             {{ form_end(delete_form) }}
         </li>
-        {% endif %}
     </ul>
+    {% endif %}
 {% endblock %}

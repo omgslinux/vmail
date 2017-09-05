@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
+
+    {{ form_start(form) }}
+    <div class="row">
+    <div class="col-md-5">
+    {{ form_widget(form.plainPassword) }}
+    </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        {{ form_widget(form.active) }}
+      </div>
+      <div class="col-md-4">
+        {{ form_widget(form.sendemail) }}
+      </div>
+    </div>
+    {% if user.replys|length >0 %}
+      {{ form_widget(form.replys) }}
+      {% do form.setRendered %}
+    {% else %}
+        <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+    {% endif %}
+    {{ form_end(form) }}
+
+{% endblock %}

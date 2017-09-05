@@ -76,7 +76,7 @@ class AutoreplyType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'appbundle_autoreply';
+        return 'vmailbundle_autoreply';
     }
 
 

@@ -44,8 +44,9 @@ class UserController extends Controller
         $formOptions['showAutoreply']=($user->getReplys()?true:false);
         $form = $this->createForm('VmailBundle\Form\UserType', $user, $formOptions);
         $form
-          ->remove('user')
+          ->remove('name')
           ->remove('admin')
+          ->remove('quota')
           ->remove('domain');
         $form->handleRequest($request);
 
@@ -54,17 +55,16 @@ class UserController extends Controller
             $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
-                $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-                //$encodedPassword = $encoder->encodePassword($user, $editForm->get('plainPassword')->getData());
+                $encodedPassword = $encoder->encodePassword($user, $plainPassword);
                 $user->setPassword($encodedPassword);
             }
+
             $em->persist($user);
             $em->flush();
-            //$this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('user_self_show');
         }
 
-        return $this->render('@vmail/user/edit.html.twig', array(
+        return $this->render('@vmail/user/self.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
         ));

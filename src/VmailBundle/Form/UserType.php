@@ -166,7 +166,7 @@ class UserType extends AbstractType
                 [
                   'entry_type' => AutoreplyType::class,
                   'by_reference' => false,
-                  'label' => 'Autoreply'
+                  'label' => false
                 ]
             )
             ;
