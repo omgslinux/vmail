@@ -424,6 +424,10 @@ class User implements UserInterface
 
     public function __toString()
     {
-        return $this->getName();
+        if ($this->getDomain()->getId()===0) {
+          return $this->getName();
+        } else {
+          return $this->getEmail();
+        }
     }
 }
