@@ -4,4 +4,4 @@ dbname = {{ dbname }}
 hosts = {{ dbhost }}
 #query = SELECT 'autoreply' as transport FROM domains WHERE domain=SUBSTRING_INDEX('%s','.',-2)
 
-query = SELECT 'autoreply' AS transport FROM domain WHERE name='%s' AND id!=0 AND is_active=1
+query = SELECT 'autoreply' AS transport FROM domain WHERE CONCAT('autoreply.',name)='%s' AND id!=0 AND is_active=1
