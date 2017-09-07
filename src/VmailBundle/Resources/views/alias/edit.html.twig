@@ -1,14 +1,21 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{{ title|trans }}</h1>
+    <h2>{{ title|trans }}</h2>
 
     {{ form_start(form) }}
         <div class="row">
-            <div class="col-md-4">
-              {{ form_widget(form.name) }}
+            <div class="col-md-2">
+              {{ form_row(form.name) }}
             </div>
-            <div class="col-md-2">@{% if domain.id ==0 %}$my_destination{% else %}{{ domain.name }}{% endif %}
+            <div class="col-md-1">
+              <div class="form-group">
+                <label class="control-label required" for="vmailbundle_domain">Dominio</label>
+                <input type="hidden">@{% if domain.id ==0 %}$my_destination{% else %}{{ domain.name }}{% endif %}
+              </div>
+            </div>
+            <div class="col-md-9">
+              {{ form_row(form.fullname) }}
             </div>
             <div class="col-md-2">{{ form_widget(form.active) }}
             </div>

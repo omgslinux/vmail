@@ -28,12 +28,14 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $userLabel='User';
+        $fullNameLabel='Full Name';
         $domain=$options['domain'];
         $managePassword=true;
         if ($options['showAlias'] || $options['showList']) {
             $managePassword=false;
             $options['showAutoreply']=false;
             $userLabel='Alias';
+            $fullNameLabel='Description';
             if ($options['showAlias']) {
                 $builder
                   ->add('aliasnames', CollectionType::class,
@@ -104,6 +106,15 @@ class UserType extends AbstractType
         ->add('name', TextType::class,
           [
             'label' => $userLabel,
+            'attr' =>
+            [
+              'class' => 'col-md-5'
+            ]
+          ]
+        )
+        ->add('fullname', TextType::class,
+          [
+            'label' => $fullNameLabel,
             'attr' =>
             [
               'class' => 'col-md-5'

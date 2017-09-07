@@ -9,26 +9,29 @@
 
     {{ form_start(form) }}
     <div class="row">
-      <div class="col-md-3">
-        {{ form_widget(form.name) }}
+      <div class="col-md-2">
+        {{ form_row(form.name) }}
       </div>
       {% if form.domain is defined %}
-      <div class="col-md-3">
-        {{ form_widget(form.domain) }}
+      <div class="col-md-2">
+        {{ form_row(form.domain) }}
       </div>
       {% endif %}
-      <div class="col-md-2">
-        {{ form_widget(form.quota) }}
+      <div class="col-md-8">
+        {{ form_row(form.fullname) }}
       </div>
     </div>
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-3">
+        {{ form_row(form.quota) }}
+      </div>
+      <div class="col-md-3">
         {{ form_widget(form.admin) }}
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         {{ form_widget(form.active) }}
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         {{ form_widget(form.sendemail) }}
       </div>
     </div>

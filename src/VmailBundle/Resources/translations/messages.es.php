@@ -24,6 +24,7 @@ return array(
   'Alias' => 'Alias',
   'Aliases' => 'Alias',
   'Alias edit' => 'Editar alias',
+  'Alias address' => 'Dirección',
   'Id' => 'Id',
   'Email' => 'Correo electrónico',
   'Email address' => 'Correo electrónico',
@@ -49,4 +50,6 @@ return array(
   'Send welcome email' => 'Enviar correo de bienvenida',
   'Autoreply' => 'Respuesta automática',
   'Create autoreply' => 'Crear respuesta automática',
+  'Full Name' => 'Nombre y apellidos',
+  'Description' => 'Descripción',
 );

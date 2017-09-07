@@ -21,11 +21,15 @@
     <table class="table table-bordered">
         <tbody>
             <tr>
-                <th>{% trans %}User{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+                <th>{% trans %}User{% endtrans %}</th>
+                <th>{% trans %}Full Name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}Admin{% endtrans %}</th>
             </tr>
             {% for user in users %}{% set email = user.name ~ '@' ~ domain.name %}
             <tr>
                 <td><a href="{{ path('manage_user_show_byemail', { 'email': email } ) }}">{{ email }}</td>
+                <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
             </tr>

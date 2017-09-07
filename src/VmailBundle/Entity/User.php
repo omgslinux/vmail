@@ -41,6 +41,13 @@ class User implements UserInterface
     /**
      * @var string
      *
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+     private $fullName;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="password", type="string", length=255)
      */
     private $password;
@@ -142,6 +149,30 @@ class User implements UserInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set fullName
+     *
+     * @param string $fullName
+     *
+     * @return users
+     */
+    public function setFullName($name)
+    {
+        $this->fullName = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get fullName
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return $this->fullName;
     }
 
     /**

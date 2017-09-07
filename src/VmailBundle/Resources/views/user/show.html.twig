@@ -12,14 +12,14 @@
         <tbody>
             <tr>
                 <th>{% trans %}User{% endtrans %}</th>
-                <th>{% trans %}Password{% endtrans %}</th>
+                <th>{% trans %}Full Name{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
                 <th>{% trans %}Admin{% endtrans %}</th>
                 <th>{% trans %}Autoreply{% endtrans %}</th>
             </tr>
             <tr>
                 <td><a href="{{ editlink }}">{{ user.name }}</a></td>
-                <td>{{ user.password }}</td>
+                <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
                 <td>{% if user.replys.count %}√{% else %}<a href="{{ path('user_autoreply_new', { id: user.id }) }}">Crear{% endif %}</a></td>
