@@ -64,7 +64,7 @@ class User implements UserInterface
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     private $quota=0;
 

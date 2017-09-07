@@ -12,6 +12,5 @@ virtual_alias_maps = mysql:/etc/postfix/vmail/mysql-virtual_autoreply_mailboxes.
 virtual_gid_maps = static:{{ GID }}
 virtual_mailbox_base = {{ virtual_mailbox_base }}
 virtual_mailbox_domains = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_domains.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_domains.cf
-virtual_mailbox_limit_maps = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_limit_maps.cf
 virtual_mailbox_maps = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_maps.cf
 virtual_uid_maps = static:{{ UID }}

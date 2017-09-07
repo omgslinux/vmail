@@ -1,6 +1,0 @@
-user = {{ dbuser }}
-password = {{ dbpass }}
-dbname = {{ dbname }}
-hosts = {{ dbhost }}
-#query = SELECT quota FROM users WHERE email='%s'
-query = SELECT u.quota FROM user u JOIN domain d ON u.domain_id=d.id WHERE CONCAT(u.user,'@',d.name) ='%s' AND d.id!=0 AND d.is_active=1 AND u.is_active=1

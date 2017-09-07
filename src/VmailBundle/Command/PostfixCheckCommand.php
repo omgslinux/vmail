@@ -70,6 +70,7 @@ class PostfixCheckCommand extends ContainerAwareCommand
         if ($exists) {
             $output->writeln("File $exists exists");
             $command="/usr/sbin/postmap -q $key mysql:$exists";
+            $output->writeln("Command to run: $command");
             $output->writeln(exec($command));
         } else {
             $output->writeln("File $file is not valid");
