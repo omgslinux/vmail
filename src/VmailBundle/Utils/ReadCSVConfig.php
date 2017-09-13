@@ -44,7 +44,7 @@ class ReadCSVConfig extends Controller
                 'type' => array(
                     'entity' => true,
                     'classname' => 'Cities',
-                    'namespace' => 'Shared'
+                    'namespace' => 'Shared',
                     'property' => 'city',
                     'mappedBy' => 'city'
                 )
@@ -53,7 +53,7 @@ class ReadCSVConfig extends Controller
                 'type' => array(
                     'entity' => true,
                     'classname' => 'Cities',
-                    'namespace' => 'Shared'
+                    'namespace' => 'Shared',
                     'property' => 'city',
                     'mappedBy' => 'id'
                 )

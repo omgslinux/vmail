@@ -52,4 +52,5 @@ return array(
   'Create autoreply' => 'Crear respuesta automática',
   'Full Name' => 'Nombre y apellidos',
   'Description' => 'Descripción',
+  'Quota' => 'Cuota',
 );

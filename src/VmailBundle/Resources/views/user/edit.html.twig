@@ -41,13 +41,12 @@
       </div>
     </div>
 
-    {% if form.replys is defined %}
-      {% if user.replys|length == 0 %}
+    {% if form.reply is not defined %}
         <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
       {% else %}
-        {% do form.replys.setRendered %}
+        {{ form_widget(form.reply) }}
+        {# do form.reply.setRendered #}
         {% endif %}
-      {% endif %}
     {{ form_end(form) }}
 
       {% if delete_form is defined %}

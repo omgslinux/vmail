@@ -29,7 +29,7 @@ class Autoreply
     /**
      * @var user
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="replys")
+     * @ORM\OneToOne(targetEntity="User", inversedBy="reply")
      */
     private $user;
 

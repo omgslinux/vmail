@@ -173,9 +173,9 @@ class UserType extends AbstractType
         }
         if ($options['showAutoreply']) {
             $builder
-            ->add('replys', CollectionType::class,
+            ->add('reply', AutoreplyType::class,
                 [
-                  'entry_type' => AutoreplyType::class,
+                  //'entry_type' => AutoreplyType::class,
                   'by_reference' => false,
                   'label' => false
                 ]

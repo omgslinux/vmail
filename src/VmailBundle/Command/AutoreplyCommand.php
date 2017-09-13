@@ -33,8 +33,8 @@ class AutoreplyCommand extends ContainerAwareCommand
 
 
         $output->writeln("Sender: ${sender}, recipient: ${recipient}. Body: " . $this->body);
-        $d=new DeliverMail();
-        $d->deliverMail($sender, $recipient, $this->body);
+        //$d=new DeliverMail();
+        //$d->deliverMail($sender, $recipient, $this->body);
     }
 
 }

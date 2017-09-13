@@ -85,9 +85,9 @@ class User implements UserInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Autoreply", mappedBy="user")
+     * @ORM\OneToOne(targetEntity="Autoreply", mappedBy="user", cascade={"persist"})
      */
-    private $replys;
+    private $reply;
 
     /**
      * @var ArrayCollection
@@ -341,9 +341,9 @@ class User implements UserInterface
      *
      * @return ArrayCollection
      */
-    public function getReplys()
+    public function getReply()
     {
-        return $this->replys;
+        return $this->reply;
     }
 
     /**
@@ -353,10 +353,10 @@ class User implements UserInterface
      *
      * @return User
      */
-    public function addReply(Autoreply $reply)
+    public function setReply(Autoreply $reply)
     {
-        $this->replys->add($reply);
-        $reply->setReply($this);
+        $this->reply=$reply;
+        //$reply->setReply($this);
 
         return $this;
     }

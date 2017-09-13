@@ -63,13 +63,13 @@ class UserController extends Controller
 */
         $user->setDomain($this->getUser()->getDomain());
 
-       $form = $this->createForm('VmailBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $encoder = $this->get('security.password_encoder');
-            $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
+            $encodedPassword = $encoder->encodePassword($user->getPlainpassword());
             $user->setPassword($encodedPassword);
             $em->persist($user);
             $em->flush();
@@ -146,9 +146,12 @@ class UserController extends Controller
     public function editAction(Request $request, User $user, $domain=false)
     {
         $deleteForm = $this->createDeleteForm($user);
-        $formOptions['showDomain']=$this->isGranted('ROLE_ADMIN');
-        $formOptions['showAutoreply']=($user->getReplys()?true:false);
-        $form = $this->createForm('VmailBundle\Form\UserType', $user, $formOptions);
+        $form = $this->createForm('VmailBundle\Form\UserType', $user,
+          [
+            'showDomain'  => $this->isGranted('ROLE_ADMIN'),
+            'showAutoreply' => (count($user->getReply())?true:false),
+          ]
+        );
 
         /*if (!$this->isGranted('ROLE_ADMIN')) {
             $usert=$this->getUser();
