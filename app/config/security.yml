@@ -42,5 +42,6 @@ security:
         ROLE_MANAGER: [ROLE_USER]
     encoders:
       VmailBundle\Entity\User:
-        algorithm: %vmail.algorithm%
+        id: vmail.passencoder
+        #algorithm: %vmail.algorithm%
         # algorithm: plaintext
