@@ -25,7 +25,7 @@ class AutoreplyType extends AbstractType
     {
         $builder
         ->add('message', TextareaType::class, array(
-            'label' => 'Texto del mensaje',
+            'label' => 'Body message',
             'required' => true,
             'attr' => [
               'cols' => 100,
@@ -35,11 +35,11 @@ class AutoreplyType extends AbstractType
         )
         ->add('startdate', DateTimeType::class, array(
           //'widget' => 'single_text',
-          'label' => 'Fecha de inicio',
+          'label' => 'Start date',
         ))
         ->add('enddate', DateTimeType::class, array(
           //'widget' => 'single_text',
-          'label' => 'Fecha de fin',
+          'label' => 'End date',
         ))
         ->add('active', CheckboxType::class, array(
             'label' => 'Autoreply active',

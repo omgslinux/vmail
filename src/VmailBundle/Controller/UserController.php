@@ -41,7 +41,7 @@ class UserController extends Controller
     public function editAction(Request $request)
     {
         $user=$this->getUser();
-        $formOptions['showAutoreply']=($user->getReplys()?true:false);
+        $formOptions['showAutoreply']=($user->getReply()?true:false);
         $form = $this->createForm('VmailBundle\Form\UserType', $user, $formOptions);
         $form
           ->remove('name')
