@@ -55,12 +55,6 @@ class UserController extends Controller
     {
         $user = new User();
         $showDomain=($this->isGranted('ROLE_ADMIN'));
-/*        if (!$this->isGranted('ROLE_ADMIN')) {
-            $usert=$this->getUser();
-            $user->setDomain($usert->getDomain());
-            $form->remove('domain');
-        }
-*/
         $user->setDomain($this->getUser()->getDomain());
 
         $form = $this->createForm('VmailBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
@@ -69,7 +63,7 @@ class UserController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $encoder = $this->get('security.password_encoder');
-            $encodedPassword = $encoder->encodePassword($user->getPlainpassword());
+            $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
             $user->setPassword($encodedPassword);
             $em->persist($user);
             $em->flush();
@@ -109,7 +103,6 @@ class UserController extends Controller
     public function showByEmailAction($email)
     {
         $t=explode('@', $email);
-        //dump($email);
         $em = $this->getDoctrine()->getManager();
         $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
         $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'name' => $t[0]]);
@@ -153,11 +146,6 @@ class UserController extends Controller
           ]
         );
 
-        /*if (!$this->isGranted('ROLE_ADMIN')) {
-            $usert=$this->getUser();
-            $user->setDomain($usert->getDomain());
-            $editForm->remove('domain');
-        }*/
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -166,7 +154,6 @@ class UserController extends Controller
             if (!empty($plainPassword)) {
                 $encoder = $this->get('security.password_encoder');
                 $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-                //$encodedPassword = $encoder->encodePassword($user, $form->get('plainPassword')->getData());
                 $user->setPassword($encodedPassword);
             }
             $em->persist($user);

@@ -8,6 +8,7 @@ return array(
   'Create a new domain' => 'Crear un dominio',
   'Create a new config' => 'Crear una nueva configuración',
   'Create a new distribution list' => 'Crear una lista de distribución',
+  'List' => 'Lista',
   'Users list' => 'Lista de usuarios',
   'Domains list' => 'Lista de dominios',
   'Configs list' => 'Lista de configuraciones',
