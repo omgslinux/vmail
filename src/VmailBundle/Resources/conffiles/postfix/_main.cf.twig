@@ -2,11 +2,11 @@
 # Debe añadirse al final de main.cf
 
 receive_override_options =
-alias_maps = hash:/etc/aliases, mysql:/etc/postfix/vmail/mysql-localaliases.cf
+alias_maps = hash:/etc/aliases, mysql:/etc/postfix/vmail/mysql-alias-maps.cf
 mailbox_size_limit = 0
 
 
-transport_maps = mysql:/etc/postfix/vmail/mysql-virtual_transports.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_transports.cf
+transport_maps = mysql:/etc/postfix/vmail/mysql-virtual_transport.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_transport.cf
 virtual_alias_domains =
 virtual_alias_maps = mysql:/etc/postfix/vmail/mysql-virtual_autoreply_mailboxes.cf, mysql:/etc/postfix/vmail/mysql-virtual_alias_maps.cf
 virtual_gid_maps = static:{{ GID }}
