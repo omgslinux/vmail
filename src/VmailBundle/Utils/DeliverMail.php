@@ -7,12 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use VmailBundle\Entity\Config;
 use VmailBundle\Entity\Autoreply;
-use VmailBundle\Utils\ReadConfig;
 use Doctrine\ORM\EntityManager;
 
 class DeliverMail
 {
-    private $mailer;
+    public $mailer;
 
     public function manualDeliver($sender, $recipient, $body, $virtual_mailbox_base)
     {
@@ -22,7 +21,7 @@ class DeliverMail
         $mailbox=$t[0];
 
         // Deliver the original text manually
-        $syslog.=", original delivery";
+        //$syslog.=", original delivery";
         //$mybase=$this->config->findParameter('virtual_mailbox_base');
         $homemailbox="$virtual_mailbox_base/$domain/$mailbox";
         $tmpdir="$homemailbox/tmp";

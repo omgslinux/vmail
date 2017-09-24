@@ -6,9 +6,7 @@ parameters:
 services:
     vmail.config:
       class: VmailBundle\Utils\ReadConfig
-      #arguments: ['@doctrine.orm.entity_manager']
-      properties:
-        em: '@doctrine.orm.entity_manager'
+      arguments: ['@service_container']
 
     vmail.deliver:
       class: VmailBundle\Utils\DeliverMail
@@ -16,7 +14,7 @@ services:
         mailer: '@mailer'
 
     vmail.autoreply:
-      class: VmailBundle\VmailBundle\Utils\AutoreplyMail
+      class: VmailBundle\Utils\AutoreplyMail
       arguments: ['@doctrine.orm.entity_manager']
       properties:
         deliver: '@vmail.deliver'

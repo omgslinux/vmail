@@ -7,9 +7,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use VmailBundle\Utils\DeliverMail;
-use VmailBundle\Entity\AutoreplyCache;
-use Doctrine\ORM\EntityManager;
 
 class AutoreplyCommand extends ContainerAwareCommand
 {

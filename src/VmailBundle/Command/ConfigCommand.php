@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use VmailBundle\Utils\DeliverMail;
+use VmailBundle\Entity\Config;
 use Doctrine\ORM\EntityManager;
 
 class ConfigCommand extends ContainerAwareCommand
@@ -35,12 +35,12 @@ class ConfigCommand extends ContainerAwareCommand
 
         $output->writeln("Arguments: all: $all, name: ${name}, value: ${value}");
         if ($all) {
-            $configs=$em->getRepository('VmailBundle:Config')->findAll();
+            $configs=$em->getRepository(Config::class)->findAll();
             foreach ($configs as $key => $config) {
                 $output->writeln("name: ".$config->getName().", value: ".$config->getValue().", description: ". $config->getDescription());
             }
         } else {
-            $config=$em->getRepository('VmailBundle:Config')->findOneByName($name);
+            $config=$em->getRepository(Config::class)->findOneByName($name);
 
             if (!$config) {
                 return $output->writeln("Parameter $name not found. Exiting");

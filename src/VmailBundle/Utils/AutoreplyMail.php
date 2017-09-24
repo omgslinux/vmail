@@ -5,16 +5,16 @@ namespace VmailBundle\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-use VmailBundle\Entity\Config;
-use VmailBundle\Entity\Autoreply;
-use VmailBundle\Utils\ReadConfig;
+use VmailBundle\Entity\AutoreplyCache;
+use VmailBundle\Entity\User;
+use VmailBundle\Entity\Domain;
 use Doctrine\ORM\EntityManager;
 
 class AutoreplyMail
 {
     private $em;
-    private $config;
-    private $deliver;
+    public $config;
+    public $deliver;
 
     public function __construct(EntityManager $em)
     {
@@ -24,23 +24,29 @@ class AutoreplyMail
     public function deliverReply($sender, $recipient, $body)
     {
         $virtual_mailbox_base=$this->config->findParameter('virtual_mailbox_base');
-        $deliver->manualDeliver($sender, $recipient, $body, $virtual_mailbox_base);
+        $this->deliver->manualDeliver($sender, $recipient, $body, $virtual_mailbox_base);
 
         //$body=file_get_contents('php://STDIN');
         $t=explode('@', $recipient);
 
         $em = $this->em;
-        $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
-        $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
+        $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
+        //dump($domain);
+        $user=$em->getRepository(User::class)->findOneBy(['domain' => $domain, 'name' => $t[0]]);
         //$reply=$em->getRepository('VmailBundle:Autoreply')->findOneBy(['user' => $user, 'active' => true]);
         $reply=$user->getReply();
 
         $date=new \DateTime();
         if (!empty($reply)) {
           if ($reply->isActive() && $date>$reply->getStartDate() && $date<$reply->getEndDate()) {
-            $lastcache=$em->getRepository('VmailBundle:AutoreplyCache')->findBy(['user' => $user], ['order' => 'DESC'], 1);
+            $lastcache=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
             $delay=$this->config->findParameter('autoreply_delay');
-            $lastcache->modify('+'.$delay.' h');
+            if (empty($lastcache)) {
+              $lastcache=new \DateTime();
+              $lastcache->modify('-'. $delay+1 .' h');
+            } else {
+              $lastcache->modify('+'.$delay.' h');
+            }
             if ($lastcache->format('Y-m-d H:i:s')>$date) {
               $this->sendReply($reply, $sender, $recipient, $body);
               $cache=new AutoreplyCache;

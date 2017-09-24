@@ -3,6 +3,8 @@
 namespace VmailBundle\Utils;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use VmailBundle\Entity\Config;
 use Doctrine\ORM\EntityManager;
 
@@ -11,16 +13,21 @@ class ReadConfig
     private $em;
     private $repo;
     private $value;
+    private $c;
 
-    public function __construct(EntityManager $em)
+    public function __construct(ContainerInterface $c=null)
     {
-        $this->em = $em; //   getDoctrine()->getManager();
-        $this->repo=$this->em->getRepository('VmailBundle:Config');
+        if (!empty($c)) {
+            $this->c=$c;
+        }
+        $this->em = $this->c->get('doctrine.orm.entity_manager');
     }
+
 
     public function findParameter($parameter)
     {
-        $config = $repo->findOneBy(['name' => $parameter]);
+      $this->repo=$this->em->getRepository(Config::class);
+        $config = $this->repo->findOneBy(['name' => $parameter]);
         $this->value=$config->getValue();
         return $this->value;
     }
