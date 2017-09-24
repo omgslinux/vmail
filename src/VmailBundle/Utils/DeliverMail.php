@@ -10,29 +10,21 @@ use VmailBundle\Entity\Autoreply;
 use VmailBundle\Utils\ReadConfig;
 use Doctrine\ORM\EntityManager;
 
-class DeliverMail implements ContainerInterface
+class DeliverMail
 {
-    private $em;
-    private $config;
+    private $mailer;
 
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em; //   getDoctrine()->getManager();
-        $this->config=new ReadConfig($em);
-    }
-
-    public function deliverMail($sender, $recipient, $body)
+    public function manualDeliver($sender, $recipient, $body, $virtual_mailbox_base)
     {
 
         $t=explode('@', $recipient);
-
         $domain=$t[1];
         $mailbox=$t[0];
 
         // Deliver the original text manually
         $syslog.=", original delivery";
-        $mybase=$this->config->findParameter('virtual_mailbox_base');
-        $homemailbox="$mybase/$domain/". $mailbox;
+        //$mybase=$this->config->findParameter('virtual_mailbox_base');
+        $homemailbox="$virtual_mailbox_base/$domain/$mailbox";
         $tmpdir="$homemailbox/tmp";
         $mytime=time();
         $mymicro=printf("%.06d", rand(0,1000000));
@@ -49,23 +41,15 @@ class DeliverMail implements ContainerInterface
         rename ($mytmpfile,$mynewfile);
     }
 
-    public function sendReply(Autoreply $reply, $sender)
+    public function sendMail($subject,$sender,$recipient,$body)
     {
-        $subject=sprintf($this->config->findParameter('autoreply_subject'),$reply->getUser()->getEmail());
-        $from='autoreply@' . $reply->getUser()->getDomainName();
-        $body=$reply->getMessage();
         $message = \Swift_Message::newInstance()
           ->setSubject($subject)
-          ->setFrom($from)
-          ->setTo($sender)
+          ->setFrom($sender)
+          ->setTo($recipient)
           ->setBody($body)
-    ;
-    $this->get('mailer')->send($message);
-
-
-
-        $this->config = $this->em->getRepository('VmailBundle:Config')->findAll();
-        return $this->config;
+        ;
+        $this->mailer->send($message);
     }
 
 }

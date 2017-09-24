@@ -30,7 +30,8 @@ Prerequisites (as root):
 - Create an unprivileged system user called 'vmail', member of 'vmail', having both uid and gid 5000.
 - Create /var/lib/vmail, and set vmail:vmail as owner and 770 as permissions.
 - Install courier-imap-ssl (in /etc/courier) and setup everything but authmysqlrc. IMPORTANT: for SHA512 (the default), you may need to edit /etc/courier/imapd and add in the line IMAP_CAPABILITY an extra "AUTH=CRAM-SHA512" at the end of the line.
-- Install postfix and setup everything but the virtual stuff. Create /etc/postfix/vmail directory.
+- Install other mail related stuff like gamin, amavis, spamassassing and postfix.
+- Setup everything about postfix but the virtual stuff. Create /etc/postfix/vmail directory.
 - Install the common stuff for symfony: php7, php7-mysql, php7-xml... and the web server of your choice. The web server should be able to write to /var/lib/vmail and ~/vmail/var/log/ and ~/vmail/var/cache, so setting vmail group membership for the webserver user is not a bad option.
 
 
@@ -49,9 +50,9 @@ Post installation (as root)
 - In /etc/postfix/sasl, rename the copied file to smtpd.conf, unless you're planning anything you're sure about.
 - In /etc/postfix/master.conf, add a line if you want to use the autoreply feature:
 autoreply  unix  -       n       n       -       -       pipe flags= user=vmail
-    argv=cd /home/vmail;./bin/console vmail:autoreply $sender $mailbox
+    argv=/home/vmail/vmail/bin/autoreply.sh $sender $mailbox $domain
 - In /etc/postfix/master.conf, the smtpd line, in the chroot column, must be "n". If you want to run postfix chroote, you'll have to adjust the paths or copy the files to the chrooted location instead.
-- Point the webserver docroot pointing to ~/vmail/web (~ is vmail $HOME). The webserver should be able to rewrite the addresses.
+- Point the webserver docroot pointing to ~/vmail/web (~ is vmail $HOME). The webserver should be able to rewrite the addresses. There's a file for an apache vhost. This requires libapache2-mod-fcgid and php7.0-cgi.
 
 
 Start the webserver, go to the address you've setup, and then log in the browser with the previously provided credentials.

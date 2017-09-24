@@ -6,12 +6,21 @@ parameters:
 services:
     vmail.config:
       class: VmailBundle\Utils\ReadConfig
-      arguments: ['@doctrine.orm.entity_manager']
+      #arguments: ['@doctrine.orm.entity_manager']
+      properties:
+        em: '@doctrine.orm.entity_manager'
 
     vmail.deliver:
       class: VmailBundle\Utils\DeliverMail
+      properties:
+        mailer: '@mailer'
+
+    vmail.autoreply:
+      class: VmailBundle\VmailBundle\Utils\AutoreplyMail
       arguments: ['@doctrine.orm.entity_manager']
+      properties:
+        deliver: '@vmail.deliver'
+        config: '@vmail.config'
 
     vmail.passencoder:
       class: VmailBundle\Utils\PassEncoder
-      

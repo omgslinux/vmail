@@ -8,11 +8,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use VmailBundle\Utils\DeliverMail;
+use VmailBundle\Entity\AutoreplyCache;
 use Doctrine\ORM\EntityManager;
 
 class AutoreplyCommand extends ContainerAwareCommand
 {
-    protected $body;
 
     protected function configure()
     {
@@ -29,12 +29,12 @@ class AutoreplyCommand extends ContainerAwareCommand
     {
         $sender = $input->getArgument('sender');
         $recipient= $input->getArgument('recipient');
-        $this->body=file_get_contents('php://STDIN');
+        $body=file_get_contents('php://STDIN');
 
-
-        $output->writeln("Sender: ${sender}, recipient: ${recipient}. Body: " . $this->body);
-        //$d=new DeliverMail();
-        //$d->deliverMail($sender, $recipient, $this->body);
+        $output->writeln("Sender: ${sender}, recipient: ${recipient}. Body: " . $body);
+        $c=$this->getContainer();
+        $a=$c->get('vmail.autoreply');
+        $a->deliverReply($sender, $recipient, $body);
     }
 
 }

@@ -40,7 +40,7 @@ class AutoreplyCacheController extends Controller
         if ($request->get('demo')) {
           $deliverreply=true;
         } else {
-          $this->get('vmail:deliver')->deliverMail($sender, $recipient, $body);
+          $this->get('vmail:deliver')->manualDeliver($sender, $recipient, $body);
           if (!empty($reply)) {
             $date=new \DateTime();
             if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {

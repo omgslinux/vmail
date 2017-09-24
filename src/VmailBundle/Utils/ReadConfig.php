@@ -3,34 +3,35 @@
 namespace VmailBundle\Utils;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use VmailBundle\Entity\Config;
 use Doctrine\ORM\EntityManager;
 
 class ReadConfig
 {
     private $em;
-    private $config;
+    private $repo;
+    private $value;
 
     public function __construct(EntityManager $em)
     {
         $this->em = $em; //   getDoctrine()->getManager();
+        $this->repo=$this->em->getRepository('VmailBundle:Config');
     }
 
     public function findParameter($parameter)
     {
-        $this->config = $this->em->getRepository('VmailBundle:Config')->findOneBy(['name' => $parameter]);
-        return $this->config->getValue();
+        $config = $repo->findOneBy(['name' => $parameter]);
+        $this->value=$config->getValue();
+        return $this->value;
     }
 
     public function findAll()
     {
-        $this->config = $this->em->getRepository('VmailBundle\Entity\Config')->findAll();
-        return $this->config;
+        return $repo->findAll();
     }
 
     public function __toString()
     {
-        return $this->config->getValue();
+        return $this->value;
     }
 }
