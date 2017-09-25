@@ -58,6 +58,9 @@ class AutoreplyMail
               ->setRecipient($recipient);
               $em->persist($cache);
               $em->flush();
+              syslog(LOG_INFO, "Autoreply INFO: Sender: $sender, recipient: $recipient, last sent: ". $now->format('d/m/Y H:i:s'));
+            } else {
+              syslog(LOG_NOTICE, "Autoreply NOTICE: Sender: $sender, recipient: $recipient, last sent: ". $lastreply[0]->getDateSent()->format('d/m/Y H:i:s'));
             }
           }
         }
