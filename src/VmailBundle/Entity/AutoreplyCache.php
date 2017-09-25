@@ -131,7 +131,7 @@ class AutoreplyCache
      */
     public function setRecipient($email)
     {
-        $this->email = $email;
+        $this->recipient = $email;
 
         return $this;
     }
@@ -143,7 +143,7 @@ class AutoreplyCache
      */
     public function getRecipient()
     {
-        return $this->sender;
+        return $this->recipient;
     }
 
 

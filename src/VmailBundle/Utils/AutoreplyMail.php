@@ -39,7 +39,7 @@ class AutoreplyMail
 
         $now=new \DateTime();
         if (!empty($reply)) {
-          if ($reply->isActive() && $date>$reply->getStartDate() && $date<$reply->getEndDate()) {
+          if ($reply->isActive() && $now>$reply->getStartDate() && $now<$reply->getEndDate()) {
             $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
             $delay=$this->config->findParameter('autoreply_delay');
             if (empty($lastreply)) {
@@ -50,7 +50,6 @@ class AutoreplyMail
               $lastcache->modify('+'.$delay.' h');
             }
             if ($lastcache->format('Y-m-d H:i:s')<$now) {
-              $reply=$lastreply->getReply();
               $this->sendReply($reply, $sender, $recipient, $body);
               $cache=new AutoreplyCache;
               $cache
@@ -69,7 +68,7 @@ class AutoreplyMail
         $subject=sprintf($this->config->findParameter('autoreply_subject'),$reply->getUser()->getEmail());
         $from='autoreply@' . $reply->getUser()->getDomainName();
         $body=$reply->getMessage();
-        $deliver->sendMail($subject,$from,$sender,$body);
+        $this->deliver->sendMail($subject,$from,$sender,$body);
     }
 
 }
