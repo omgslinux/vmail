@@ -27,14 +27,11 @@ class AutoreplyMail
         $virtual_mailbox_base=$this->config->findParameter('virtual_mailbox_base');
         $this->deliver->manualDeliver($sender, $recipient, $body, $virtual_mailbox_base);
 
-        //$body=file_get_contents('php://STDIN');
         $t=explode('@', $recipient);
 
         $em = $this->em;
         $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
-        //dump($domain);
         $user=$em->getRepository(User::class)->findOneBy(['domain' => $domain, 'name' => $t[0]]);
-        //$reply=$em->getRepository(Autoreply::class)->findOneBy(['user' => $user, 'active' => true]);
         $reply=$user->getReply();
 
         if (!empty($reply)) {
