@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use VmailBundle\Entity\AutoreplyCache;
+use VmailBundle\Entity\Autoreply;
 use VmailBundle\Entity\User;
 use VmailBundle\Entity\Domain;
 use Doctrine\ORM\EntityManager;
@@ -33,21 +34,23 @@ class AutoreplyMail
         $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
         //dump($domain);
         $user=$em->getRepository(User::class)->findOneBy(['domain' => $domain, 'name' => $t[0]]);
-        //$reply=$em->getRepository('VmailBundle:Autoreply')->findOneBy(['user' => $user, 'active' => true]);
+        //$reply=$em->getRepository(Autoreply::class)->findOneBy(['user' => $user, 'active' => true]);
         $reply=$user->getReply();
 
-        $date=new \DateTime();
+        $now=new \DateTime();
         if (!empty($reply)) {
           if ($reply->isActive() && $date>$reply->getStartDate() && $date<$reply->getEndDate()) {
-            $lastcache=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
+            $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
             $delay=$this->config->findParameter('autoreply_delay');
-            if (empty($lastcache)) {
+            if (empty($lastreply)) {
               $lastcache=new \DateTime();
               $lastcache->modify('-'. $delay+1 .' h');
             } else {
+              $lastcache=$lastreply->getDateSent();
               $lastcache->modify('+'.$delay.' h');
             }
-            if ($lastcache->format('Y-m-d H:i:s')>$date) {
+            if ($lastcache->format('Y-m-d H:i:s')<$now) {
+              $reply=$lastreply->getReply();
               $this->sendReply($reply, $sender, $recipient, $body);
               $cache=new AutoreplyCache;
               $cache
