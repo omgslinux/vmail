@@ -158,6 +158,15 @@ class UserController extends Controller
             }
             $em->persist($user);
             $em->flush();
+            if ($form->get('sendemail')) {
+              $config=$this->get('vmail.config');
+              $body=$config->findParameter('welcome_body');
+              $subject=$config->findParameter('welcome_subject');
+              $recipient=$user->getEmail();
+              $sender='welcome@default';
+              $deliver=$this->get('vmail.deliver');
+              $deliver->sendMail($subject,$sender,$recipient,$body);
+            }
             if ($domain) {
                 return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
             } else {
