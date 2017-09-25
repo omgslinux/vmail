@@ -37,19 +37,18 @@ class AutoreplyMail
         //$reply=$em->getRepository(Autoreply::class)->findOneBy(['user' => $user, 'active' => true]);
         $reply=$user->getReply();
 
-        $now=new \DateTime();
         if (!empty($reply)) {
           if ($reply->isActive() && $now>$reply->getStartDate() && $now<$reply->getEndDate()) {
             $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
             $delay=$this->config->findParameter('autoreply_delay');
             if (empty($lastreply)) {
               $newcache=new \DateTime();
-              $newcache->modify('-'. $delay+1 .' hour');
             } else {
               $newcache=$lastreply[0]->getDateSent();
               $newcache->modify('+'.$delay.' hour');
             }
-            if ($newcache<$now) {
+            $now=new \DateTime();
+            if ($newcache<=$now) {
               $this->sendReply($reply, $sender, $recipient, $body);
               $cache=new AutoreplyCache;
               $cache
@@ -58,9 +57,10 @@ class AutoreplyMail
               ->setRecipient($recipient);
               $em->persist($cache);
               $em->flush();
-              syslog(LOG_INFO, "Autoreply INFO: Sender: $sender, recipient: $recipient, next autoreply: ". $newcache->format('d/m/Y H:i:s'));
+              $now->modify('+'.$delay.' hour');
+              syslog(LOG_INFO, "Autoreply INFO (SENT): Sender: $sender, recipient: $recipient, next autoreply: ". $now->format('d/m/Y H:i:s'));
             } else {
-              syslog(LOG_NOTICE, "Autoreply NOTICE: Sender: $sender, recipient: $recipient, last sent: ". $lastreply[0]->getDateSent()->format('d/m/Y H:i:s'));
+              syslog(LOG_NOTICE, "Autoreply NOTICE (NOT SENT): Sender: $sender, recipient: $recipient, next sent: ". $newcache->format('d/m/Y H:i:s'));
             }
           }
         }
