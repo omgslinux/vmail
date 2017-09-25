@@ -38,6 +38,7 @@ class AutoreplyMail
         $reply=$user->getReply();
 
         if (!empty($reply)) {
+          $now=new \DateTime();
           if ($reply->isActive() && $now>$reply->getStartDate() && $now<$reply->getEndDate()) {
             $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
             $delay=$this->config->findParameter('autoreply_delay');
@@ -47,7 +48,6 @@ class AutoreplyMail
               $newcache=$lastreply[0]->getDateSent();
               $newcache->modify('+'.$delay.' hour');
             }
-            $now=new \DateTime();
             if ($newcache<=$now) {
               $this->sendReply($reply, $sender, $recipient, $body);
               $cache=new AutoreplyCache;
