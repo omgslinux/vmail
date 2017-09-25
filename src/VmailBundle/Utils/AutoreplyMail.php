@@ -43,13 +43,13 @@ class AutoreplyMail
             $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(['sender' => $sender], ['datesent' => 'DESC'], 1);
             $delay=$this->config->findParameter('autoreply_delay');
             if (empty($lastreply)) {
-              $lastcache=new \DateTime();
-              $lastcache->modify('-'. $delay+1 .' h');
+              $newcache=new \DateTime();
+              $newcache->modify('-'. $delay+1 .' h');
             } else {
-              $lastcache=$lastreply->getDateSent();
-              $lastcache->modify('+'.$delay.' h');
+              $newcache=$lastreply[0]->getDateSent();
+              $newcache->modify('+'.$delay.' h');
             }
-            if ($lastcache->format('Y-m-d H:i:s')<$now) {
+            if ($newcache<$now) {
               $this->sendReply($reply, $sender, $recipient, $body);
               $cache=new AutoreplyCache;
               $cache
