@@ -46,7 +46,7 @@ class AutoreplyCache
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="datestart", type="datetime")
+     * @ORM\Column(type="datetime")
      */
     private $datesent;
 
