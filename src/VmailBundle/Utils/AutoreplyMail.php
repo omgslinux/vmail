@@ -44,10 +44,10 @@ class AutoreplyMail
             $delay=$this->config->findParameter('autoreply_delay');
             if (empty($lastreply)) {
               $newcache=new \DateTime();
-              $newcache->modify('-'. $delay+1 .' h');
+              $newcache->modify('-'. $delay+1 .' hour');
             } else {
               $newcache=$lastreply[0]->getDateSent();
-              $newcache->modify('+'.$delay.' h');
+              $newcache->modify('+'.$delay.' hour');
             }
             if ($newcache<$now) {
               $this->sendReply($reply, $sender, $recipient, $body);
