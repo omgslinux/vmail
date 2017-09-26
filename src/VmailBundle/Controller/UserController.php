@@ -51,16 +51,10 @@ class UserController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $plainPassword = $form->get('plainPassword')->getData();
-            if (!empty($plainPassword)) {
-                $encoder = $this->get('security.password_encoder');
-                $encodedPassword = $encoder->encodePassword($user, $plainPassword);
-                $user->setPassword($encodedPassword);
-            }
+            $u=$this->get('vmail.userform');
+            $u->setUser($user);
+            $u->formSubmit($form);
 
-            $em->persist($user);
-            $em->flush();
             return $this->redirectToRoute('user_self_show');
         }
 
