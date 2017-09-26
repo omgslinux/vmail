@@ -187,7 +187,11 @@ class UserType extends AbstractType
         $builder
         ->add('submit', SubmitType::class,
         [
-          'label' => 'Save'
+          'label' => 'Save',
+          'attr' =>
+          [
+            'class' => 'btn btn-success'
+          ]
         ]
       );
     }

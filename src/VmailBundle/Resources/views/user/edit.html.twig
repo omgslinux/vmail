@@ -44,20 +44,21 @@
     {% if form.reply is not defined and user.id %}
       {% if user.reply|length == 0 %}
         <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
-      {% else %}
+      {% endif %}
+    {% else %}
+      {% if user.id %}
+        <hr>
+        <h3>{% trans %}Autoreply{% endtrans %}</h3>
         {{ form_widget(form.reply) }}
-        {% do form.replys.setRendered %}
+        {% do form.reply.setRendered %}
+        <hr>
       {% endif %}
     {% endif %}
     {{ form_end(form) }}
 
       {% if delete_form is defined %}
-    <ul>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="{% trans %}Delete{% endtrans %}">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+        {{ form_start(delete_form) }}
+            <input type="submit" class="btn btn-danger" value="{% trans %}Delete{% endtrans %}">
+        {{ form_end(delete_form) }}
     {% endif %}
 {% endblock %}

@@ -32,7 +32,7 @@
     <table class="table table-bordered">
         <tbody>
             <tr>
-                <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+                <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th>
             </tr>
             {% for list in lists %}{% set email = list.name ~ '@' ~ domain.name %}
             <tr>
