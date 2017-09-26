@@ -55,18 +55,19 @@ class UserController extends Controller
     {
         $user = new User();
         $showDomain=($this->isGranted('ROLE_ADMIN'));
-        $user->setDomain($this->getUser()->getDomain());
+        $user
+        ->setDomain($this->getUser()->getDomain())
+        ->setSendEmail(true)
+        ->setActive(true)
+        ;
 
         $form = $this->createForm('VmailBundle\Form\UserType', $user, ['showDomain' => $showDomain]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $encoder = $this->get('security.password_encoder');
-            $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-            $user->setPassword($encodedPassword);
-            $em->persist($user);
-            $em->flush();
+            $u=$this->get('vmail.userform');
+            $u->setUser($user);
+            $u->formSubmit($form);
 
             return $this->redirectToRoute('manage_user_show', array('id' => $user->getId()));
         }
@@ -149,24 +150,10 @@ class UserController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $plainPassword = $form->get('plainPassword')->getData();
-            if (!empty($plainPassword)) {
-                $encoder = $this->get('security.password_encoder');
-                $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-                $user->setPassword($encodedPassword);
-            }
-            $em->persist($user);
-            $em->flush();
-            if ($form->get('sendemail')) {
-              $config=$this->get('vmail.config');
-              $body=$config->findParameter('welcome_body');
-              $subject=$config->findParameter('welcome_subject');
-              $recipient=$user->getEmail();
-              $sender='welcome@default';
-              $deliver=$this->get('vmail.deliver');
-              $deliver->sendMail($subject,$sender,$recipient,$body);
-            }
+            $u=$this->get('vmail.userform');
+            $u->setUser($user);
+            $u->formSubmit($form);
+
             if ($domain) {
                 return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
             } else {

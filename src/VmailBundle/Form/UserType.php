@@ -108,7 +108,8 @@ class UserType extends AbstractType
             'label' => $userLabel,
             'attr' =>
             [
-              'class' => 'col-md-5'
+              'class' => 'col-md-5',
+              'placeholder' => 'Enter username'
             ]
           ]
         )
@@ -117,7 +118,8 @@ class UserType extends AbstractType
             'label' => $fullNameLabel,
             'attr' =>
             [
-              'class' => 'col-md-5'
+              'class' => 'col-md-5',
+              'placeholder' => 'Enter full name'
             ]
           ]
         )

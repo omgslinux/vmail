@@ -22,3 +22,11 @@ services:
 
     vmail.passencoder:
       class: VmailBundle\Utils\PassEncoder
+
+    vmail.userform:
+      class: VmailBundle\Utils\UserForm
+      arguments: ['@doctrine.orm.entity_manager']
+      properties:
+        deliver: '@vmail.deliver'
+        config: '@vmail.config'
+        encoder: '@security.password_encoder'

@@ -66,4 +66,6 @@ return array(
   'VMAIL' => 'Gestor de correo virtual',
   'Username' => 'Usuario',
   'Password' => 'Contraseña',
+  'Enter username' => 'Introducir el nombre de usuario',
+  'Enter full name' => 'Introducir el nombre completo',
 );

@@ -45,17 +45,14 @@ class DomainController extends Controller
         //$em = $this->getDoctrine()->getManager();
         //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $user = new User();
-        $user->setDomain($domain);
+        $user->setDomain($domain)->setSendEmail(true)->setActive(true);
         $form = $this->createForm('VmailBundle\Form\UserType', $user,['showAutoreply' => false] );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $encoder = $this->get('security.password_encoder');
-            $encodedPassword = $encoder->encodePassword($user, $user->getPlainpassword());
-            $user->setPassword($encodedPassword);
-            $em->persist($user);
-            $em->flush($user);
+            $u=$this->get('vmail.userform');
+            $u->setUser($user);
+            $u->formSubmit($form);
 
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
