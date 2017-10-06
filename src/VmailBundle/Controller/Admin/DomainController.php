@@ -95,8 +95,6 @@ class DomainController extends Controller
         return $this->render('@vmail/domain/edit.html.twig', array(
             'domain' => $domain,
             'action' => $this->get('translator')->trans('Create a new domain'),
-            'backlink' => $this->generateUrl('admin_domain_index'),
-            'backmessage' => 'Back',
             'form' => $form->createView(),
         ));
     }

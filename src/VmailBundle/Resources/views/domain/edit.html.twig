@@ -1,21 +1,25 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
-    <h1>{% trans %}Domain edit{% endtrans %}</h1>
-
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <input type="submit" value="{% trans %}Edit{% endtrans %}" />
-    {{ form_end(form) }}
-
-    <ul>
-        <li>
-            <a href="{{ backlink }}">{{ backmessage|trans }}</a>
-        </li>
-          {% if delete_form is defined %}
-            {{ form_start(delete_form) }}
-                <input type="submit" value="{% trans %}Delete{% endtrans %}">
-            {{ form_end(delete_form) }}
+  <div class="modal fade" id="vmailModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">{% trans %}Domain edit{% endtrans %}</h4>
+        </div>
+        <div class="modal-body">
+          {% if form is defined %}
+          {{ form_start(form) }}
+            {{ form_widget(form.name) }}
+            {{ form_widget(form.active) }}
+          {{ form_end(form) }}
+          <input type="submit" value="{% trans %}Edit{% endtrans %}" />
           {% endif %}
-    </ul>
-{% endblock %}
+        </div>
+        <div class="modal-footer">
+            {% if delete_form is defined %}
+              {{ form_start(delete_form) }}
+                  <input type="submit" value="{% trans %}Delete{% endtrans %}">
+              {{ form_end(delete_form) }}
+            {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
