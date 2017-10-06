@@ -5,17 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}VMAIL{% if title is defined %} - {{ title }}{% endif %}{% if is_granted('ROLE_USER') %} - ({{ app.user.username }}/{{ app.user.getRol }}/id:{{ app.user.id }}){% endif %}{% endblock %}</title>
         {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css')}}" />
-        <link rel="stylesheet" href="{{ asset('css/bootstrap-theme.min.css')}}" />
-        <link rel="stylesheet" href="{{ asset('css/boe/doc.css')}}" />
+        {#}<link rel="stylesheet" href="{{ asset('css/bootstrap.min.css')}}" />
+        <link rel="stylesheet" href="{{ asset('css/bootstrap-theme.min.css')}}" />{#}
         {% endblock %}
+        {% block jquery %}{% endblock %}
+        {% block bootstrap %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('vmaillogo.png') }}" />
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('vmaillogo.png') }}" sizes="16x16" />
     </head>
     <body>
         <nav class="navbar navbar-default">
-          {% block jquery %}{% endblock %}
-          {% block bootstrap %}{% endblock %}
           {% block html5forms %}{% endblock %}
 
           <div class="container-fluid">
