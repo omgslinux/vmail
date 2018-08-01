@@ -24,7 +24,7 @@ class AutoreplyController extends Controller
      * @Route("/new/{id}", name="user_autoreply_new")
      * @Method({"GET", "POST"})
      */
-    public function newAction(Request $request, User $user=null)
+    public function newAction(Request $request, User $user = null)
     {
         if (is_null($user)) {
             $user=$this->getUser();
@@ -59,7 +59,7 @@ class AutoreplyController extends Controller
      * @Route("/show/{id}", name="user_autoreply_show")
      * @Method("GET")
      */
-    public function showAction(User $user=null)
+    public function showAction(User $user = null)
     {
         if (is_null($user)) {
             $user=$this->getUser();
@@ -100,5 +100,4 @@ class AutoreplyController extends Controller
             'form' => $editForm->createView(),
         ));
     }
-
 }

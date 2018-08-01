@@ -38,35 +38,45 @@ class AutoreplyCacheController extends Controller
         $deliverreply=false;
         $date=new \DateTime();
         if ($request->get('demo')) {
-          $deliverreply=true;
+            $deliverreply=true;
         } else {
-          $this->get('vmail:deliver')->manualDeliver($sender, $recipient, $body);
-          if (!empty($reply)) {
-            $date=new \DateTime();
-            if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {
-              $lastcache=$em->getRepository('VmailBundle:AutoreplyCache')->findBy(['user' => $user], ['order' => 'DESC'], 1);
-              $config=$this->get('vmail:config');
-              $delay=$config->findParameter('autoreply_delay');
-              $lastcache->modify('+'.$delay.' h');
-              if ($lastcache->format('Y-m-d H:i:s')>$date) {
-                $cache=new AutoreplyCache;
-                $cache->setReply($reply);
-                $cache->setSender($sender);
-                $em->persist($cache);
-                $em->flush();
+            $this->get('vmail:deliver')->manualDeliver($sender, $recipient, $body);
+            if (!empty($reply)) {
+                $date=new \DateTime();
+                if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {
+                    $lastcache=$em->getRepository('VmailBundle:AutoreplyCache')->findBy(
+                        [
+                            'user' => $user
+                        ],
+                        [
+                            'order' => 'DESC'
+                        ],
+                        1
+                    );
+                    $config=$this->get('vmail:config');
+                    $delay=$config->findParameter('autoreply_delay');
+                    $lastcache->modify('+'.$delay.' h');
+                    if ($lastcache->format('Y-m-d H:i:s')>$date) {
+                        $cache=new AutoreplyCache;
+                        $cache->setReply($reply);
+                        $cache->setSender($sender);
+                        $em->persist($cache);
+                        $em->flush();
 
-                $deliverreply=true;
-              }
+                        $deliverreply=true;
+                    }
+                }
             }
-          }
         }
 
         if ($deliverreply===true) {
-              $this->sendReply($reply, $sender);
+            $this->sendReply($reply, $sender);
         }
-        return $this->render('@vmail/reply/show.html.twig', [
-            'item' => $reply
-          ]
+        return $this->render(
+            '@vmail/reply/show.html.twig',
+            [
+                'item' => $reply
+            ]
         );
 
 
@@ -111,5 +121,4 @@ class AutoreplyCacheController extends Controller
             'form' => $editForm->createView(),
         ));
     }
-
 }

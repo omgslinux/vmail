@@ -7,7 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-//use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 class ManagePasswordType extends AbstractType
 {
@@ -17,19 +16,21 @@ class ManagePasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-        ->add('plainPassword', RepeatedType::class,
-          [
-            'type' => PasswordType::class,
-            'required' => false,
-            'first_options' =>
+        ->add(
+            'plainPassword',
+            RepeatedType::class,
             [
-              'label' => 'Password',
-            ],
-            'second_options' =>
-            [
-              'label' => 'Confirm password',
-            ],
-          ]
+                'type' => PasswordType::class,
+                'required' => false,
+                'first_options' =>
+                [
+                    'label' => 'Password',
+                ],
+                'second_options' =>
+                [
+                    'label' => 'Confirm password',
+                ],
+            ]
         );
     }
 
@@ -39,9 +40,9 @@ class ManagePasswordType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-          [
-            'data_class' => 'AppBundle\Entity\User',
-          ]
+            [
+                'data_class' => 'AppBundle\Entity\User',
+            ]
         );
     }
 
@@ -52,6 +53,4 @@ class ManagePasswordType extends AbstractType
     {
         return 'appbundle_user';
     }
-
-
 }

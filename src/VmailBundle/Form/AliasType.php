@@ -20,41 +20,47 @@ class AliasType extends AbstractType
     {
         $domain=$options['domain'];
         $builder
-        ->add('addressname', EntityType::class,
-          [
-            'class' => 'VmailBundle:User',
-            'label' => 'Alias address',
-            'query_builder' => function (EntityRepository $er) use ($domain) {
-                $qb = $er->createQueryBuilder('u');
-                $qb
-                ->where('u.list = 0');
-                if ($domain!=0) {
+        ->add(
+            'addressname',
+            EntityType::class,
+            [
+                'class' => 'VmailBundle:User',
+                'label' => 'Alias address',
+                'query_builder' => function (EntityRepository $er) use ($domain) {
+                    $qb = $er->createQueryBuilder('u');
                     $qb
-                      ->andWhere('u.domain = :domain')
-                      ->setParameter('domain', $domain)
-                    ;
-                }
-                return $qb;
-            },
-          ]
+                    ->where('u.list = 0');
+                    if ($domain!=0) {
+                        $qb
+                          ->andWhere('u.domain = :domain')
+                          ->setParameter('domain', $domain)
+                        ;
+                    }
+                    return $qb;
+                },
+            ]
         )
-        ->add('active', CheckboxType::class,
-          [
-            'required' => false,
-            'label' => false
-          ]
+        ->add(
+            'active',
+            CheckboxType::class,
+            [
+                'required' => false,
+                'label' => false
+            ]
         )
         ;
-        $builder->get('active')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
+        $builder
+        ->get('active')
+        ->addModelTransformer(
+            new CallbackTransformer(
+                function ($booleanAsString) {
+                    // transform the string to boolean
+                    return (bool)(int)$booleanAsString;
+                },
+                function ($stringAsBoolean) {
+                    // transform the boolean to string
+                    return (string)(int)$stringAsBoolean;
+                }
             )
         );
     }
@@ -77,6 +83,4 @@ class AliasType extends AbstractType
     {
         return 'vmailbundle_aliasname';
     }
-
-
 }

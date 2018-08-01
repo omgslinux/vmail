@@ -13,13 +13,13 @@ class SecurityController extends Controller
      */
     public function loginAction(Request $request)
     {
-      $authUtils = $this->get('security.authentication_utils');
+        $authUtils = $this->get('security.authentication_utils');
 
-      // get the login error if there is one
-       $error = $authUtils->getLastAuthenticationError();
+        // get the login error if there is one
+        $error = $authUtils->getLastAuthenticationError();
 
-       // last username entered by the user
-       $lastUsername = $authUtils->getLastUsername();
+        // last username entered by the user
+        $lastUsername = $authUtils->getLastUsername();
 
 
         return $this->render('@vmail/security/login.html.twig', array(

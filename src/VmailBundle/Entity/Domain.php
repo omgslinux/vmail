@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  */
 class Domain
 {
-    Use ActivableEntityTrait;
+    use ActivableEntityTrait;
     /**
      * @var int
      *
@@ -123,5 +123,4 @@ class Domain
     {
         return $this->getName();
     }
-
 }

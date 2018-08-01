@@ -181,6 +181,4 @@ class AutoreplyCache
     {
         return $this->demo;
     }
-
-
 }

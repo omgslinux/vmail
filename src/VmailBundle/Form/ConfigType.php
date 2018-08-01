@@ -33,6 +33,4 @@ class ConfigType extends AbstractType
     {
         return 'appbundle_config';
     }
-
-
 }

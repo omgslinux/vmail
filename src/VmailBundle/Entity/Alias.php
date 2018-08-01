@@ -13,7 +13,7 @@ use VmailBundle\Entity\Traits\ActivableEntityTrait;
  */
 class Alias
 {
-    Use ActivableEntityTrait;
+    use ActivableEntityTrait;
     /**
      * @var int
      *
@@ -102,5 +102,4 @@ class Alias
     {
         return $this->getAliasname()->getEmail() .'/'. $this->getAddressname()->getEmail();
     }
-
 }

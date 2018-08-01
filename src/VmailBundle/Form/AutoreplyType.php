@@ -24,14 +24,17 @@ class AutoreplyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-        ->add('message', TextareaType::class, array(
-            'label' => 'Body message',
-            'required' => true,
-            'attr' => [
-              'cols' => 100,
-              'rows' => 3
-              ]
-            )
+        ->add(
+            'message',
+            TextareaType::class,
+            [
+                'label' => 'Body message',
+                'required' => true,
+                'attr' => [
+                    'cols' => 100,
+                    'rows' => 3
+                ]
+            ]
         )
         ->add('startdate', DateTimeType::class, array(
           //'widget' => 'single_text',
@@ -41,22 +44,27 @@ class AutoreplyType extends AbstractType
           //'widget' => 'single_text',
           'label' => 'End date',
         ))
-        ->add('active', CheckboxType::class, array(
-            'label' => 'Autoreply active',
-            'required' => false,
-            )
+        ->add(
+            'active',
+            CheckboxType::class,
+            [
+                'label' => 'Autoreply active',
+                'required' => false,
+            ]
         )
         ;
-        $builder->get('active')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($booleanAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$booleanAsString;
-                 },
-                 function ($stringAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$stringAsBoolean;
-                 }
+        $builder
+        ->get('active')
+        ->addModelTransformer(
+            new CallbackTransformer(
+                function ($booleanAsString) {
+                    // transform the string to boolean
+                    return (bool)(int)$booleanAsString;
+                },
+                function ($stringAsBoolean) {
+                    // transform the boolean to string
+                    return (string)(int)$stringAsBoolean;
+                }
             )
         );
     }
@@ -78,6 +86,4 @@ class AutoreplyType extends AbstractType
     {
         return 'vmailbundle_autoreply';
     }
-
-
 }

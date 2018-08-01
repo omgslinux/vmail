@@ -28,7 +28,12 @@ class AliasController extends Controller
     public function indexAction(Domain $domain)
     {
         if (!($this->isGranted('ROLE_ADMIN')) && $domain->getId()===0) {
-            return $this->redirectToRoute('manage_domain_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
+            return $this->redirectToRoute(
+                'manage_domain_alias_index',
+                [
+                    'id' => $this->getUser()->getDomain()->getId()
+                ]
+            );
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -48,7 +53,7 @@ class AliasController extends Controller
     public function domainindexAction(Domain $domain)
     {
         if ($domain->getId==0) {
-          return $this->redirectToRoute('manage_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
+            return $this->redirectToRoute('manage_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -80,10 +85,13 @@ class AliasController extends Controller
           ->setList(true)
           ->setPassword(false)
         ;
-        $form = $this->createForm('VmailBundle\Form\UserType', $alias, [
-          'domain' => $domain->getId(),
-          'showList' => true
-          ]
+        $form = $this->createForm(
+            'VmailBundle\Form\UserType',
+            $alias,
+            [
+                'domain' => $domain->getId(),
+                'showList' => true
+            ]
         )
         ;
         $form->handleRequest($request);
@@ -96,12 +104,13 @@ class AliasController extends Controller
             return $this->redirectToRoute('manage_alias_show', array('id' => $alias->getId()));
         }
 
-        return $this->render('@vmail/alias/edit.html.twig',
-          [
-            'domain' => $domain,
-            'form' => $form->createView(),
-            'title' => 'Alias creation'
-          ]
+        return $this->render(
+            '@vmail/alias/edit.html.twig',
+            [
+                'domain' => $domain,
+                'form' => $form->createView(),
+                'title' => 'Alias creation'
+            ]
         );
     }
 
@@ -114,20 +123,22 @@ class AliasController extends Controller
     public function domainnewAction(Request $request, Domain $domain)
     {
         if ($domain->getId()===0) {
-          return $this->redirectToRoute('manage_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
+            return $this->redirectToRoute('manage_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
         $alias = new User();
         $alias
-          ->setDomain($domain)
-          ->setList(true)
-          ->setPassword(false)
+        ->setDomain($domain)
+        ->setList(true)
+        ->setPassword(false)
         ;
-        $form = $this->createForm('VmailBundle\Form\UserType', $alias,
-          [
-            'domain' => $domain->getId(),
-            'showList' => true,
-          ]
+        $form = $this->createForm(
+            'VmailBundle\Form\UserType',
+            $alias,
+            [
+                'domain' => $domain->getId(),
+                'showList' => true,
+            ]
         )
         ;
         $form->handleRequest($request);
@@ -171,12 +182,14 @@ class AliasController extends Controller
     {
         $domain=$alias->getDomain();
         $deleteForm = $this->createDeleteForm($alias);
-        $editForm = $this->createForm('VmailBundle\Form\UserType', $alias,
-          [
-          'domain' => $domain->getId(),
-          'showAlias' => true,
-          'showList' => true
-          ]
+        $editForm = $this->createForm(
+            'VmailBundle\Form\UserType',
+            $alias,
+            [
+                'domain' => $domain->getId(),
+                'showAlias' => true,
+                'showList' => true
+            ]
         );
         $editForm->handleRequest($request);
 

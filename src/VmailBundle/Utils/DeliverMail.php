@@ -13,7 +13,7 @@ class DeliverMail
 {
     public $mailer;
 
-    public function manualDeliver($sender, $recipient, $body, $virtual_mailbox_base)
+    public function manualDeliver($recipient, $body, $virtual_mailbox_base)
     {
 
         $t=explode('@', $recipient);
@@ -21,26 +21,24 @@ class DeliverMail
         $mailbox=$t[0];
 
         // Deliver the original text manually
-        //$syslog.=", original delivery";
-        //$mybase=$this->config->findParameter('virtual_mailbox_base');
         $homemailbox="$virtual_mailbox_base/$domain/$mailbox";
         $tmpdir="$homemailbox/tmp";
         $mytime=time();
-        $mymicro=printf("%.06d", rand(0,1000000));
+        $mymicro=printf("%.06d", rand(0, 1000000));
         $mypid=getmypid();
         $myhost=gethostname();
         $mytmpfile=$tmpdir . "/" . $mytime . ".M" . $mymicro . "P". $mypid . "." . $myhost;
-        file_put_contents($mytmpfile,$body);
+        file_put_contents($mytmpfile, $body);
         $mystat=stat($mytmpfile);
         $mydev=$mystat['dev'];
         $myino=$mystat['ino'];
         $mysize=$mystat['size'];
-        $mynewfile="$homemailbox/new/" . $mytime . ".M" . $mymicro . "P". $mypid . "V". $mydev . "I". $myino . "." . $myhost . ",S=" . $mysize;
+        $mynewfile=$mytime . ".M" . $mymicro . "P". $mypid . "V". $mydev . "I". $myino . "." . $myhost . ",S=$mysize";
 
-        rename ($mytmpfile,$mynewfile);
+        rename($mytmpfile, "$homemailbox/new/" . $mynewfile);
     }
 
-    public function sendMail($subject,$sender,$recipient,$body)
+    public function sendMail($subject, $sender, $recipient, $body)
     {
         $message = \Swift_Message::newInstance()
           ->setSubject($subject)
@@ -50,5 +48,4 @@ class DeliverMail
         ;
         $this->mailer->send($message);
     }
-
 }

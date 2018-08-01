@@ -16,7 +16,7 @@ use VmailBundle\Entity\Autoreply;
  */
 class Autoreply
 {
-    Use ActivableEntityTrait;
+    use ActivableEntityTrait;
     /**
      * @var int
      *
@@ -214,7 +214,4 @@ class Autoreply
 
         return $this;
     }
-
-
-
 }

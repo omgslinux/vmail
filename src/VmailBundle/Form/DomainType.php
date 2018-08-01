@@ -16,25 +16,30 @@ class DomainType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-          ->add('name')
-          ->add('active', CheckboxType::class, array(
-            'label' => 'Active',
-            'required' => false
-          )
+        ->add('name')
+        ->add(
+            'active',
+            CheckboxType::class,
+            [
+                'label' => 'Active',
+                'required' => false
+            ]
         );
-        $builder->get('active')
-             ->addModelTransformer(new CallbackTransformer(
-                 function ($activeAsString) {
-                     // transform the string to boolean
-                     return (bool)(int)$activeAsString;
-                 },
-                 function ($activeAsBoolean) {
-                     // transform the boolean to string
-                     return (string)(int)$activeAsBoolean;
-                 }
+        $builder
+        ->get('active')
+        ->addModelTransformer(
+            new CallbackTransformer(
+                function ($activeAsString) {
+                    // transform the string to boolean
+                    return (bool)(int)$activeAsString;
+                },
+                function ($activeAsBoolean) {
+                    // transform the boolean to string
+                    return (string)(int)$activeAsBoolean;
+                }
             )
-          );
-        }
+        );
+    }
 
     /**
      * {@inheritdoc}
@@ -53,6 +58,4 @@ class DomainType extends AbstractType
     {
         return 'appbundle_domain';
     }
-
-
 }

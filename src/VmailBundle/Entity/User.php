@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
  */
 class User implements UserInterface
 {
-    Use ActivableEntityTrait, UserInterfaceEntityTrait;
+    use ActivableEntityTrait, UserInterfaceEntityTrait;
 
     /**
      * @var int
@@ -43,7 +43,7 @@ class User implements UserInterface
      *
      * @ORM\Column(type="string", length=64, nullable=true)
      */
-     private $fullName;
+    private $fullName;
 
     /**
      * @var string
@@ -456,9 +456,9 @@ class User implements UserInterface
     public function __toString()
     {
         if ($this->getDomain()->getId()===0) {
-          return $this->getName();
+            return $this->getName();
         } else {
-          return $this->getEmail();
+            return $this->getEmail();
         }
     }
 }
