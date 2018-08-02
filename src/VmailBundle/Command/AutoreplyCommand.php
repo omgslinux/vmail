@@ -33,8 +33,8 @@ class AutoreplyCommand extends ContainerAwareCommand
         $now=new \DateTime();
         syslog(
             LOG_INFO,
-            "Autoreply INFO (PROCESANDO): Sender: $sender, recipient: $recipient, hora entrada: ".
-                $now->format('d/m/Y H:i:s')
+            "Autoreply INFO (PROCESANDO): Sender: $sender, recipient: $recipient, tamaño: "
+                .strlen($body)." hora entrada: ". $now->format('d/m/Y H:i:s')
         );
         $a=$c->get('vmail.autoreply');
         $a->deliverReply($sender, $recipient, $body);
