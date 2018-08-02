@@ -26,7 +26,8 @@ class AutoreplyCommand extends ContainerAwareCommand
     {
         $sender = $input->getArgument('sender');
         $recipient= $input->getArgument('recipient');
-        $body=file_get_contents('php://STDIN');
+        $bodyfile=trim(file_get_contents('php://STDIN'));
+        $body=file_get_contents($bodyfile);
 
         $output->writeln("Sender: ${sender}, recipient: ${recipient}. Body: " . $body);
         $c=$this->getContainer();
