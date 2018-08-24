@@ -5,7 +5,7 @@ namespace VmailBundle\Controller\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\User;
 
@@ -27,7 +27,7 @@ class DomainController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $domains = $em->getRepository('VmailBundle:Domain')->findAll();
+        $domains = $em->getRepository(Domain::class)->findAll();
 
         return $this->render('@vmail/domain/index.html.twig', array(
             'domains' => $domains,
@@ -42,11 +42,13 @@ class DomainController extends Controller
      */
     public function newUserAction(Request $request, Domain $domain)
     {
-        //$em = $this->getDoctrine()->getManager();
-        //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $user = new User();
         $user->setDomain($domain)->setSendEmail(true)->setActive(true);
-        $form = $this->createForm('VmailBundle\Form\UserType', $user,['showAutoreply' => false] );
+        $form = $this->createForm(
+            'VmailBundle\Form\UserType',
+            $user,
+            ['showAutoreply' => false]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -74,8 +76,6 @@ class DomainController extends Controller
      */
     public function newAction(Request $request)
     {
-        //$em = $this->getDoctrine()->getManager();
-        //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $domain = new Domain();
         $form = $this->createForm('VmailBundle\Form\DomainType', $domain);
         $form->handleRequest($request);
@@ -185,9 +185,9 @@ class DomainController extends Controller
     public function showByNameAction(Request $request, $name)
     {
         $em = $this->getDoctrine()->getManager();
-        $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $name]);
-        $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 0]);
-        $lists=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
+        $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $name]);
+        $users=$em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 0]);
+        $lists=$em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
         $deleteForm = $this->createDeleteForm($domain);
 
         return $this->render('@vmail/domain/show.html.twig', array(
@@ -208,7 +208,7 @@ class DomainController extends Controller
     {
         $deleteForm = $this->createDeleteForm($domain);
         $em = $this->getDoctrine()->getManager();
-        $users=$em->getRepository('VmailBundle:User')->findBy(['domain' => $domain]);
+        $users=$em->getRepository(User::class)->findBy(['domain' => $domain]);
 
         return $this->redirectToRoute('admin_domain_showbyname', ['name' => $domain->getName()]);
 
@@ -218,6 +218,4 @@ class DomainController extends Controller
             'users' => $users,
         ));
     }
-
-
 }

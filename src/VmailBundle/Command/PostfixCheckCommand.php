@@ -27,11 +27,9 @@ class PostfixCheckCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $c=$this->getContainer();
         $key = $input->getOption('key');
         $source = $input->getOption('source');
         $file = $input->getArgument('file');
-        //$this->body=file_get_contents('php://STDIN');
 
         $output->writeln("Source: ${source}, file: ${file}");
 
@@ -77,5 +75,4 @@ class PostfixCheckCommand extends ContainerAwareCommand
         }
 
     }
-
 }

@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManager;
 class SetupCommand extends ContainerAwareCommand
 {
     protected $body;
-    private $em;
+    private $EM;
 
     protected function configure()
     {
@@ -30,17 +30,17 @@ class SetupCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $c=$this->getContainer();
-        $em=$this->em = $c->get('doctrine.orm.entity_manager');
+        $em=$this->EM = $c->get('doctrine.orm.entity_manager');
         $this->rawsql('TRUNCATE config');
         $domain=$em->getRepository('VmailBundle:Domain')->find(0);
 
         if (empty($domain)) {
-          $domain=new Domain();
-          $domain->setName('default')->setActive(0);
-          $em->persist($domain);
-          $em->flush();
-          $this->rawsql('UPDATE domain SET id=0 WHERE name="default"');
-          $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => 'default']);
+            $domain=new Domain();
+            $domain->setName('default')->setActive(0);
+            $em->persist($domain);
+            $em->flush();
+            $this->rawsql('UPDATE domain SET id=0 WHERE name="default"');
+            $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => 'default']);
         }
 
         $user=$em->getRepository('VmailBundle:User')->findOneByName('admin');
@@ -49,34 +49,32 @@ class SetupCommand extends ContainerAwareCommand
         $encoder=$c->get('vmail.passencoder');
         $encodedPassword = $encoder->encodePassword($plainPassword);
         if (empty($user)) {
-          $user=new User();
-          $output->writeln("Domain: id-> ". $domain->getId() .", name: " . $domain->getName() . ", active: " . ($domain->isActive()?'true':'false').PHP_EOL);
-          $user->setDomain($domain)
-          ->setActive(false)
-          ->setName('admin')
-          ->setFullName('Vmail Admin')
-          ->setPassword($encodedPassword)
-          ->setList(false)
-          ;
-          $em->persist($user);
-          $em->flush();
-          //$this->rawsql('UPDATE user SET id=0 WHERE user="admin"');
-          $user=$em->getRepository('VmailBundle:User')->findOneByName('admin');
+            $user=new User();
+            $output->writeln("Domain: id-> ". $domain->getId() .", name: " . $domain->getName() . ", active: " . ($domain->isActive()?'True':'False').PHP_EOL);
+            $user->setDomain($domain)
+            ->setActive(false)
+            ->setName('admin')
+            ->setFullName('Vmail Admin')
+            ->setPassword($encodedPassword)
+            ->setList(false)
+            ;
+            $em->persist($user);
+            $em->flush();
+            $user=$em->getRepository('VmailBundle:User')->findOneByName('admin');
         } else {
-          $user->setDomain($domain)
-          ->setActive(false)
-          ->setName('admin')
-          ->setFullName('Vmail Admin')
-          ->setPassword($encodedPassword)
-          ->setList(false)
-          ;
-          $em->persist($user);
-          $em->flush();
+            $user->setDomain($domain)
+            ->setActive(false)
+            ->setName('admin')
+            ->setFullName('Vmail Admin')
+            ->setPassword($encodedPassword)
+            ->setList(false)
+            ;
+            $em->persist($user);
+            $em->flush();
         }
 
-        $output->writeln("User: id-> " . $user->getId() .", username: " . $user->getEmail() . ", Full name: " . $user->getFullName() . ", Password: $plainPassword, list: " . ($user->isList()?'true':'false'). ", active: " . ($user->isActive()?'true':'false') );
+        $output->writeln("User: id-> " . $user->getId() .", username: " . $user->getEmail() . ", Full name: " . $user->getFullName() . ", Password: $plainPassword, list: " . ($user->isList()?'true':'false'). ", active: " . ($user->isActive()?'true':'false'));
 
-        //$output->writeln("Arguments: all: $all, name: ${name}, value: ${value}");
         $configs=
         [
           [
@@ -107,11 +105,11 @@ class SetupCommand extends ContainerAwareCommand
         ];
 
         foreach ($configs as $key) {
-          $config=new Config();
-          $config->setValue($key['value'])
-          ->setName($key['name'])
-          ->setDescription($key['description']);
-          $em->persist($config);
+            $config=new Config();
+            $config->setValue($key['value'])
+            ->setName($key['name'])
+            ->setDescription($key['description']);
+            $em->persist($config);
         }
         $em->flush();
 
@@ -122,10 +120,8 @@ class SetupCommand extends ContainerAwareCommand
     private function rawsql($rawsql)
     {
         $conn=$this->em->getConnection();
-        //writeln("Running raw SQL: $rawsql".PHP_EOL);
         $num_rows_effected = $conn->exec($rawsql);
         $this->em->flush();
         return $num_rows_effected;
     }
-
 }

@@ -55,5 +55,4 @@ class ConfigCommand extends ContainerAwareCommand
         }
 
     }
-
 }

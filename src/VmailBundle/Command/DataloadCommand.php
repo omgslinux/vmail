@@ -30,5 +30,4 @@ class DataloadCommand extends ContainerAwareCommand
 
         $output->writeln('Command result.');
     }
-
 }

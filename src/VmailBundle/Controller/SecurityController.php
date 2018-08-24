@@ -3,8 +3,8 @@ namespace VmailBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Routing\Annotation\Route;
 
 class SecurityController extends Controller
 {
@@ -36,7 +36,7 @@ class SecurityController extends Controller
         $this->get('security.context')->setToken(null);
         $this->get('request')->getSession()->invalidate();
 
-        $response = new RedirectResponse($this->generateUrl('dn_send_me_the_bundle_confirm', array(
+        return new RedirectResponse($this->generateUrl('dn_send_me_the_bundle_confirm', array(
                     'token' => $token
                     )));
     }

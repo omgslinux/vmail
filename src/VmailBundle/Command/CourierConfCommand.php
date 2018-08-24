@@ -18,7 +18,13 @@ class CourierConfCommand extends ContainerAwareCommand
         $this
             ->setName('vmail:conffiles:courier')
             ->setDescription('Writes postfix config files from database parameters')
-            ->addOption('source', 's', InputOption::VALUE_OPTIONAL, 'Source directory', './src/VmailBundle/Resources/conffiles/courier/')
+            ->addOption(
+                'source',
+                's',
+                InputOption::VALUE_OPTIONAL,
+                'Source directory',
+                './src/VmailBundle/Resources/conffiles/courier/'
+            )
             ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, 'Destination directory', '/etc/courier/')
         ;
     }
@@ -36,35 +42,39 @@ class CourierConfCommand extends ContainerAwareCommand
         $dbuser=$params['user'];
         $dbhost=$params['host'];
         $dbpass=$params['password'];
-        $virtual_mailbox_base=$em->getRepository('VmailBundle:Config')->findOneBy(['name' => 'virtual_mailbox_base'])->getValue();
+        $virtual_mailbox_base=$em->getRepository('VmailBundle:Config')->findOneBy(
+            [
+                'name' => 'virtual_mailbox_base'
+            ]
+        )->getValue();
         $stat=stat($virtual_mailbox_base);
         $uid=$stat['uid'];
         $gid=$stat['gid'];
 
         $output->writeln("Source: ${source}, destination: ${destination}");
-        #$c->get('twig.loader')->addPath($source);
         $sourcefiles = array_slice(scandir($source), 2);
 
-        foreach($sourcefiles as $sourcefile) {
-          $destfile=substr($sourcefile, 0, -strlen('.twig'));
-          $output->writeln("Procesando $sourcefile -> $destfile");
-          file_put_contents($destination . '/' . $destfile,
-            $this->getContainer()->get('templating')->render('@conffiles/courier/' . $sourcefile,
-              [
-                'dbname' => $dbname,
-                'dbuser' => $dbuser,
-                'dbhost' => $dbhost,
-                'dbpass' => $dbpass,
-                'params' => $params,
-                'UID' => $uid,
-                'GID' => $gid,
-                'enctype' => strtoupper($c->getParameter('vmail.algorithm')),
-                'virtual_mailbox_base'=> $virtual_mailbox_base,
-              ]
-            )
-          );
-          $output->writeln("\n");
+        foreach ($sourcefiles as $sourcefile) {
+            $destfile=substr($sourcefile, 0, -strlen('.twig'));
+            $output->writeln("Procesando $sourcefile -> $destfile");
+            file_put_contents(
+                $destination . '/' . $destfile,
+                $this->getContainer()->get('templating')->render(
+                    '@conffiles/courier/' . $sourcefile,
+                    [
+                        'dbname' => $dbname,
+                        'dbuser' => $dbuser,
+                        'dbhost' => $dbhost,
+                        'dbpass' => $dbpass,
+                        'params' => $params,
+                        'UID' => $uid,
+                        'GID' => $gid,
+                        'enctype' => strtoupper($c->getParameter('vmail.algorithm')),
+                        'virtual_mailbox_base'=> $virtual_mailbox_base,
+                    ]
+                )
+            );
+            $output->writeln("\n");
         }
     }
-
 }

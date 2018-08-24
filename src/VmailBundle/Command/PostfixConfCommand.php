@@ -19,8 +19,20 @@ class PostfixConfCommand extends ContainerAwareCommand
         $this
             ->setName('vmail:conffiles:postfix')
             ->setDescription('Writes postfix config files from database parameters')
-            ->addOption('source', 's', InputOption::VALUE_OPTIONAL, 'Source directory', './src/VmailBundle/Resources/conffiles/postfix/vmail/')
-            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, 'Destination directory', '/etc/postfix/vmail/')
+            ->addOption(
+                'source',
+                's',
+                InputOption::VALUE_OPTIONAL,
+                'Source directory',
+                './src/VmailBundle/Resources/conffiles/postfix/vmail/'
+            )
+            ->addOption(
+                'destination',
+                'd',
+                InputOption::VALUE_OPTIONAL,
+                'Destination directory',
+                '/etc/postfix/vmail/'
+            )
         ;
     }
 
@@ -31,9 +43,7 @@ class PostfixConfCommand extends ContainerAwareCommand
         $source = $input->getOption('source');
         $destination = $input->getOption('destination');
         print getcwd();
-        //$this->body=file_get_contents('php://STDIN');
 
-        //$em=$this->getContainer()->get('doctrine')->getManager();
         $em = $c->get('doctrine.orm.entity_manager');
         $params=$em->getConnection()->getParams();
         $dbname=$params['dbname'];
@@ -42,27 +52,24 @@ class PostfixConfCommand extends ContainerAwareCommand
         $dbpass=$params['password'];
 
         $output->writeln("Source: ${source}, destination: ${destination}");
-        #$c->get('twig.loader')->addPath($source);
         $sourcefiles = array_slice(scandir($source), 2);
-        //$sourcefile='mysql-virtual_transports.cf.twig';
 
-        foreach($sourcefiles as $sourcefile) {
-          $destfile=substr($sourcefile, 0, -strlen('.twig'));
-          $output->writeln("Procesando $sourcefile -> $destfile");
-          file_put_contents($destination . '/' . $destfile,
-            $this->getContainer()->get('templating')->render('@conffiles/postfix/vmail/' . $sourcefile,
-              [
-                'dbname' => $dbname,
-                'dbuser' => $dbuser,
-                'dbhost' => $dbhost,
-                'dbpass' => $dbpass
-              ]
-            )
-          );
-          $output->writeln("\n");
+        foreach ($sourcefiles as $sourcefile) {
+            $destfile=substr($sourcefile, 0, -strlen('.twig'));
+            $output->writeln("Procesando $sourcefile -> $destfile");
+            file_put_contents(
+                $destination . '/' . $destfile,
+                $this->getContainer()->get('templating')->render(
+                    '@conffiles/postfix/vmail/' . $sourcefile,
+                    [
+                    'dbname' => $dbname,
+                    'dbuser' => $dbuser,
+                    'dbhost' => $dbhost,
+                    'dbpass' => $dbpass
+                    ]
+                )
+            );
+            $output->writeln("\n");
         }
-        //$d=new DeliverMail();
-        //$d->deliverMail($sender, $recipient, $this->body);
     }
-
 }

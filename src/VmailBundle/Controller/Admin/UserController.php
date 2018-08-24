@@ -5,8 +5,8 @@ namespace VmailBundle\Controller\Admin;
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
 
 /**
@@ -137,14 +137,16 @@ class UserController extends Controller
      * @Route("/{id}/edit", name="manage_user_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, User $user, $domain=false)
+    public function editAction(Request $request, User $user, $domain = false)
     {
         $deleteForm = $this->createDeleteForm($user);
-        $form = $this->createForm('VmailBundle\Form\UserType', $user,
-          [
-            'showDomain'  => $this->isGranted('ROLE_ADMIN'),
-            'showAutoreply' => (count($user->getReply())?true:false),
-          ]
+        $form = $this->createForm(
+            'VmailBundle\Form\UserType',
+            $user,
+            [
+                'showDomain'  => $this->isGranted('ROLE_ADMIN'),
+                'showAutoreply' => (count($user->getReply())?true:false),
+            ]
         );
 
         $form->handleRequest($request);
