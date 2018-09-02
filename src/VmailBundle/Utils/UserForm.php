@@ -7,19 +7,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use VmailBundle\Entity\Config;
 use VmailBundle\Entity\User;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserForm
 {
-    private $em;
+    private $EM;
     public $config;
     public $deliver;
     private $user;
     public $encoder;
 
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManagerInterface $em)
     {
-        $this->em = $em; //   getDoctrine()->getManager();
+        $this->_em = $em;
     }
 
     public function setUser($user)
@@ -29,11 +29,10 @@ class UserForm
 
     public function formSubmit($form)
     {
-        $em = $this->em;
+        $em = $this->EM;
         $user=$this->user;
         $plainPassword = $form->get('plainPassword')->getData();
         if (!empty($plainPassword)) {
-            //$encoder = $this->get('security.password_encoder');
             $encodedPassword = $this->encoder->encodePassword($user, $user->getPlainpassword());
             $user->setPassword($encodedPassword);
         }
@@ -51,8 +50,7 @@ class UserForm
         $subject=$this->config->findParameter('welcome_subject');
         $recipient=$user->getEmail();
         $sender='welcome@default';
-        $this->deliver->sendMail($subject,$sender,$recipient,$body);
+        $this->deliver->sendMail($subject, $sender, $recipient, $body);
 
     }
-
 }

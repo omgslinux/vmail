@@ -9,7 +9,7 @@ use VmailBundle\Entity\AutoreplyCache;
 use VmailBundle\Entity\Autoreply;
 use VmailBundle\Entity\User;
 use VmailBundle\Entity\Domain;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class AutoreplyMail
 {
@@ -17,7 +17,7 @@ class AutoreplyMail
     public $config;
     public $deliver;
 
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManagerInterface $em)
     {
         $this->EM = $em;
     }
