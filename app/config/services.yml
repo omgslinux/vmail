@@ -28,8 +28,9 @@ services:
         resource: '../../src/VmailBundle/Controller'
         tags: ['controller.service_arguments']
 
-    #VmailBundle\Utils\AutoreplyMail:
-        #arguments: ['@doctrine.orm.entity_manager']
-        #properties:
-        #    $config: '@VmailBundle\Utils\ReadConfig'
-        #    $deliver: '@VmailBundle\Utils\DeliverMail'
+    VmailBundle\Utils\AutoreplyMail:
+        public: true
+        arguments: ['@doctrine.orm.entity_manager',
+            '@VmailBundle\Utils\DeliverMail',
+            '@VmailBundle\Utils\ReadConfig'
+            ]

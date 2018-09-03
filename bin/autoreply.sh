@@ -1,6 +1,9 @@
 #!/bin/bash
 
-cd /home/vmail/vmail
+#cd /home/vmail/vmail
+cd $(dirname $0)
+cd ..
+
 input=$(cat)
 bodyfile=~/tmp/vmail-$$.tmp
 echo "$input" > $bodyfile

@@ -28,7 +28,6 @@ class AutoreplyMail
 
     public function deliverReply($sender, $recipient, $body)
     {
-        //$virtual_mailbox_base=$this->config->findParameter('virtual_mailbox_base');
         $this->deliver->manualDeliver($recipient, $body);
 
         $t=explode('@', $recipient);
@@ -36,9 +35,7 @@ class AutoreplyMail
         $em = $this->EM;
         $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
         $user=$em->getRepository(User::class)->findOneBy(['domain' => $domain, 'name' => $t[0]]);
-        //$reply=$user->getReply();
 
-        //if (!empty($reply)) {
         if ($reply=$user->getReply()) {
             $now=new \DateTime();
             if ($reply->isActive() && $now>$reply->getStartDate() && $now<$reply->getEndDate()) {

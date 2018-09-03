@@ -37,10 +37,8 @@ class AutoreplyCommand extends ContainerAwareCommand
             "Autoreply INFO (PROCESANDO): Sender: $sender, recipient: $recipient, tamaño: "
                 .strlen($body)." hora entrada: ". $now->format('d/m/Y H:i:s')
         );
-        //$a=$c->get('vmail.autoreply');
-        $autoreply = new AutoreplyMail();
+        $autoreply = $this->getContainer()->get('VmailBundle\Utils\AutoreplyMail');
         $autoreply->deliverReply($sender, $recipient, $body);
-        //$autoreply->deliverReply($sender, $recipient, $body);
         syslog(
             LOG_DEBUG,
             "Autoreply INFO (SUCCESS): Sender: $sender, recipient: $recipient, hora autoreply: ".
