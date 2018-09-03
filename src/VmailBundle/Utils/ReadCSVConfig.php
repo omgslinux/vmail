@@ -4,8 +4,7 @@ namespace VmailBundle\Utils;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Config;
 
 /**
@@ -19,8 +18,7 @@ class ReadCSVConfig extends Controller
     /**
      * Loads the contents of a csv file into Securities from a FundBanks entity
      *
-     * @Route("/load", name="readcsv_config_load")
-     * @Method({"GET", "POST"})
+     * @Route("/load", name="readcsv_config_load", methods={"GET", "POST"})
      */
     public function loadAction(Request $request, Config $config)
     {

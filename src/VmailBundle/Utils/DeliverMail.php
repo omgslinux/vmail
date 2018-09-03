@@ -40,11 +40,11 @@ class DeliverMail
 
     public function sendMail($subject, $sender, $recipient, $body)
     {
-        $message = \Swift_Message::newInstance()
-          ->setSubject($subject)
-          ->setFrom($sender)
-          ->setTo($recipient)
-          ->setBody($body)
+        $message = (new \Swift_Message())
+        ->setSubject($subject)
+        ->setFrom($sender)
+        ->setTo($recipient)
+        ->setBody($body)
         ;
         $this->mailer->send($message);
     }

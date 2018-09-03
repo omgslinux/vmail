@@ -4,7 +4,6 @@ namespace VmailBundle\Controller;
 
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use VmailBundle\Entity\Domain;
@@ -14,7 +13,7 @@ use VmailBundle\Entity\AutoreplyCache;
 /**
  * AutoreplyCache controller.
  *
- * @Route("/user/autoreplycache")
+ * @Route("/user/autoreplycache", name="user_autoreplycache_")
  */
 class AutoreplyCacheController extends Controller
 {
@@ -22,8 +21,7 @@ class AutoreplyCacheController extends Controller
     /**
      * Creates a new Domain entity.
      *
-     * @Route("/new/{id}", name="user_autoreplycache_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
     public function newAction(Request $request, $sender, $recipient, $body)
     {
@@ -86,8 +84,7 @@ class AutoreplyCacheController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/show", name="user_autoreplycache_show")
-     * @Method("GET")
+     * @Route("/show", name="show", methods={"GET"})
      */
     public function showAction(AutoreplyCache $cache)
     {
@@ -101,8 +98,7 @@ class AutoreplyCacheController extends Controller
     /**
      * Displays a form to edit an existing user entity.
      *
-     * @Route("/edit", name="user_autoreplycache_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request, AutoreplyCache $cache)
     {
@@ -110,14 +106,14 @@ class AutoreplyCacheController extends Controller
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
             $em->persist($cache);
             $em->flush();
-            //$this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('user_autoreplycache_show');
         }
 
         return $this->render('@vmail/reply/edit.html.twig', array(
-            'item' => $reply,
+            'item' => $cache,
             'form' => $editForm->createView(),
         ));
     }

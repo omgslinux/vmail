@@ -4,7 +4,6 @@ namespace VmailBundle\Controller;
 
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
@@ -12,7 +11,7 @@ use VmailBundle\Entity\Domain;
 /**
  * User controller.
  *
- * @Route("/user/self")
+ * @Route("/user/self", name="user_self_")
  */
 class UserController extends Controller
 {
@@ -20,8 +19,7 @@ class UserController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/show", name="user_self_show")
-     * @Method("GET")
+     * @Route("/show", name="show", methods={"GET"})
      */
     public function showAction()
     {
@@ -35,8 +33,7 @@ class UserController extends Controller
     /**
      * Displays a form to edit an existing user entity.
      *
-     * @Route("/edit", name="user_self_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request)
     {

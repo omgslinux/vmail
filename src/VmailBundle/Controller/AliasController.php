@@ -4,7 +4,6 @@ namespace VmailBundle\Controller;
 
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Alias;
@@ -13,15 +12,14 @@ use VmailBundle\Entity\Domain;
 /**
  * Alias controller.
  *
- * @Route("/manage/alias")
+ * @Route("/manage/alias", name="manage_alias_")
  */
 class AliasController extends Controller
 {
     /**
      * Lists all alias entities.
      *
-     * @Route("/index/{id}", name="manage_alias_index")
-     * @Method("GET")
+     * @Route("/index/{id}", name="index", methods={"GET"})
      */
     public function indexAction(Domain $domain)
     {
@@ -45,10 +43,9 @@ class AliasController extends Controller
     /**
      * Lists all alias entities.
      *
-     * @Route("/index/{id}", name="manage_domain_alias_index")
-     * @Method("GET")
+     * @Route("/index/{id}", name="domain_index", methods={"GET"})
      */
-    public function domainindexAction(Domain $domain)
+    public function domainIndexAction(Domain $domain)
     {
         if ($domain->getId==0) {
             return $this->redirectToRoute('manage_alias_index', ['id' => $this->getUser()->getDomain()->getId()]);
@@ -66,8 +63,7 @@ class AliasController extends Controller
     /**
      * Creates a new alias entity.
      *
-     * @Route("/new/{id}", name="manage_alias_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
     public function newAction(Request $request, Domain $domain)
     {
@@ -115,10 +111,9 @@ class AliasController extends Controller
     /**
      * Creates a new alias entity.
      *
-     * @Route("/new/{id}", name="manage_domain_alias_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new/{id}", name="domain_new", methods={"GET", "POST"})
      */
-    public function domainnewAction(Request $request, Domain $domain)
+    public function domainNewAction(Request $request, Domain $domain)
     {
         if ($domain->getId()===0) {
             return $this->redirectToRoute('manage_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
@@ -159,8 +154,7 @@ class AliasController extends Controller
     /**
      * Finds and displays a alias entity.
      *
-     * @Route("/show/{id}", name="manage_alias_show")
-     * @Method("GET")
+     * @Route("/show/{id}", name="show", methods={"GET"})
      */
     public function showAction(User $alias)
     {
@@ -173,8 +167,7 @@ class AliasController extends Controller
     /**
      * Displays a form to edit an existing alias entity.
      *
-     * @Route("/{id}/edit", name="manage_alias_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request, User $alias)
     {
@@ -212,8 +205,7 @@ class AliasController extends Controller
     /**
      * Deletes a alias entity.
      *
-     * @Route("/delete/{id}", name="manage_alias_delete")
-     * @Method("DELETE")
+     * @Route("/delete/{id}", name="delete", methods={"DELETE"})
      */
     public function deleteAction(Request $request, User $alias)
     {

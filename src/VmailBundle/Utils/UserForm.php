@@ -19,7 +19,7 @@ class UserForm
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->_em = $em;
+        $this->EM = $em;
     }
 
     public function setUser($user)

@@ -4,7 +4,6 @@ namespace VmailBundle\Controller;
 
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
@@ -13,7 +12,7 @@ use VmailBundle\Entity\Autoreply;
 /**
  * Autoreply controller.
  *
- * @Route("/user/autoreply")
+ * @Route("/user/autoreply", name="user_autoreply_")
  */
 class AutoreplyController extends Controller
 {
@@ -21,8 +20,7 @@ class AutoreplyController extends Controller
     /**
      * Creates a new Domain entity.
      *
-     * @Route("/new/{id}", name="user_autoreply_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
     public function newAction(Request $request, User $user = null)
     {
@@ -56,8 +54,7 @@ class AutoreplyController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/show/{id}", name="user_autoreply_show")
-     * @Method("GET")
+     * @Route("/show/{id}", name="show", methods={"GET"})
      */
     public function showAction(User $user = null)
     {
@@ -73,8 +70,7 @@ class AutoreplyController extends Controller
     /**
      * Displays a form to edit an existing user entity.
      *
-     * @Route("/edit", name="user_autoreply_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request)
     {
@@ -89,8 +85,7 @@ class AutoreplyController extends Controller
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->persist($reply);
-            $em->flush($reply);
-            //$this->getDoctrine()->getManager()->flush();
+            $em->flush();
             return $this->redirectToRoute('user_autoreply_show');
         }
 

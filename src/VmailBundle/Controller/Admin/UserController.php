@@ -4,7 +4,7 @@ namespace VmailBundle\Controller\Admin;
 
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
@@ -12,15 +12,14 @@ use VmailBundle\Entity\Domain;
 /**
  * User controller.
  *
- * @Route("/manage/user")
+ * @Route("/manage/user", name="manage_user_")
  */
 class UserController extends Controller
 {
     /**
      * Lists all user entities.
      *
-     * @Route("/", name="manage_user_index")
-     * @Method("GET")
+     * @Route("/", name="index", methods={"GET"})
      */
     public function indexAction()
     {
@@ -48,8 +47,7 @@ class UserController extends Controller
     /**
      * Creates a new user entity.
      *
-     * @Route("/new", name="manage_user_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="new", methods={"GET", "POST"})
      */
     public function newAction(Request $request)
     {
@@ -81,8 +79,7 @@ class UserController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/domain/{id}", name="manage_user_domain_show")
-     * @Method("GET")
+     * @Route("/domain/{id}", name="domain_show", methods={"GET"})
      */
     public function showDomainAction(User $user)
     {
@@ -98,8 +95,7 @@ class UserController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/show/byemail/{email}", name="manage_user_show_byemail")
-     * @Method("GET")
+     * @Route("/show/byemail/{email}", name="show_byemail", methods={"GET"})
      */
     public function showByEmailAction($email)
     {
@@ -118,8 +114,7 @@ class UserController extends Controller
     /**
      * Finds and displays a user entity.
      *
-     * @Route("/show/byid/{id}", name="manage_user_show")
-     * @Method("GET")
+     * @Route("/show/byid/{id}", name="show", methods={"GET"})
      */
     public function showAction(User $user)
     {
@@ -134,8 +129,7 @@ class UserController extends Controller
     /**
      * Displays a form to edit an existing user entity.
      *
-     * @Route("/{id}/edit", name="manage_user_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request, User $user, $domain = false)
     {
@@ -145,7 +139,7 @@ class UserController extends Controller
             $user,
             [
                 'showDomain'  => $this->isGranted('ROLE_ADMIN'),
-                'showAutoreply' => (count($user->getReply())?true:false),
+                'showAutoreply' => null!==$user->getReply(),
             ]
         );
 
@@ -173,8 +167,7 @@ class UserController extends Controller
     /**
      * Deletes a user entity.
      *
-     * @Route("/{id}", name="manage_user_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="delete", methods={"DELETE"})
      */
     public function deleteAction(Request $request, User $user)
     {

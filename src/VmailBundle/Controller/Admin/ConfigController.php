@@ -4,7 +4,6 @@ namespace VmailBundle\Controller\Admin;
 
 use VmailBundle\Entity\Config;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,8 +17,7 @@ class ConfigController extends Controller
     /**
      * Lists all config entities.
      *
-     * @Route("/", name="config_index")
-     * @Method("GET")
+     * @Route("/", name="config_index", methods={"GET"})
      */
     public function indexAction()
     {
@@ -35,8 +33,7 @@ class ConfigController extends Controller
     /**
      * Creates a new config entity.
      *
-     * @Route("/new", name="config_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="config_new", methods={"GET", "POST"})
      */
     public function newAction(Request $request)
     {
@@ -61,8 +58,7 @@ class ConfigController extends Controller
     /**
      * Finds and displays a config entity.
      *
-     * @Route("/{id}", name="config_show")
-     * @Method("GET")
+     * @Route("/{id}", name="config_show", methods={"GET"})
      */
     public function showAction(Config $config)
     {
@@ -77,8 +73,7 @@ class ConfigController extends Controller
     /**
      * Displays a form to edit an existing config entity.
      *
-     * @Route("/{id}/edit", name="config_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="config_edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request, Config $config)
     {
@@ -102,8 +97,7 @@ class ConfigController extends Controller
     /**
      * Deletes a config entity.
      *
-     * @Route("/{id}", name="config_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="config_delete", methods={"DELETE"})
      */
     public function deleteAction(Request $request, Config $config)
     {

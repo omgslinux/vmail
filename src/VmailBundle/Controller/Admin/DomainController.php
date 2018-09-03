@@ -4,7 +4,6 @@ namespace VmailBundle\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\User;
@@ -12,7 +11,7 @@ use VmailBundle\Entity\User;
 /**
  * Domain controller.
  *
- * @Route("/admin/domain")
+ * @Route("/admin/domain", name="admin_domain_")
  */
 class DomainController extends Controller
 {
@@ -20,8 +19,7 @@ class DomainController extends Controller
     /**
      * Lists all domain entities.
      *
-     * @Route("/", name="admin_domain_index")
-     * @Method("GET")
+     * @Route("/", name="index", methods={"GET"})
      */
     public function indexAction()
     {
@@ -37,8 +35,7 @@ class DomainController extends Controller
     /**
      * Creates a new User in a Domain entity.
      *
-     * @Route("/user/new/{id}", name="admin_domain_user_new")
-     * @Method({"GET", "POST"})
+     * @Route("/user/new/{id}", name="user_new", methods={"GET", "POST"})
      */
     public function newUserAction(Request $request, Domain $domain)
     {
@@ -71,8 +68,7 @@ class DomainController extends Controller
     /**
      * Creates a new Domain entity.
      *
-     * @Route("/new", name="admin_domain_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="new", methods={"GET", "POST"})
      */
     public function newAction(Request $request)
     {
@@ -104,8 +100,7 @@ class DomainController extends Controller
     /**
      * Creates a form to edit a Domain entity.
      *
-     * @Route("/edit/{id}", name="admin_domain_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/edit/{id}", name="edit", methods={"GET", "POST"})
      */
     public function editAction(Request $request, Domain $domain)
     {
@@ -139,8 +134,7 @@ class DomainController extends Controller
     /**
      * Deletes a Domain entity.
      *
-     * @Route("/delete/{id}", name="admin_domain_delete")
-     * @Method({"GET", "DELETE"})
+     * @Route("/delete/{id}", name="delete", methods={"GET", "DELETE"})
      */
     public function deleteAction(Request $request, Domain $domain)
     {
@@ -179,8 +173,7 @@ class DomainController extends Controller
     /**
      * Creates a form to show a FundBanks entity.
      *
-     * @Route("/show/byname/{name}", name="admin_domain_showbyname")
-     * @Method({"GET", "POST"})
+     * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
     public function showByNameAction(Request $request, $name)
     {
@@ -201,21 +194,10 @@ class DomainController extends Controller
     /**
      * Creates a form to show a FundBanks entity.
      *
-     * @Route("/show/byid/{id}", name="admin_domain_show")
-     * @Method({"GET", "POST"})
+     * @Route("/show/byid/{id}", name="show", methods={"GET", "POST"})
      */
     public function showAction(Request $request, Domain $domain)
     {
-        $deleteForm = $this->createDeleteForm($domain);
-        $em = $this->getDoctrine()->getManager();
-        $users=$em->getRepository(User::class)->findBy(['domain' => $domain]);
-
         return $this->redirectToRoute('admin_domain_showbyname', ['name' => $domain->getName()]);
-
-        return $this->render('@vmail/domain/show.html.twig', array(
-            'domain' => $domain,
-            'delete_form' => $deleteForm->createView(),
-            'users' => $users,
-        ));
     }
 }
