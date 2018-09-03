@@ -179,6 +179,9 @@ class UserType extends AbstractType
                     [
                         'label' => 'Confirm password',
                     ],
+                    'attr' => [
+                        'autocomplete' => 'off'
+                    ]
                 ]
             )
             ;
