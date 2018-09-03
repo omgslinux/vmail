@@ -26,33 +26,4 @@ services:
     # and have a tag that allows actions to type-hint services
     VmailBundle\Controller\:
         resource: '../../src/VmailBundle/Controller'
-        public: true
         tags: ['controller.service_arguments']
-
-    vmail.config:
-      class: VmailBundle\Utils\ReadConfig
-      arguments: ['@service_container']
-
-    vmail.deliver:
-      class: VmailBundle\Utils\DeliverMail
-      properties:
-        mailer: '@mailer'
-
-    vmail.autoreply:
-      class: VmailBundle\Utils\AutoreplyMail
-      arguments: ['@doctrine.orm.entity_manager']
-      properties:
-        deliver: '@vmail.deliver'
-        config: '@vmail.config'
-
-    vmail.passencoder:
-      class: VmailBundle\Utils\PassEncoder
-
-    vmail.userform:
-      class: VmailBundle\Utils\UserForm
-      public: true
-      arguments: ['@doctrine.orm.entity_manager']
-      properties:
-        deliver: '@vmail.deliver'
-        config: '@vmail.config'
-        encoder: '@security.password_encoder'

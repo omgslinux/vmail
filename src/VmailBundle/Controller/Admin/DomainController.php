@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\User;
+use VmailBundle\Utils\UserForm;
+use VmailBundle\Utils\ReadConfig;
 
 /**
  * Domain controller.
@@ -37,7 +39,7 @@ class DomainController extends Controller
      *
      * @Route("/user/new/{id}", name="user_new", methods={"GET", "POST"})
      */
-    public function newUserAction(Request $request, Domain $domain)
+    public function newUserAction(Request $request, UserForm $u, Domain $domain)
     {
         $user = new User();
         $user->setDomain($domain)->setSendEmail(true)->setActive(true);
@@ -49,7 +51,6 @@ class DomainController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u=$this->get('vmail.userform');
             $u->setUser($user);
             $u->formSubmit($form);
 
@@ -70,7 +71,7 @@ class DomainController extends Controller
      *
      * @Route("/new", name="new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, ReadConfig $config)
     {
         $domain = new Domain();
         $form = $this->createForm('VmailBundle\Form\DomainType', $domain);
@@ -80,7 +81,6 @@ class DomainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
-            $config=$this->get('vmail.config');
             $base=$config->findParameter('virtual_mailbox_base');
             mkdir($base.'/'.$domain->getId());
             system("cd $base;ln -s " . $domain->getId() . " " . $domain->getName());
@@ -102,7 +102,7 @@ class DomainController extends Controller
      *
      * @Route("/edit/{id}", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, Domain $domain)
+    public function editAction(Request $request, ReadConfig $config, Domain $domain)
     {
         $deleteForm = $this->createDeleteForm($domain);
         $editform = $this->createForm('VmailBundle\Form\DomainType', $domain);
@@ -112,7 +112,6 @@ class DomainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
-            $config=$this->get('vmail.config');
             $base=$config->findParameter('virtual_mailbox_base')->getValue();
             system("rm -rf " . $base . "/" . $domain->getName());
             system("cd $base;ln -sf " . $domain->getId() . " " . $domain->getName());
@@ -136,14 +135,13 @@ class DomainController extends Controller
      *
      * @Route("/delete/{id}", name="delete", methods={"GET", "DELETE"})
      */
-    public function deleteAction(Request $request, Domain $domain)
+    public function deleteAction(Request $request, ReadConfig $config, Domain $domain)
     {
         $form = $this->createDeleteForm($domain);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $config=$this->get('vmail.config');
             $base=$config->findParameter('virtual_mailbox_base');
             system("rm -rf " . $base . "/" . $domain->getName());
             rmdir($base . "/" . $domain->getId());

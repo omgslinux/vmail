@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\Autoreply;
 use VmailBundle\Entity\AutoreplyCache;
+use VmailBundle\Utils\ReadConfig;
+use VmailBundle\Utils\DeliverMail;
 
 /**
  * AutoreplyCache controller.
@@ -23,22 +25,22 @@ class AutoreplyCacheController extends Controller
      *
      * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request, $sender, $recipient, $body)
+    public function newAction(Request $request, DeliverMail $deliver, ReadConfig $config, $sender, $recipient, $body)
     {
         //$body=file_get_contents('php://STDIN');
         $t=explode('@', $recipient);
 
         $em = $this->getDoctrine()->getManager();
-        $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => $t[1]]);
-        $user=$em->getRepository('VmailBundle:User')->findOneBy(['domain' => $domain, 'user' => $t[0]]);
-        $reply=$em->getRepository('VmailBundle:Autoreply')->findOneBy(['user' => $user, 'active' => true]);
+        $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
+        $user=$em->getRepository(User::class)->findOneBy(['domain' => $domain, 'user' => $t[0]]);
+        $reply=$em->getRepository(Autoreply::class)->findOneBy(['user' => $user, 'active' => true]);
 
         $deliverreply=false;
         $date=new \DateTime();
         if ($request->get('demo')) {
             $deliverreply=true;
         } else {
-            $this->get('vmail:deliver')->manualDeliver($sender, $recipient, $body);
+            $deliver->manualDeliver($sender, $recipient, $body);
             if (!empty($reply)) {
                 $date=new \DateTime();
                 if ($date>$reply->getStartDate() && $date<$reply->getEndDate()) {
@@ -51,7 +53,6 @@ class AutoreplyCacheController extends Controller
                         ],
                         1
                     );
-                    $config=$this->get('vmail:config');
                     $delay=$config->findParameter('autoreply_delay');
                     $lastcache->modify('+'.$delay.' h');
                     if ($lastcache->format('Y-m-d H:i:s')>$date) {
@@ -76,9 +77,6 @@ class AutoreplyCacheController extends Controller
                 'item' => $reply
             ]
         );
-
-
-        return $this->redirectToRoute('user_autoreply_show');
     }
 
     /**
@@ -92,6 +90,7 @@ class AutoreplyCacheController extends Controller
 
         return $this->render('@vmail/reply/show.html.twig', array(
             'item' => $cache,
+            'user' => $user
         ));
     }
 

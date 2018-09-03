@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
+use VmailBundle\Utils\UserForm;
 
 /**
  * User controller.
@@ -49,7 +50,7 @@ class UserController extends Controller
      *
      * @Route("/new", name="new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, UserForm $u)
     {
         $user = new User();
         $showDomain=($this->isGranted('ROLE_ADMIN'));
@@ -63,7 +64,6 @@ class UserController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u=$this->get('vmail.userform');
             $u->setUser($user);
             $u->formSubmit($form);
 
@@ -131,7 +131,7 @@ class UserController extends Controller
      *
      * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, User $user, $domain = false)
+    public function editAction(Request $request, UserForm $u, User $user, $domain = false)
     {
         $deleteForm = $this->createDeleteForm($user);
         $form = $this->createForm(
@@ -146,7 +146,6 @@ class UserController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u=$this->get('vmail.userform');
             $u->setUser($user);
             $u->formSubmit($form);
 

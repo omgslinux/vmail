@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
+use VmailBundle\Utils\UserForm;
 
 /**
  * User controller.
@@ -35,10 +36,10 @@ class UserController extends Controller
      *
      * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request)
+    public function editAction(Request $request, UserForm $u)
     {
         $user=$this->getUser();
-        $formOptions['showAutoreply']=($user->getReply()?true:false);
+        $formOptions['showAutoreply'] = null!==$user->getReply();
         $form = $this->createForm('VmailBundle\Form\UserType', $user, $formOptions);
         $form
           ->remove('name')
@@ -48,7 +49,6 @@ class UserController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u=$this->get('vmail.userform');
             $u->setUser($user);
             $u->formSubmit($form);
 
