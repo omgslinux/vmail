@@ -9,6 +9,7 @@ parameters:
     locale:  es
     vmail.conffiles: "%kernel.root_dir%/../src/VmailBundle/Resources/conffiles"
     vmail.algorithm: sha512
+    container.autowiring.strict_mode: true
 
 framework:
     #esi:             ~
