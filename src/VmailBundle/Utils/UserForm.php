@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use VmailBundle\Entity\Config;
 use VmailBundle\Entity\User;
+use VmailBundle\Utils\ReadConfig;
+use VmailBundle\Utils\DeliverMail;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserForm
@@ -17,9 +19,11 @@ class UserForm
     private $user;
     public $encoder;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, ReadConfig $config, DeliverMail $deliver)
     {
         $this->EM = $em;
+        $this->config = $config;
+        $this->deliver = $deliver;
     }
 
     public function setUser($user)

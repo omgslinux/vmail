@@ -13,6 +13,11 @@ class DeliverMail
 {
     public $mailer;
 
+    public function __construct(\Swift_Mailer $mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
     public function manualDeliver($recipient, $body, $virtual_mailbox_base)
     {
 
