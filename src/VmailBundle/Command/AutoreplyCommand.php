@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use VmailBundle\Utils\AutoreplyMail;
 
 class AutoreplyCommand extends ContainerAwareCommand
 {
@@ -30,15 +31,15 @@ class AutoreplyCommand extends ContainerAwareCommand
         $body=file_get_contents($bodyfile);
 
         $output->writeln("Sender: ${sender}, recipient: ${recipient}. Body: " . $body);
-        $c=$this->getContainer();
         $now=new \DateTime();
         syslog(
             LOG_INFO,
             "Autoreply INFO (PROCESANDO): Sender: $sender, recipient: $recipient, tamaño: "
                 .strlen($body)." hora entrada: ". $now->format('d/m/Y H:i:s')
         );
-        $a=$c->get('vmail.autoreply');
-        $a->deliverReply($sender, $recipient, $body);
+        //$a=$c->get('vmail.autoreply');
+        AutoreplyMail::deliverReply($sender, $recipient, $body);
+        //$autoreply->deliverReply($sender, $recipient, $body);
         syslog(
             LOG_DEBUG,
             "Autoreply INFO (SUCCESS): Sender: $sender, recipient: $recipient, hora autoreply: ".

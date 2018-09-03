@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use VmailBundle\Utils\DeliverMail;
+use VmailBundle\Utils\PassEncoder;
 use VmailBundle\Entity\User;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\Config;
@@ -32,7 +33,7 @@ class SetupCommand extends ContainerAwareCommand
         $c=$this->getContainer();
         $em=$this->EM = $c->get('doctrine.orm.entity_manager');
         $this->rawsql('TRUNCATE config');
-        $domain=$em->getRepository('VmailBundle:Domain')->find(0);
+        $domain=$em->getRepository(Domain::class)->find(0);
 
         if (empty($domain)) {
             $domain=new Domain();
@@ -40,14 +41,13 @@ class SetupCommand extends ContainerAwareCommand
             $em->persist($domain);
             $em->flush();
             $this->rawsql('UPDATE domain SET id=0 WHERE name="default"');
-            $domain=$em->getRepository('VmailBundle:Domain')->findOneBy(['name' => 'default']);
+            $domain=$em->getRepository(Domain::class)->findOneBy(['name' => 'default']);
         }
 
-        $user=$em->getRepository('VmailBundle:User')->findOneByName('admin');
+        $user=$em->getRepository(User::class)->findOneByName('admin');
 
         $plainPassword='vmailadmin';
-        $encoder=$c->get('vmail.passencoder');
-        $encodedPassword = $encoder->encodePassword($plainPassword);
+        //$encodedPassword = $encoder->encodePassword($plainPassword);
         if (empty($user)) {
             $user=new User();
             $output->writeln("Domain: id-> ". $domain->getId() .", name: " . $domain->getName() . ", active: " . ($domain->isActive()?'True':'False').PHP_EOL);
@@ -55,12 +55,12 @@ class SetupCommand extends ContainerAwareCommand
             ->setActive(false)
             ->setName('admin')
             ->setFullName('Vmail Admin')
-            ->setPassword($encodedPassword)
+            ->setPassword(PassEncoder::encodePassword($plainPassword))
             ->setList(false)
             ;
             $em->persist($user);
             $em->flush();
-            $user=$em->getRepository('VmailBundle:User')->findOneByName('admin');
+            $user=$em->getRepository(User::class)->findOneByName('admin');
         } else {
             $user->setDomain($domain)
             ->setActive(false)
