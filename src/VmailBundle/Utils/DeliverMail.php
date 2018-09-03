@@ -11,15 +11,20 @@ use Doctrine\ORM\EntityManager;
 
 class DeliverMail
 {
-    public $mailer;
+    private $mailer;
+    private $config;
 
-    public function __construct(\Swift_Mailer $mailer)
+    public function __construct(\Swift_Mailer $mailer, ReadConfig $config)
     {
         $this->mailer = $mailer;
+        $this->config = $config;
     }
 
-    public function manualDeliver($recipient, $body, $virtual_mailbox_base)
+    public function manualDeliver($recipient, $body, $virtual_mailbox_base = null)
     {
+        if (null==$virtual_mailbox_base) {
+            $virtual_mailbox_base=$this->config->findParameter('virtual_mailbox_base');
+        }
 
         $t=explode('@', $recipient);
         $domain=$t[1];

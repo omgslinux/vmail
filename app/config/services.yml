@@ -20,7 +20,7 @@ services:
         resource: '../../src/VmailBundle/*'
         # you can exclude directories or files
         # but if a service is unused, it's removed anyway
-        exclude: '../../src/VmailBundle/{Controller,Entity,Repository}/*'
+        exclude: '../../src/VmailBundle/{Controller,Entity,Repository}'
 
     # controllers are imported separately to make sure they're public
     # and have a tag that allows actions to type-hint services
@@ -28,8 +28,8 @@ services:
         resource: '../../src/VmailBundle/Controller'
         tags: ['controller.service_arguments']
 
-    VmailBundle\Utils\AutoreplyMail:
-      arguments: ['@doctrine.orm.entity_manager']
-      properties:
-        $config: '@VmailBundle\Utils\ReadConfig'
-        $deliver: '@VmailBundle\Utils\DeliverMail'
+    #VmailBundle\Utils\AutoreplyMail:
+        #arguments: ['@doctrine.orm.entity_manager']
+        #properties:
+        #    $config: '@VmailBundle\Utils\ReadConfig'
+        #    $deliver: '@VmailBundle\Utils\DeliverMail'

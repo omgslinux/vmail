@@ -9,32 +9,37 @@ use VmailBundle\Entity\AutoreplyCache;
 use VmailBundle\Entity\Autoreply;
 use VmailBundle\Entity\User;
 use VmailBundle\Entity\Domain;
+use VmailBundle\Utils\ReadConfig;
+use VmailBundle\Utils\DeliverMail;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AutoreplyMail
 {
     private $EM;
-    private $config;
     private $deliver;
+    private $config;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, DeliverMail $deliver, ReadConfig $config)
     {
         $this->EM = $em;
+        $this->deliver = $deliver;
+        $this->config = $config;
     }
 
     public function deliverReply($sender, $recipient, $body)
     {
-        $virtual_mailbox_base=$this->config->findParameter('virtual_mailbox_base');
-        $this->deliver->manualDeliver($recipient, $body, $virtual_mailbox_base);
+        //$virtual_mailbox_base=$this->config->findParameter('virtual_mailbox_base');
+        $this->deliver->manualDeliver($recipient, $body);
 
         $t=explode('@', $recipient);
 
         $em = $this->EM;
         $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
         $user=$em->getRepository(User::class)->findOneBy(['domain' => $domain, 'name' => $t[0]]);
-        $reply=$user->getReply();
+        //$reply=$user->getReply();
 
-        if (!empty($reply)) {
+        //if (!empty($reply)) {
+        if ($reply=$user->getReply()) {
             $now=new \DateTime();
             if ($reply->isActive() && $now>$reply->getStartDate() && $now<$reply->getEndDate()) {
                 $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(
@@ -50,8 +55,8 @@ class AutoreplyMail
                     $newcache->modify('+'.$delay.' hour');
                 }
                 if ($newcache<=$now) {
-                    $this->sendReply($reply, $sender, $recipient, $body);
-                    $cache=new AutoreplyCache;
+                    $this->sendReply($reply, $sender);
+                    $cache=new AutoreplyCache();
                     $cache
                     ->setReply($reply)
                     ->setSender($sender)

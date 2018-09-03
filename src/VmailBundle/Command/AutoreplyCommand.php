@@ -38,7 +38,8 @@ class AutoreplyCommand extends ContainerAwareCommand
                 .strlen($body)." hora entrada: ". $now->format('d/m/Y H:i:s')
         );
         //$a=$c->get('vmail.autoreply');
-        AutoreplyMail::deliverReply($sender, $recipient, $body);
+        $autoreply = new AutoreplyMail();
+        $autoreply->deliverReply($sender, $recipient, $body);
         //$autoreply->deliverReply($sender, $recipient, $body);
         syslog(
             LOG_DEBUG,
