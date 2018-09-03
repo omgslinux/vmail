@@ -28,7 +28,8 @@ services:
         resource: '../../src/VmailBundle/Controller'
         tags: ['controller.service_arguments']
 
-    VmailBundle\Utils\UserForm:
+    VmailBundle\Utils\AutoreplyMail:
       arguments: ['@doctrine.orm.entity_manager']
       properties:
-        encoder: '@security.password_encoder'
+        $config: '@VmailBundle\Utils\ReadConfig'
+        $deliver: '@VmailBundle\Utils\DeliverMail'

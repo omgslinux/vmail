@@ -33,7 +33,7 @@ class AliasController extends Controller
         }
 
         $em = $this->getDoctrine()->getManager();
-        $aliases = $em->getRepository('VmailBundle:User')->findBy(['domain' => $domain, 'list' => 1]);
+        $aliases = $em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
 
         return $this->render('@vmail/alias/index.html.twig', array(
             'items' => $aliases,

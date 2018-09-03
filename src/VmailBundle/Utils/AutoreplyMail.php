@@ -14,8 +14,8 @@ use Doctrine\ORM\EntityManagerInterface;
 class AutoreplyMail
 {
     private $EM;
-    public $config;
-    public $deliver;
+    private $config;
+    private $deliver;
 
     public function __construct(EntityManagerInterface $em)
     {

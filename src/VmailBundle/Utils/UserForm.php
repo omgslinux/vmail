@@ -9,13 +9,14 @@ use VmailBundle\Entity\Config;
 use VmailBundle\Entity\User;
 use VmailBundle\Utils\ReadConfig;
 use VmailBundle\Utils\DeliverMail;
+use VmailBundle\Utils\PassEncoder;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserForm
 {
     private $EM;
-    public $config;
-    public $deliver;
+    private $config;
+    private $deliver;
     private $user;
     public $encoder;
 
@@ -37,8 +38,9 @@ class UserForm
         $user=$this->user;
         $plainPassword = $form->get('plainPassword')->getData();
         if (!empty($plainPassword)) {
-            $encodedPassword = $this->encoder->encodePassword($user, $user->getPlainpassword());
-            $user->setPassword($encodedPassword);
+            //$encodedPassword = $this->encoder->encodePassword($user, $user->getPlainpassword());
+            //$user->setPassword($encodedPassword);
+            $user->setPassword(PassEncoder::encodePassword($user, $user->getPlainpassword()));
         }
         $em->persist($user);
         $em->flush();
