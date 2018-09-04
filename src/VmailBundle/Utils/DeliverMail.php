@@ -34,7 +34,7 @@ class DeliverMail
         $homemailbox="$virtual_mailbox_base/$domain/$mailbox";
         $tmpdir="$homemailbox/tmp";
         $mytime=time();
-        $mymicro=printf("%.06d", rand(0, 1000000));
+        $mymicro=sprintf("%06d", rand(0, 1000000));
         $mypid=getmypid();
         $myhost=gethostname();
         $mytmpfile=$tmpdir . "/" . $mytime . ".M" . $mymicro . "P". $mypid . "." . $myhost;
