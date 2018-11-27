@@ -20,11 +20,12 @@ class UserForm
     private $user;
     public $encoder;
 
-    public function __construct(EntityManagerInterface $em, ReadConfig $config, DeliverMail $deliver)
+    public function __construct(EntityManagerInterface $em, ReadConfig $config, DeliverMail $deliver, PassEncoder $enc)
     {
         $this->EM = $em;
         $this->config = $config;
         $this->deliver = $deliver;
+        $this->encoder = $enc;
     }
 
     public function setUser($user)
@@ -40,7 +41,8 @@ class UserForm
         if (!empty($plainPassword)) {
             //$encodedPassword = $this->encoder->encodePassword($user, $user->getPlainpassword());
             //$user->setPassword($encodedPassword);
-            $user->setPassword(PassEncoder::encodePassword($user, $user->getPlainpassword()));
+            //$user->setPassword(PassEncoder::encodePassword($user->getPlainpassword()));
+            $user->setPassword($this->encoder->encodePassword($user->getPlainpassword()));
         }
         $em->persist($user);
         $em->flush();

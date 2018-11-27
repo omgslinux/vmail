@@ -48,7 +48,7 @@ class PassEncoder implements PasswordEncoderInterface
     public function encodePassword($raw, $saltPrefix=null)
     {
         // Implementamos nuestro encoder personalizado
-        if (is_null($saltPrefix)) $saltPrefix=$this->getSaltPrefix($this->cryptType).md5(md5($raw));
+        if (null==$saltPrefix) $saltPrefix=$this->getSaltPrefix($this->cryptType).md5(md5($raw));
         //die(dump($raw, $this->cryptType, "salt: ".$this->getSaltPrefix($this->cryptType),$saltPrefix));
 				return crypt($raw, $saltPrefix);
         //return hash('sha1', $salt . $raw);
