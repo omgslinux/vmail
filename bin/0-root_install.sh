@@ -25,7 +25,7 @@ apt update
 apt -y upgrade
 BASIC="wget git bash-completion ca-certificates vim.tiny iputils-ping"
 MAIL="postfix-mysql courier-imap-ssl courier-authlib-mysql sasl2-bin mysql-server"
-ANTISPAM="amavisd-new"
+ANTISPAM="amavisd-new clamav spamassassin"
 PHP="php-cli php-xml php-mysql php-zip"
 CERTBOT="python-certbot-nginx"
 WEBSERVER="libapache2-mod-php"
