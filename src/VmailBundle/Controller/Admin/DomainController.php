@@ -6,8 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\User;
+use VmailBundle\Form\DomainType;
 
 /**
  * Domain controller.
@@ -21,7 +23,7 @@ class DomainController extends Controller
      * Lists all domain entities.
      *
      * @Route("/", name="admin_domain_index")
-     * @Method("GET")
+     * @Method({"GET", "POST"})
      */
     public function indexAction()
     {
@@ -70,34 +72,84 @@ class DomainController extends Controller
      * Creates a new Domain entity.
      *
      * @Route("/new", name="admin_domain_new")
-     * @Method({"GET", "POST"})
+     * @Method({"GET"})
      */
-    public function newAction(Request $request)
+    public function newDomainAction(Request $request)
     {
-        //$em = $this->getDoctrine()->getManager();
-        //$fundbanks = $em->getRepository('VmailBundle:FundBanks')->find($fund);
         $domain = new Domain();
-        $form = $this->createForm('VmailBundle\Form\DomainType', $domain);
-        $form->handleRequest($request);
+        $form = $this->createDomainForm($domain);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($domain);
-            $em->flush();
-            $config=$this->get('vmail.config');
-            $base=$config->findParameter('virtual_mailbox_base');
-            mkdir($base.'/'.$domain->getId());
-            system("cd $base;ln -s " . $domain->getId() . " " . $domain->getName());
-
-            return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
-        }
-
-        return $this->render('@vmail/domain/edit.html.twig', array(
+        return $this->render('@vmail/domain/new.html.twig', array(
             'domain' => $domain,
             'action' => $this->get('translator')->trans('Create a new domain'),
             'form' => $form->createView(),
         ));
     }
+
+    /**
+     * Creates a new Demo entity.
+     *
+     * @Route("/new", name="admin_domain_create")
+     * @Method("POST")
+     *
+     */
+    public function createDomainAction(Request $request)
+    {
+        //This is optional. Do not do this check if you want to call the same action using a regular request.
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(array('message' => 'You can access this only using Ajax!'), 400);
+        }
+
+        $entity = new Domain();
+        $form = $this->createDomainForm($entity);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+
+            return new JsonResponse(array('message' => 'Success!'), 200);
+        }
+
+        $response = new JsonResponse(
+            [
+                'message' => 'Error',
+                'form' => $this->renderView(
+                    '@vmail/user/form.html.twig',
+                    [
+                        'entity' => $entity,
+                        'form' => $form->createView(),
+                    ]
+                ),
+            ],
+            400
+        );
+dump($response);
+        return $response;
+    }
+
+    /**
+     * Creates a form to create a Demo entity.
+     *
+     * @param Demo $entity The entity
+     *
+     * @return SymfonyComponentFormForm The form
+     */
+    private function createDomainForm(Domain $entity)
+    {
+        $form = $this->createForm(
+            DomainType::class,
+            $entity,
+            [
+                'action' => $this->generateUrl('admin_domain_create'),
+                'method' => 'POST',
+            ]
+        );
+
+        return $form;
+    }
+
 
     /**
      * Creates a form to edit a Domain entity.

@@ -1,6 +1,8 @@
 {% block jquery %}
 <script type="text/javascript" src="{{ asset('shared/js/jquery-3.1.1.min.js') }}">
 </script>
+<script type="text/javascript" src="{{ asset('shared/js/main.js') }}">
+</script>
 {% endblock %}
 
 {% block bootstrap %}
@@ -14,3 +16,5 @@
         <script type="text/javascript" src="{{ asset('shared/js/html5Forms.js') }}" data-webforms2-support="date" data-webforms2-force-js-validation="true" data-lang="qq">
         </script>
 {% endblock %}
+
+        {% block content %}{% endblock %}

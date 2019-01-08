@@ -76,6 +76,12 @@
         <div class="container">
           {% include '@vmail/custom.html.twig' %}
         {% block body %}{% endblock %}
+        <div class="modal fade" id="vmailModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">{% block content %}{% endblock %}
+                </div>
+            </div>
+            </div>
         </div>
         {% block javascripts %}{% endblock %}
     </body>
