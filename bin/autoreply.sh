@@ -17,12 +17,12 @@ recipients=$(( NUMPARAMS / 2 ))
 logger -t autoreply "Todo: $NUMPARAMS: ($PARAMS) Sender: $sender Destinatarios: $recipients, bodyfile: $bodyfile ($bodysize bytes)"
 while [[ $(echo $1|grep -v 'autoreply.') ]]
 do
-	mailbox=$1
-	domain=${!dparam##autoreply.}
+    mailbox=$1
+    domain=${!dparam##autoreply.}
     logger -t autoreply "Recipient: $mailbox@$domain($dparam)"
-	#echo "bin/console vmail:autoreply $sender $mailbox@$domain"
+    #echo "bin/console vmail:autoreply $sender $mailbox@$domain"
     echo $bodyfile|bin/console vmail:autoreply $sender $mailbox@$domain
-   	shift
+    shift
 done
 ## Fin de apaño mientras no se soluciona la query
 
