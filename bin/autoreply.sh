@@ -14,6 +14,7 @@ sender=$1
 PARAMS="$@"
 NUMPARAMS="$#"
 recipients=$(( NUMPARAMS / 2 ))
+dparam=$(( recipients + 1 ))
 logger -t autoreply "Todo: $NUMPARAMS: ($PARAMS) Sender: $sender Destinatarios: $recipients, bodyfile: $bodyfile ($bodysize bytes)"
 while [[ $(echo $1|grep -v 'autoreply.') ]]
 do
