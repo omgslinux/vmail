@@ -13,6 +13,7 @@ sender=$1
 ## Apaño mientras no se soluciona la query
 PARAMS="$@"
 NUMPARAMS="$#"
+shift
 recipients=$(( NUMPARAMS / 2 ))
 dparam=$(( recipients + 1 ))
 contador=0
