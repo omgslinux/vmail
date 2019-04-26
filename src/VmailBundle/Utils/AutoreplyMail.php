@@ -40,8 +40,10 @@ class AutoreplyMail
             $now=new \DateTime();
             if ($reply->isActive() && $now>$reply->getStartDate() && $now<$reply->getEndDate()) {
                 $lastreply=$em->getRepository(AutoreplyCache::class)->findBy(
-                    ['recipient' => $recipient],
-                    ['sender' => $sender],
+                    [
+                        'recipient' => $recipient,
+                        'sender' => $sender
+                    ],
                     ['datesent' => 'DESC'],
                     1
                 );
