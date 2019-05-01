@@ -7,12 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use VmailBundle\Entity\User;
 use VmailBundle\Entity\Traits\ActivableEntityTrait;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Domain
  *
  * @ORM\Entity(repositoryClass="VmailBundle\Repository\DomainRepository")
- * @ORM\Table(name="domain", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"name", "id"})})
+ * @ORM\Table(name="domain", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"name"})})
+ * @UniqueEntity(fields="name", message="El nombre ya está en uso")
  */
 class Domain
 {

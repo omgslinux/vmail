@@ -11,7 +11,7 @@ return array(
   'Create a new distribution list' => 'Crear una lista de distribución',
   'List' => 'Lista',
   'Users list' => 'Lista de usuarios',
-  'Domains list' => 'Lista de dominios',
+  'Domain list' => 'Lista de dominios',
   'Configs list' => 'Lista de configuraciones',
   'Config creation' => 'Creación de configuración',
   'Config edit' => 'Edición de configuración',

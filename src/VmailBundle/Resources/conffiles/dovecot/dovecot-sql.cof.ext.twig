@@ -1,0 +1,56 @@
+MYSQL_USER_TABLE	user u JOIN domain d ON u.domain_id=d.id
+MYSQL_LOGIN_FIELD CONCAT(u.user, '@', d.name)
+#MYSQL_CRYPT_PWFIELD	CONCAT('{{ '{' ~ enctype ~ '}' }}',password)
+MYSQL_CRYPT_PWFIELD	password
+# MYSQL_CLEAR_PWFIELD	clear
+MYSQL_HOME_FIELD "{{ virtual_mailbox_base }}"
+MYSQL_QUOTA_FIELD quota
+MYSQL_MAILDIR_FIELD	CONCAT(d.name, '/', u.user)
+MYSQL_UID_FIELD		{{ UID }}
+MYSQL_GID_FIELD		{{ GID }}
+
+
+MYSQL_SERVER		{{ dbhost }}
+MYSQL_USERNAME	{{ dbuser }}
+MYSQL_PASSWORD	{{ dbpass }}
+MYSQL_PORT		  {{ params['port'] }}
+MYSQL_OPT		0
+MYSQL_DATABASE	{{ dbname }}
+
+# MYSQL_CHARACTER_SET latin1
+
+DEFAULT_DOMAIN		mailtest.org
+
+
+# MYSQL_WHERE_CLAUSE	server='mailhost.example.com'
+MYSQL_SELECT_CLAUSE     SELECT CONCAT(u.user, '@', d.name), password, '', {{ UID }}, {{ GID }}, \
+	"{{ virtual_mailbox_base }}", CONCAT(d.name, '/', u.user), quota,'','' \
+	FROM user u JOIN domain d ON u.domain_id=d.id \
+	WHERE u.user='$(local_part)' AND d.name='$(domain)'
+
+
+
+#For database driver, we want mysql:
+driver = mysql
+
+#The connect string will point to the maildb database on the local machine,
+#with the user and password you defined when you set it up according to Flurdy.
+#connect = host=127.0.0.1 dbname=maildb user=mail password=mailPASSWORD
+connect = host={{ dbhost }} dbname={{ dbname }} user={{ dbuser }} password={{ dbpass }}
+
+#We'll be using the encrypted password from the mysql database:
+default_pass_scheme = {{ encrypt }} {# CRYPT #}
+
+#Set the password query to point to the users table:
+#password_query = SELECT id AS user, crypt AS password, CONCAT(home,'/',maildir) AS userdb_home, \
+#                        uid AS userdb_uid, gid AS userdb_gid, CONCAT(home,'/',maildir) AS userdb_mail FROM users WHERE id='%u'
+# For LDA:
+#user_query = SELECT home, uid, gid FROM users WHERE userid = '%u'
+
+password_query = SELECT user, password,  CONCAT({{ virtual_mailbox_base }}, '/', d.name, '/', u.user) AS userdb_home, \
+                {{ UID }} AS userdb_uid, {{ GID }} AS userdb_gid, AS userdb_mail \
+				FROM user u JOIN domain d ON u.domain_id=d.id WHERE u.user='%n' AND d.name='%d'
+
+# For LDA:
+user_query = SELECT CONCAT({{ virtual_mailbox_base }}, '/', d.name, '/', u.user) as home, {{ UID }} AS uid, {{ GID }} AS gid \
+	FROM user u JOIN domain d ON u.domain_id=d.id WHERE u.user='%n' AND d.name='%d'

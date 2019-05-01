@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}Domains list{% endtrans %}</h1>
+    <h1>{% trans %}Domain list{% endtrans %}</h1>
 
     <table class="table table-bordered">
         <thead>
@@ -22,7 +22,7 @@
     {% if is_granted('ROLE_ADMIN') %}
     <ul>
         <li>
-            <a href="{{ path('admin_domain_new') }}">{% trans %}Create a new domain{% endtrans %}</a>
+            <a href="{{ path('admin_domain_new') }}" {{ modal }}>{% trans %}Create a new domain{% endtrans %}</a>
         </li>
     </ul>
     {% endif %}

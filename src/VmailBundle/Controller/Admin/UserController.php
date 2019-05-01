@@ -4,7 +4,6 @@ namespace VmailBundle\Controller\Admin;
 
 use VmailBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use VmailBundle\Entity\Domain;
@@ -24,7 +23,6 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        //$em = $this->getDoctrine()->getManager();
 
         $domain=$this->getUser()->getDomain();
         $users=[];
@@ -70,7 +68,7 @@ class UserController extends Controller
             return $this->redirectToRoute('manage_user_show', array('id' => $user->getId()));
         }
 
-        return $this->render('@vmail/user/edit.html.twig', array(
+        return $this->render('@vmail/user/form.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
         ));
@@ -156,7 +154,7 @@ class UserController extends Controller
             }
         }
 
-        return $this->render('@vmail/user/edit.html.twig', array(
+        return $this->render('@vmail/user/form.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
             'delete_form' => $deleteForm->createView(),

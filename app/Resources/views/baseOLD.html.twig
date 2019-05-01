@@ -74,40 +74,9 @@
           </div><!-- /.container-fluid -->
         </nav>
 
-        <div class="{% if app.user and is_granted('ROLE_ADMIN') %}content-wrapper{% endif %}">
-        {% if app.session.flashBag.has('success') %}
-            <div class="alert alert-success">
-            {% for msg in app.session.flashBag.get('success') %}
-                {{ msg }}
-            {% endfor %}
-            </div>
-        {% endif %}
-        {% if app.session.flashBag.has('warning') %}
-            <div class="alert alert-warning">
-            {% for msg in app.session.flashBag.get('warning') %}
-                {{ msg }}
-            {% endfor %}
-            </div>
-        {% endif %}
-        {% if app.session.flashBag.has('error') %}
-            <div class="alert alert-danger">
-            {% for msg in app.session.flashBag.get('error') %}
-                {{ msg }}
-            {% endfor %}
-            </div>
-        {% endif %}
-            <div class="container">
-            {% set modal %}data-toggle="modal" data-target="#vmailModal"{% endset %}
-            {% include '@vmail/custom.html.twig' %}
-            {% block body %}{% endblock %}
-                <div class="modal fade" id="vmailModal" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            {% block content %}{% endblock %}
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="container">
+          {% include '@vmail/custom.html.twig' %}
+        {% block body %}{% endblock %}
         </div>
         {% block javascripts %}{% endblock %}
     </body>

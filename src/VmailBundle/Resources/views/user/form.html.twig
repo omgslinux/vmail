@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'crud.html.twig' %}
 
 {% block body %}
     {% if delete_form is defined %}
@@ -61,4 +61,10 @@
             <input type="submit" class="btn btn-danger" value="{% trans %}Delete{% endtrans %}">
         {{ form_end(delete_form) }}
     {% endif %}
+{% endblock %}
+
+{% block buttons %}
+<div class="record_actions">
+{{ form_widget(form.save, {'label': 'Guardar',  'attr': {'class': 'ladda-button btn btn-primary btn-save', 'data-style': 'zoom-in'} }) }}
+
 {% endblock %}

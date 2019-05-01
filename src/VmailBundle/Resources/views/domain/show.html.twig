@@ -10,7 +10,7 @@
                 <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             <tr>
-                <td><a title="{% trans %}Edit{% endtrans %}" href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{{ domain.name }}</a></td>
+                <td><a {{ modal }} title="{% trans %}Edit{% endtrans %}" href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{{ domain.name }}</a></td>
                 <td>{{ domain.active }}</td>
             </tr>
         </tbody>
@@ -36,7 +36,7 @@
             {% endfor %}
             <tr>
                 <td>
-                  <a href="{{ path('admin_domain_user_new', { 'id': domain.id }) }}">{% trans %}Create a new user{% endtrans %}</a>
+                  <a {{ modal }} href="{{ path('admin_domain_user_new', { 'id': domain.id }) }}">{% trans %}Create a new user{% endtrans %}</a>
                 </td>
             </tr>
         </tbody>
@@ -62,7 +62,7 @@
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-      <p><a href="{{ path('manage_alias_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
+      <p><a {{ modal }} href="{{ path('manage_alias_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
       </p>
 
 {% endblock %}

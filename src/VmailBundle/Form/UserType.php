@@ -214,7 +214,7 @@ class UserType extends AbstractType
         }
         $builder
         ->add(
-            'submit',
+            'save',
             SubmitType::class,
             [
                 'label' => 'Save',

@@ -28,7 +28,12 @@
         "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^5.2",
         "incenteev/composer-parameter-handler": "^2.0",
-        "twig/twig": "^1.0||^2.0"
+        "twig/twig": "^1.0||^2.0",
+        "robloach/component-installer": "^0.2.3",
+        "components/jquery": "^3.3",
+        "components/bootstrap-default": "^3.3",
+        "components/modernizr": "^3.5",
+        "components/bootstrap": "3.3.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0"
@@ -48,6 +53,9 @@
         "post-update-cmd": [
             "@symfony-scripts"
         ]
+    },
+    "config": {
+        "component-dir": "web/components"
     },
     "extra": {
         "symfony-app-dir": "app",

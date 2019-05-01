@@ -9,6 +9,8 @@ use VmailBundle\Entity\Domain;
 use VmailBundle\Entity\User;
 use VmailBundle\Utils\UserForm;
 use VmailBundle\Utils\ReadConfig;
+use VmailBundle\Form\UserType;
+use VmailBundle\Form\DomainType;
 
 /**
  * Domain controller.
@@ -44,9 +46,12 @@ class DomainController extends Controller
         $user = new User();
         $user->setDomain($domain)->setSendEmail(true)->setActive(true);
         $form = $this->createForm(
-            'VmailBundle\Form\UserType',
+            UserType::class,
             $user,
-            ['showAutoreply' => false]
+            [
+                'action' => $this->generateUrl('admin_domain_user_new', ['id' => $domain->getId()]),
+                'showAutoreply' => false,
+            ]
         );
         $form->handleRequest($request);
 
@@ -63,6 +68,7 @@ class DomainController extends Controller
             'backlink' => $this->generateUrl('admin_domain_index'),
             'backmessage' => 'Back',
             'form' => $form->createView(),
+            'ajax' => true,
         ));
     }
 
@@ -74,7 +80,13 @@ class DomainController extends Controller
     public function newAction(Request $request, ReadConfig $config)
     {
         $domain = new Domain();
-        $form = $this->createForm('VmailBundle\Form\DomainType', $domain);
+        $form = $this->createForm(
+            DomainType::class,
+            $domain,
+            [
+                'action' => $this->generateUrl('admin_domain_new')
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -88,12 +100,13 @@ class DomainController extends Controller
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('@vmail/domain/edit.html.twig', array(
+        return $this->render('@vmail/domain/form.html.twig', array(
             'domain' => $domain,
             'action' => $this->get('translator')->trans('Create a new domain'),
             'backlink' => $this->generateUrl('admin_domain_index'),
             'backmessage' => 'Back',
             'form' => $form->createView(),
+            'ajax' => true,
         ));
     }
 
@@ -105,14 +118,20 @@ class DomainController extends Controller
     public function editAction(Request $request, ReadConfig $config, Domain $domain)
     {
         $deleteForm = $this->createDeleteForm($domain);
-        $editform = $this->createForm('VmailBundle\Form\DomainType', $domain);
+        $editform = $this->createForm(
+            DomainType::class,
+            $domain,
+            [
+                'action' => $this->generateUrl('admin_domain_edit', [ 'id' => $domain->getId() ])
+            ]
+        );
         $editform->handleRequest($request);
 
         if ($editform->isSubmitted() && $editform->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();
-            $base=$config->findParameter('virtual_mailbox_base')->getValue();
+            $base=$config->findParameter('virtual_mailbox_base');
             system("rm -rf " . $base . "/" . $domain->getName());
             system("cd $base;ln -sf " . $domain->getId() . " " . $domain->getName());
 
@@ -120,13 +139,14 @@ class DomainController extends Controller
         }
         $t = $this->get('translator');
 
-        return $this->render('@vmail/domain/edit.html.twig', array(
+        return $this->render('@vmail/domain/form.html.twig', array(
             'domain' => $domain,
-            'action' => $t->trans('Domain edit') . ' ' . $domain->getName(),
+            'action' => 'Domain edit',
             'backlink' => $this->generateUrl('admin_domain_show', array('id' => $domain->getId())),
             'backmessage' => 'Back',
             'form' => $editform->createView(),
             'delete_form' => $deleteForm->createView(),
+            'ajax' => true
         ));
     }
 
