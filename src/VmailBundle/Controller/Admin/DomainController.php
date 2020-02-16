@@ -62,7 +62,7 @@ class DomainController extends Controller
             return $this->redirectToRoute('admin_domain_show', array('id' => $domain->getId()));
         }
 
-        return $this->render('@vmail/user/edit.html.twig', array(
+        return $this->render('@vmail/user/form.html.twig', array(
             'user' => $user,
             'action' => $this->get('translator')->trans('Create a new user'),
             'backlink' => $this->generateUrl('admin_domain_index'),

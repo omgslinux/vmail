@@ -11,7 +11,7 @@
             </tr>
             <tr>
                 <td><a {{ modal }} title="{% trans %}Edit{% endtrans %}" href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{{ domain.name }}</a></td>
-                <td>{{ domain.active }}</td>
+                <td>{{ domain.active ? '√' : '--' }}</td>
             </tr>
         </tbody>
     </table>
