@@ -1,22 +1,30 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}Domain{% endtrans %} {{ domain }}</h1>
+    <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
 
-    <table class="table table-bordered">
+        {% set modalId, modalTitle = 'domains', 'Edit domain' %}
+        {{ include('_modal.html.twig', {
+          'included': 'domain/_form',
+          'closeMessage': 'Cerrar',
+          'nobutton': true,
+          })
+        }}
+<table class="table table-bordered">
         <tbody>
             <tr>
                 <th>{% trans %}Name{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             <tr>
-                <td><a title="{% trans %}Edit{% endtrans %}" href="{{ path('admin_domain_edit', { 'id': domain.id }) }}">{{ domain.name }}</a></td>
-                <td>{{ domain.active ? '√' : '--' }}</td>
+                {#}<td><a title="{% trans %}Edit{% endtrans %}" href="{{ path(PREFIX ~ 'edit', { 'id': entity.id }) }}">{{ entity.name }}</a></td>#}
+                <td><a title="{% trans %}Edit{% endtrans %}" href="#" data-toggle="modal" data-target="#{{ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
+                <td>{{ entity.active ? '√' : '--' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <h2>{% trans %}Users in domain{% endtrans %} {{ domain.name }}</h2>
+    <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
 
     <table class="table table-bordered">
         <tbody>
@@ -26,7 +34,7 @@
                 <th>{% trans %}Active{% endtrans %}</th>
                 <th>{% trans %}Admin{% endtrans %}</th>
             </tr>
-            {% for user in users %}{% set email = user.name ~ '@' ~ domain.name %}
+            {% for user in users %}{% set email = user.name ~ '@' ~ entity.name %}
             <tr>
                 <td><a href="{{ path('manage_user_show_byemail', { 'email': email } ) }}">{{ email }}</td>
                 <td>{{ user.fullName }}</td>
@@ -36,13 +44,13 @@
             {% endfor %}
             <tr>
                 <td>
-                  <a href="{{ path('admin_domain_user_new', { 'id': domain.id }) }}">{% trans %}Create a new user{% endtrans %}</a>
+                  <a href="{{ path(PREFIX ~ 'user_new', { 'id': entity.id }) }}">{% trans %}Create a new user{% endtrans %}</a>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <h2>{% trans %}Aliases in domain{% endtrans %} {{ domain.name }}</h2>
+    <h2>{% trans %}Aliases in domain{% endtrans %} {{ entity.name }}</h2>
 
     {% if lists %}
 
@@ -51,7 +59,7 @@
             <tr>
                 <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
             </tr>
-            {% for list in lists %}{% set email = list.name ~ '@' ~ domain.name %}
+            {% for list in lists %}{% set email = list.name ~ '@' ~ entity.name %}
             <tr>
                 <td><a href="{{ path('manage_alias_show', { 'id': list.id } ) }}">{{ email }}</td>
                 <td>{{ list.isActive ? '√' : '--' }}</td>
@@ -62,7 +70,7 @@
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-      <p><a href="{{ path('manage_alias_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
+      <p><a href="{{ path('manage_alias_new', { 'id': entity.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
       </p>
 
 {% endblock %}

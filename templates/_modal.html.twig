@@ -1,5 +1,8 @@
-  <!-- Button trigger modal -->{% set modalId2 = modalId ~ "Modal" %}
-  <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle }}</a>
+{% set modalId2 = modalId ~ "Modal" %}
+{% if nobutton is not defined %}
+    <!-- Button trigger modal -->
+    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle }}</a>
+{% endif %}
   <!-- Modal -->
   <div class="modal fade" id="{{ modalId2 }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalId2 }}Label" aria-hidden="true">
       <div class="modal-dialog" role="document">

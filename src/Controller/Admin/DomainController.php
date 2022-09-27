@@ -13,6 +13,7 @@ use App\Utils\ReadConfig;
 use App\Form\UserType;
 use App\Form\DomainType;
 use App\Repository\DomainRepository as REPO;
+use App\Repository\UserRepository as UR;
 
 /**
  * Domain controller.
@@ -22,28 +23,29 @@ use App\Repository\DomainRepository as REPO;
 class DomainController extends AbstractController
 {
     const PREFIX = 'admin_domain_';
+
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
     /**
      * Lists all domain entities.
      *
      * @Route("/", name="index", methods={"GET", "POST"})
      */
-    public function indexAction(Request $request, REPO $repo, ReadConfig $config): Response
+    //public function index(Request $request, REPO $repo, ReadConfig $config): Response
+    public function index(Request $request, ReadConfig $config): Response
     {
         $entity = new Domain();
-        $form = $this->createForm(
-            DomainType::class,
-            $entity,
-            /*[
-                'action' => $this->generateUrl(self::PREFIX . 'new')
-            ]*/
-        );
+        $form = $this->createForm(DomainType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /*$em = $this->getDoctrine()->getManager();
             $em->persist($domain);
             $em->flush();*/
-            $repo->add($entity, true);
+            $this->repo->add($entity, true);
             $base=$config->findParameter('virtual_mailbox_base');
             mkdir($base.'/'.$entity->getId());
             system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
@@ -51,9 +53,9 @@ class DomainController extends AbstractController
             //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $entity->getId()));
         }
 
-
         return $this->render('domain/index.html.twig', array(
-            'entities' => $repo->findAll(),
+            'entities' => $this->repo->findAll(),
+            'title' => 'Domain list',
             'form' => $form->createView(),
             'PREFIX' => self::PREFIX,
         ));
@@ -98,112 +100,56 @@ class DomainController extends AbstractController
     }
 
     /**
-     * Creates a form to edit a Domain entity.
-     *
-     * @Route("/edit/{id}", name="edit", methods={"GET", "POST"})
-     */
-    public function editAction(Request $request, ReadConfig $config, Domain $domain)
-    {
-        $deleteForm = $this->createDeleteForm($domain);
-        $editform = $this->createForm(
-            DomainType::class,
-            $domain,
-            [
-                'action' => $this->generateUrl(self::PREFIX . 'edit', [ 'id' => $domain->getId() ])
-            ]
-        );
-        $editform->handleRequest($request);
-
-        if ($editform->isSubmitted() && $editform->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($domain);
-            $em->flush();
-            $base=$config->findParameter('virtual_mailbox_base');
-            system("rm -rf " . $base . "/" . $domain->getName());
-            system("cd $base;ln -sf " . $domain->getId() . " " . $domain->getName());
-
-            return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
-        }
-        $t = $this->get('translator');
-
-        return $this->render('domain/form.html.twig', array(
-            'domain' => $domain,
-            'action' => 'Domain edit',
-            'backlink' => $this->generateUrl(self::PREFIX . 'show', array('id' => $domain->getId())),
-            'backmessage' => 'Back',
-            'form' => $editform->createView(),
-            'delete_form' => $deleteForm->createView(),
-            'ajax' => true,
-            'PREFIX' => self::PREFIX,
-        ));
-    }
-
-    /**
      * @Route("/{id}/delete", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, Domain $entity, REPO $repo): Response
+    public function delete(Request $request, Domain $entity, REPO $repo, ReadConfig $config): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
-            $REPO->remove($entity, true);
+            $base=$config->findParameter('virtual_mailbox_base');
+            system("rm -rf " . $base . "/" . $entity->getName());
+            rmdir($base . "/" . $entity->getId());
+            $this->repo->remove($entity, true);
         }
 
         return $this->redirectToRoute(self::PREFIX . 'index', [], Response::HTTP_SEE_OTHER);
     }
 
-    /**
-     * Deletes a Domain entity.
-     *
-     * @Route("/delete/{id}", name="delete", methods={"GET", "DELETE"})
-     */
-    public function deleteAction(Request $request, ReadConfig $config, Domain $domain)
-    {
-        $form = $this->createDeleteForm($domain);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $base=$config->findParameter('virtual_mailbox_base');
-            system("rm -rf " . $base . "/" . $domain->getName());
-            rmdir($base . "/" . $domain->getId());
-            $em->remove($domain);
-            $em->flush($domain);
-        }
-
-        return $this->redirectToRoute(self::PREFIX . 'index');
-    }
-
-    /**
-     * Creates a form to delete a Domain entity.
-     *
-     * @param Domain $domain The Domain entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Domain $domain)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl(self::PREFIX . 'delete', array('id' => $domain->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
-    }
 
     /**
      * Creates a form to show a FundBanks entity.
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByNameAction(Request $request, $name)
+    public function showByNameAction(Request $request, $name, UR $ur, ReadConfig $config)
     {
-        $em = $this->getDoctrine()->getManager();
-        $domain=$em->getRepository(Domain::class)->findOneBy(['name' => $name]);
-        $users=$em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 0]);
-        $lists=$em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
-        $deleteForm = $this->createDeleteForm($domain);
+        $entity=$this->repo->findOneByName($name);
+        $oldname=$entity->getName();
+        $users=$ur->findBy(['domain' => $entity, 'list' => 0]);
+        //$lists=$em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
+        $lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
+        //$deleteForm = $this->createDeleteForm($domain);
+        $editform = $this->createForm(DomainType::class, $entity);
+        $editform->handleRequest($request);
+
+        if ($editform->isSubmitted() && $editform->isValid()) {
+            /*$em = $this->getDoctrine()->getManager();
+            $em->persist($domain);
+            $em->flush(); */
+            $this->repo->add($entity, true);
+            if ($oldname!=$entity->getName()) {
+                $base=$config->findParameter('virtual_mailbox_base');
+                //system("rm -rf " . $base . "/" . $entity->getName());
+                //system("cd $base;ln -sf " . $entity->getId() . " " . $entity->getName());
+                system("cd $base;mv $oldname " .$entity->getName(). ";ln -sf " . $entity->getId() . " " . $entity->getName());
+            }
+
+            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $entity->getId()));
+        }
 
         return $this->render('domain/show.html.twig', array(
-            'domain' => $domain,
-            'delete_form' => $deleteForm->createView(),
+            'entity' => $entity,
+            'form' => $editform->createView(),
+            'delete_form' => true, // $deleteForm->createView(),
             'users' => $users,
             'lists' => $lists,
             'PREFIX' => self::PREFIX,
