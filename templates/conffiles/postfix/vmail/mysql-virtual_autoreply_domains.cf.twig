@@ -1,0 +1,7 @@
+user = {{ dbuser }}
+password = {{ dbpass }}
+dbname = {{ dbname }}
+hosts = {{ dbhost }}
+{# query = SELECT CONCAT('autoreply.',domain) AS virtdom FROM domains WHERE CONCAT('autoreply.',domain)='%s' #}
+
+query = SELECT CONCAT('autoreply.',name) AS autoreplydom FROM domain WHERE CONCAT('autoreply.',name)='%s' AND id !=0 AND is_active=1

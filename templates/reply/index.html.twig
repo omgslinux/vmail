@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Users list{% endtrans %}</h1>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>{% trans %}Email{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}Admin{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="{{ path('manage_user_show_byemail', { 'email': user.email }) }}">{{ user.email }}</td>
+                <td>{{ user.isactive ? '√' : '--' }}</td>
+                <td>{{ user.isAdmin ? '√' : '--' }}</td>
+            </tr>
+        {% endfor %}
+        {% if is_granted('ROLE_MANAGER') %}
+        <tr>
+            <td>
+                <a href="{{ path('manage_user_new') }}">{% trans %}Create a new user{% endtrans %}</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    {% endif %}
+
+{% endblock %}

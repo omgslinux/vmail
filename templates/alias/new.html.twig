@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Alias creation{% endtrans %}</h1>
+
+    {{ form_start(form) }}
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(form.name) }}
+        </div>
+        <div class="col-md-1">
+        {{ form_widget(form.active) }}
+        </div>
+    </div>
+        <input type="submit" value="Create" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>
+            <a href="{{ path('manage_virtuals_index') }}">Back to the list</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,6 @@
+user = {{ dbuser }}
+password = {{ dbpass }}
+dbname = {{ dbname }}
+hosts = {{ dbhost }}
+#query = select CONCAT(SUBSTRING_INDEX(u.email,'@',1),'@autoreply.',SUBSTRING_INDEX(u.email,'@',-1)) AS autoreply from mailbox_outofoffice o,users u where o.email=u.email and now() between date_begin and date_end and flag_active=1 and o.email='%s'
+query = SELECT CONCAT(u.user,'@autoreply.',d.name) AS autoreply FROM user u JOIN domain d ON u.domain_id=d.id JOIN autoreply a ON u.id=a.user_id WHERE CONCAT(u.user,'@',d.name) ='%s' AND d.id!=0 AND d.is_active=1 AND u.is_active=1 AND a.is_active=1 AND now() BETWEEN startdate AND enddate

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}User creation{% endtrans %}</h1>
+
+    {% if domain is defined %}
+    {{ form_start(form) }}
+    <div class="row">
+      <div class="col-md-3">
+        {{ form_row(form.name) }}
+        </div>
+        <div class="col-md5">@ {{ domain.name }}
+        </div>
+      </div>
+        {{ form_widget(form) }}
+        <input type="submit" value="{% trans %}Create{% endtrans %}" />
+    {{ form_end(form) }}
+
+    {% else %}
+    {{ form_start(form) }}
+        {{ form_widget(form.name) }} @ {{ user.domainName }}
+        {{ form_widget(form) }}
+        <input type="submit" value="{% trans %}Create{% endtrans %}" />
+    {{ form_end(form) }}
+    {% endif %}
+
+    <ul>
+        <li>
+            <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+        </li>
+    </ul>
+{% endblock %}

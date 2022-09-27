@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Configs list{% endtrans %}</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>{% trans %}Id{% endtrans %}</th>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Value{% endtrans %}</th>
+                <th>{% trans %}Actions{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for config in configs %}
+            <tr>
+                <td><a href="{{ path('config_show', { 'id': config.id }) }}">{{ config.id }}</a></td>
+                <td>{{ config.name }}</td>
+                <td>{{ config.value }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('config_show', { 'id': config.id }) }}">{% trans %}show{% endtrans %}</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('config_edit', { 'id': config.id }) }}">{% trans %}edit{% endtrans %}</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('config_new') }}">{% trans %}Create a new config{% endtrans %}</a>
+        </li>
+    </ul>
+{% endblock %}

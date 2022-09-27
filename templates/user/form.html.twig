@@ -1,0 +1,70 @@
+{% extends 'crud.html.twig' %}
+
+{% block body %}
+    {% if delete_form is defined %}
+    <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
+    {% else %}
+    <h1>{% trans %}User creation{% endtrans %} @{{ user.domain.name }}</h1>
+    {% endif %}
+
+    {{ form_start(form) }}
+    <div class="row">
+      <div class="col-md-2">
+        {{ form_row(form.name) }}
+      </div>
+      {% if form.domain is defined %}
+      <div class="col-md-2">
+        {{ form_row(form.domain) }}
+      </div>
+      {% endif %}
+      <div class="col-md-8">
+        {{ form_row(form.fullname) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        {{ form_row(form.quota) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(form.admin) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(form.active) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(form.sendemail) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(form.plainPassword) }}
+      </div>
+    </div>
+
+    {% if form.reply is not defined and user.id %}
+      {% if user.reply|length == 0 %}
+        <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+      {% endif %}
+    {% else %}
+      {% if user.id %}
+        <hr>
+        <h3>{% trans %}Autoreply{% endtrans %}</h3>
+        {{ form_widget(form.reply) }}
+        {% do form.reply.setRendered %}
+        <hr>
+      {% endif %}
+    {% endif %}
+    {{ form_end(form) }}
+
+      {% if delete_form is defined %}
+        {{ form_start(delete_form) }}
+            <input type="submit" class="btn btn-danger" value="{% trans %}Delete{% endtrans %}">
+        {{ form_end(delete_form) }}
+    {% endif %}
+{% endblock %}
+
+{% block buttons %}
+<div class="record_actions">
+{{ form_widget(form.save, {'label': 'Guardar',  'attr': {'class': 'ladda-button btn btn-primary btn-save', 'data-style': 'zoom-in'} }) }}
+
+{% endblock %}

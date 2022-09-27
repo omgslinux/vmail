@@ -1,0 +1,6 @@
+user = {{ dbuser }}
+password = {{ dbpass }}
+dbname = {{ dbname }}
+hosts = {{ dbhost }}
+{# query = SELECT transport FROM transport WHERE domain='%s' #}
+query = SELECT 'virtual' AS transport FROM domain WHERE name='%s' AND id !=0 AND is_active=1

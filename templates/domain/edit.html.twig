@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Domain edit{% endtrans %}</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <input type="submit" value="{% trans %}Edit{% endtrans %}" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>
+            <a href="{{ backlink }}">{{ backmessage|trans }}</a>
+        </li>
+          {% if delete_form is defined %}
+            {{ form_start(delete_form) }}
+                <input type="submit" value="{% trans %}Delete{% endtrans %}">
+            {{ form_end(delete_form) }}
+          {% endif %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}{{ title }}{% endtrans %}</h1>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path(PREFIX ~ 'showbyname', { 'name': entity.name }) }}">{{ entity.name }}</td>
+                <td>{{ entity.active }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if is_granted('ROLE_ADMIN') %}
+        {% set modalId, modalTitle = 'domains', 'Crear dominio' %}
+        {{ include('_modal.html.twig', {
+          'included': 'domain/_form',
+          'closeMessage': 'Cerrar'
+          })
+        }}
+    {% endif %}
+
+{% endblock %}
