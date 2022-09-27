@@ -1,0 +1,64 @@
+<div class="modal-body">
+    {% if user is defined %}
+    <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
+    {% else %}
+    <h1>{% trans %}User creation{% endtrans %} @{{ entity.name }}</h1>
+    {% endif %}
+
+    {{ form_start(user_form) }}
+    <div class="row">
+      <div class="col-md-2">
+        {{ form_row(user_form.name) }}
+      </div>
+      {% if user_form.domain is defined %}
+      <div class="col-md-2">
+        {{ form_row(user_form.domain) }}
+      </div>
+      {% endif %}
+      <div class="col-md-8">
+        {{ form_row(user_form.fullname) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        {{ form_row(user_form.quota) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(user_form.admin) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(user_form.active) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(user_form.sendemail) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(user_form.plainPassword) }}
+      </div>
+    </div>
+
+    {% if user_form.reply is not defined and user.id is defined %}
+      {% if user.reply|length == 0 %}
+        <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+      {% endif %}
+    {% else %}
+      {% if user.id is defined %}
+        <hr>
+        <h3>{% trans %}Autoreply{% endtrans %}</h3>
+        {{ form_widget(user_form.reply) }}
+        {% do user_form.reply.setRendered %}
+        <hr>
+      {% endif %}
+    {% endif %}
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Guardar cambios')}}</button>
+    </div>
+    {{ form_end(user_form) }}
+
+{% if delete_user_form is defined %}
+    {{ include('domain/user/_delete_form.html.twig') }}
+{% endif %}

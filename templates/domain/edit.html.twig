@@ -1,9 +1,0 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
-    <h1>{% trans %}{{ title }}{% endtrans %}</h1>
-
-    {{ include('domain/_form.html.twig', {'button_label': 'Guardar'}) }}
-
-    {{ include('domain/_delete_form.html.twig') }}
-{% endblock %}

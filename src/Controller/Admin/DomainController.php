@@ -42,15 +42,10 @@ class DomainController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /*$em = $this->getDoctrine()->getManager();
-            $em->persist($domain);
-            $em->flush();*/
             $this->repo->add($entity, true);
             $base=$config->findParameter('virtual_mailbox_base');
             mkdir($base.'/'.$entity->getId());
             system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
-
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $entity->getId()));
         }
 
         return $this->render('domain/index.html.twig', array(
@@ -120,7 +115,7 @@ class DomainController extends AbstractController
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByNameAction(Request $request, $name, UR $ur, ReadConfig $config)
+    public function showByNameAction(Request $request, $name, UR $ur, UserForm $uf, ReadConfig $config)
     {
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -132,9 +127,6 @@ class DomainController extends AbstractController
         $editform->handleRequest($request);
 
         if ($editform->isSubmitted() && $editform->isValid()) {
-            /*$em = $this->getDoctrine()->getManager();
-            $em->persist($domain);
-            $em->flush(); */
             $this->repo->add($entity, true);
             if ($oldname!=$entity->getName()) {
                 $base=$config->findParameter('virtual_mailbox_base');
@@ -142,13 +134,29 @@ class DomainController extends AbstractController
                 //system("cd $base;ln -sf " . $entity->getId() . " " . $entity->getName());
                 system("cd $base;mv $oldname " .$entity->getName(). ";ln -sf " . $entity->getId() . " " . $entity->getName());
             }
+        }
 
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $entity->getId()));
+        $user = new User();
+        $user->setDomain($entity)->setSendEmail(true)->setActive(true);
+        $userform = $this->createForm(UserType::class, $user,
+            [
+                'showAutoreply' => false,
+            ]
+        );
+
+        $userform->handleRequest($request);
+
+        if ($userform->isSubmitted() && $userform->isValid()) {
+            $uf->setUser($user);
+            $uf->formSubmit($userform);
+
+            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
         }
 
         return $this->render('domain/show.html.twig', array(
             'entity' => $entity,
             'form' => $editform->createView(),
+            'user_form' => $userform->createView(),
             'delete_form' => true, // $deleteForm->createView(),
             'users' => $users,
             'lists' => $lists,

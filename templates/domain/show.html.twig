@@ -10,7 +10,7 @@
           'nobutton': true,
           })
         }}
-<table class="table table-bordered">
+    <table class="table table-bordered">
         <tbody>
             <tr>
                 <th>{% trans %}Name{% endtrans %}</th>
@@ -26,6 +26,7 @@
 
     <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
 
+    {% if users|length > 0 %}
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -42,13 +43,18 @@
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
             </tr>
             {% endfor %}
-            <tr>
-                <td>
-                  <a href="{{ path(PREFIX ~ 'user_new', { 'id': entity.id }) }}">{% trans %}Create a new user{% endtrans %}</a>
-                </td>
-            </tr>
         </tbody>
     </table>
+    {% else %}
+        <p>{% trans %}No users in domain{% endtrans %}</p>
+    {% endif %}
+        {% set modalId, modalTitle = 'users', 'Crear usuario en el dominio' ~ entity.name %}
+        {{ include('_modal.html.twig', {
+          'included': 'domain/user/_form',
+          'closeMessage': 'Cerrar',
+          'modalSize': 'modal-xl',
+          })
+        }}
 
     <h2>{% trans %}Aliases in domain{% endtrans %} {{ entity.name }}</h2>
 
