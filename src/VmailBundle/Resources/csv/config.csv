@@ -1,6 +1,0 @@
-id,name,value
-1,virtual_mailbox_base,/home/oscar/www/vmail/mailbox_base
-2,welcome_subject,Bienvenido
-3,welcome_body,"Este es un correo de bienvenida para crear el buzón"
-4,autoreply_delay,4
-5,autoreply_subject,"Respuesta automática de %s (NO RESPONDER)"

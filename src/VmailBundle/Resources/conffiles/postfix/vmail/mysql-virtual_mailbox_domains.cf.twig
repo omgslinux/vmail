@@ -1,6 +1,0 @@
-user = {{ dbuser }}
-password = {{ dbpass }}
-dbname = {{ dbname }}
-hosts = {{ dbhost }}
-#query = SELECT user FROM alias WHERE address='%s' AND active != 0
-query = SELECT name FROM domain WHERE name='%s' AND id !=0 AND is_active=1

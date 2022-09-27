@@ -1,6 +1,0 @@
-user = {{ dbuser }}
-password = {{ dbpass }}
-dbname = {{ dbname }}
-hosts = {{ dbhost }}
-#query = SELECT user FROM alias WHERE address='%s' AND active != 0
-query = SELECT CONCAT(u.user,'@',d.name) AS addressname FROM user u JOIN domain d ON u.domain_id=d.id JOIN alias a ON u.id=a.aliasname_id WHERE a.is_active=1 AND a.addressname_id=(SELECT u2.id FROM user u2 JOIN domain d2 ON u2.domain_id=d2.id WHERE CONCAT(u2.user,'@',d2.name) ='%s' AND u2.is_list=1 AND d2.id=0 AND u2.is_active=1);
