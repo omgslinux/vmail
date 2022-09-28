@@ -1,0 +1,23 @@
+<div class="modal-body">
+<h1>{% trans %}List creation{% endtrans %}</h1>
+
+{{ form_start(list_form) }}
+<div class="row">
+  <div class="col-md-5">
+    {{ form_widget(list_form.name) }}
+    </div>
+    <div class="col-md-1">
+    {{ form_widget(list_form.active) }}
+    </div>
+</div>
+    <input type="submit" value="Create" />
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage }}</button>
+    <button type="submit" class="btn btn-primary">{{ saveMessage|default('Guardar cambios')}}</button>
+    {% if delete_list_form is defined %}
+        {{ include('domain/users/_delete_form.html.twig') }}
+    {% endif %}
+</div>
+
+{{ form_end(list_form) }}

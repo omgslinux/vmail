@@ -8,7 +8,7 @@ security:
         id: App\Utils\PassEncoder
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users:
+        app_vmail_users:
             entity:
               class: App\Entity\User
     firewalls:
@@ -17,7 +17,7 @@ security:
             security: false
         main:
             lazy: true
-            provider: users
+            provider: app_vmail_users
             #logout_on_user_change: true
             form_login:
               login_path: login

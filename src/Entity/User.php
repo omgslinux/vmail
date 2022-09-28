@@ -11,14 +11,14 @@ use App\Entity\Traits\UserInterfaceEntityTrait;
 use App\Entity\Alias;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping\UniqueConstraint;
-
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 /**
  * User
  *
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="user", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"domain_id", "user"})})
  */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use ActivableEntityTrait, UserInterfaceEntityTrait;
 
@@ -44,13 +44,6 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=64, nullable=true)
      */
     private $fullName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="password", type="string", length=255)
-     */
-    private $password;
 
     /**
      * @var domain
@@ -173,30 +166,6 @@ class User implements UserInterface
     public function getFullName()
     {
         return $this->fullName;
-    }
-
-    /**
-     * Set password
-     *
-     * @param string $password
-     *
-     * @return users
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * Get password
-     *
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->password;
     }
 
     /**
@@ -453,7 +422,7 @@ class User implements UserInterface
         return $this;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->getDomain()->getId()===0) {
             return $this->getName();

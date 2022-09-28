@@ -124,7 +124,6 @@ class UserType extends AbstractType
                 'label' => $userLabel,
                 'attr' =>
                 [
-                  'class' => 'col-md-5',
                   'placeholder' => 'Enter username'
                 ]
             ]
@@ -136,7 +135,6 @@ class UserType extends AbstractType
                 'label' => $fullNameLabel,
                 'attr' =>
                 [
-                  'class' => 'col-md-5',
                   'placeholder' => 'Enter full name'
                 ]
             ]
@@ -214,18 +212,7 @@ class UserType extends AbstractType
             )
             ;
         }
-        $builder
-        ->add(
-            'save',
-            SubmitType::class,
-            [
-                'label' => 'Save',
-                'attr' =>
-                [
-                    'class' => 'btn btn-success'
-                ]
-            ]
-        );
+        ;
     }
 
     /**

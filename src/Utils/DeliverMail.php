@@ -9,6 +9,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Entity\Config;
 use App\Entity\Autoreply;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Mime\Email;
 
 class DeliverMail
 {
@@ -16,7 +17,6 @@ class DeliverMail
     private $config;
 
     public function __construct(MailerInterface $mailer, ReadConfig $config)
-    //public function __construct()
     {
         $this->mailer = $mailer;
         $this->config = $config;
@@ -52,12 +52,12 @@ class DeliverMail
 
     public function sendMail($subject, $sender, $recipient, $body)
     {
-        $message = (new \Swift_Message())
-        ->setSubject($subject)
-        ->setFrom($sender)
-        ->setTo($recipient)
-        ->setBody($body)
+        $email = (new Email())
+        ->subject($subject)
+        ->from($sender)
+        ->to($recipient)
+        ->text($body)
         ;
-        $this->mailer->send($message);
+        $this->mailer->send($email);
     }
 }

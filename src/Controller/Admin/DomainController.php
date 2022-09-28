@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Entity\User;
 use App\Utils\UserForm;
@@ -23,6 +24,21 @@ use App\Repository\UserRepository as UR;
 class DomainController extends AbstractController
 {
     const PREFIX = 'admin_domain_';
+
+    const TABS = [
+        [
+          'n' => 'users',
+          't' => 'Usuarios',
+        ],
+        [
+          'n' => 'aliases',
+          't' => 'Alias',
+        ],
+        [
+          'n' => 'lists',
+          't' => 'Listas',
+        ],
+      ];
 
     private $repo;
     public function __construct(REPO $repo)
@@ -115,7 +131,7 @@ class DomainController extends AbstractController
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByNameAction(Request $request, $name, UR $ur, UserForm $uf, ReadConfig $config)
+    public function showByNameAction(Request $request, $name, UR $ur, UserForm $uf, ReadConfig $config, $activetab = 'users')
     {
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -136,6 +152,7 @@ class DomainController extends AbstractController
             }
         }
 
+        // Pestaña usuarios
         $user = new User();
         $user->setDomain($entity)->setSendEmail(true)->setActive(true);
         $userform = $this->createForm(UserType::class, $user,
@@ -152,11 +169,65 @@ class DomainController extends AbstractController
 
             //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
         }
+        // Fin pestaña usuarios
+
+        // Pestaña Alias
+        $alias = new User();
+        $alias
+        ->setDomain($entity)
+        ->setList(false)
+        ->setPassword(false)
+        ;
+        $aliasform = $this->createForm(
+            UserType::class,
+            $alias,
+            [
+                'domain' => $entity->getId(),
+                'showList' => true,
+            ]
+        )
+        ;
+        $aliasform->handleRequest($request);
+        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
+            $ur->add($alias, true);
+
+            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
+        }
+        // Fin pestaña aliases
+
+        // Pestaña listas
+        $list = new User();
+        $list
+        ->setDomain($entity)
+        ->setList(true)
+        ->setPassword(false)
+        ;
+        $listform = $this->createForm(
+            UserType::class,
+            $list,
+            [
+                'domain' => $entity->getId(),
+                'showList' => true,
+            ]
+        )
+        ;
+        $listform->handleRequest($request);
+        if ($listform->isSubmitted() && $listform->isValid()) {
+            $ur->add($list, true);
+
+            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
+        }
+        // Fin pestaña listas
+
 
         return $this->render('domain/show.html.twig', array(
             'entity' => $entity,
+            'tabs' => self::TABS,
+            'activetab' => $activetab,
             'form' => $editform->createView(),
             'user_form' => $userform->createView(),
+            'alias_form' => $aliasform->createView(),
+            'list_form' => $listform->createView(),
             'delete_form' => true, // $deleteForm->createView(),
             'users' => $users,
             'lists' => $lists,

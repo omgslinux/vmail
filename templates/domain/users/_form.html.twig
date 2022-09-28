@@ -7,34 +7,51 @@
 
     {{ form_start(user_form) }}
     <div class="row">
-      <div class="col-md-2">
-        {{ form_row(user_form.name) }}
+      <div class="col-lg-4">
+        {{ form_label(user_form.name) }}
       </div>
+      <div class="col-lg-1">
       {% if user_form.domain is defined %}
-      <div class="col-md-2">
         {{ form_row(user_form.domain) }}
-      </div>
+        {% else %}
+        Dominio
       {% endif %}
-      <div class="col-md-8">
-        {{ form_row(user_form.fullname) }}
+      </div>
+      <div class="col-lg-7">
+        {{ form_label(user_form.fullname) }}
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-lg-4">
+        {{ form_widget(user_form.name, {'attr': {'autocomplete': 'off'}} ) }}
+      </div>
+      <div class="col-lg-1">
+      {% if user_form.domain is defined %}
+        {{ form_widget(user_form.domain, {'attr': {'autocomplete': 'off'}} ) }}
+        {% else %}
+        @{{entity.name}}
+      {% endif %}
+      </div>
+      <div class="col-lg-7">
+        {{ form_widget(user_form.fullname, {'attr': {'autocomplete': 'off'}} ) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-2">
         {{ form_row(user_form.quota) }}
       </div>
-      <div class="col-md-3">
-        {{ form_widget(user_form.admin) }}
+      <div class="col-lg-3">
+        {{ form_row(user_form.admin) }}
       </div>
-      <div class="col-md-3">
-        {{ form_widget(user_form.active) }}
+      <div class="col-lg-3">
+        {{ form_row(user_form.active) }}
       </div>
-      <div class="col-md-3">
-        {{ form_widget(user_form.sendemail) }}
+      <div class="col-lg-4">
+        {{ form_row(user_form.sendemail) }}
       </div>
     </div>
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-lg-5">
         {{ form_widget(user_form.plainPassword) }}
       </div>
     </div>

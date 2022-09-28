@@ -1,0 +1,27 @@
+    <h2>{% trans %}Aliases in domain{% endtrans %} {{ entity.name }}</h2>
+
+    {% if lists %}
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+            </tr>
+            {% for user in lists %}{% set email = user.name ~ '@' ~ entity.name %}
+            <tr>
+                <td><a href="{{ path('manage_alias_show', { 'id': user.id } ) }}">{{ email }}</td>
+                <td>{{ user.isActive ? '√' : '--' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+      <p>No hay alias definidos</p>
+    {% endif %}
+    {% set modalId, modalTitle = 'alias', 'Crear alias en el dominio' ~ entity.name %}
+    {{ include('_modal.html.twig', {
+      'included': 'domain/aliases/_form',
+      'closeMessage': 'Cerrar',
+      'modalSize': 'modal-md',
+      })
+    }}

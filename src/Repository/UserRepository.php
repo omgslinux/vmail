@@ -2,11 +2,12 @@
 
 namespace App\Repository;
 
-use App\Entity\User as Entity;
+use App\Entity\User;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * usersRepository
@@ -30,24 +31,41 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Entity::class);
+        parent::__construct($registry, User::class);
     }
 
-    public function loadUserByUsername($username)
+    //public function loadUserByUsername($username)
+    public function loadUserByIdentifier(string $username): UserInterface
     {
         $a=explode('@', $username);
         $user=$a[0];
         $domain=$a[1];
         return $this->createQueryBuilder('u')
-            ->join('App:Domain', 'd', 'WITH', 'u.domain = d.id')
+            ->join('App\Entity\Domain', 'd', 'WITH', 'u.domain = d.id')
             ->where('u.name = :user AND d.name = :domain')
             ->setParameter('user', $user)
             ->setParameter('domain', $domain)
             ->getQuery()
             ->getOneOrNullResult();
+        /*return $this->getEntityManager()->createQuery(
+                'SELECT u
+                FROM App\Entity\User u
+                JOIN App\Entity\Domain d
+                WITH u.domain = d.id
+                WHERE u.name = :user AND d.name = :domain'
+            )
+            ->setParameter('user', $user)
+            ->setParameter('domain', $domain)
+            ->getOneOrNullResult(); */
+     }
+
+    /** @deprecated since Symfony 5.3 */
+    public function loadUserByUsername(string $username)
+    {
+        return $this->loadUserByIdentifier($username);
     }
 
-    public function add(Entity $entity, bool $flush = false): void
+    public function add(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -56,7 +74,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         }
     }
 
-    public function remove(Entity $entity, bool $flush = false): void
+    public function remove(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 

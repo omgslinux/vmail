@@ -19,6 +19,37 @@ trait UserInterfaceEntityTrait
     private $plainPassword;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="password", type="string", length=255)
+     */
+    private $password;
+
+    /**
+     * Set password
+     *
+     * @param string $password
+     *
+     * @return users
+     */
+    public function setPassword($password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Get password
+     *
+     * @return string
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
      * Set plainpassword
      *
      * @param string $plainpassword
