@@ -2,9 +2,10 @@
 
 namespace App\Utils;
 
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+#use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class PassEncoder implements PasswordEncoderInterface
+class PassEncoder implements PasswordHasherInterface
 {
     const SPECIALCHARS = '~!@#$%^&*_-+=`|\(){}[]:;"\'<>,.?/';
 
@@ -50,7 +51,7 @@ class PassEncoder implements PasswordEncoderInterface
         // Implementamos nuestro encoder personalizado
         if (null==$saltPrefix) $saltPrefix=$this->getSaltPrefix($this->cryptType).md5(md5($raw));
         //die(dump($raw, $this->cryptType, "salt: ".$this->getSaltPrefix($this->cryptType),$saltPrefix));
-				return crypt($raw, $saltPrefix);
+		return crypt($raw, $saltPrefix);
         //return hash('sha1', $salt . $raw);
     }
 
@@ -134,6 +135,16 @@ class PassEncoder implements PasswordEncoderInterface
         $s .= $random_char[$func(0, count($random_char)-1)];
       }
       return $s;
+    }
+
+    public function hash(string $plainPassword): string
+    {
+        return "";
+    }
+
+    public function verify(string $hashedPassword, string $plainPassword): bool
+    {
+        return true;
     }
 
     public function needsRehash(string $encoded): bool
