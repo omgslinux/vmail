@@ -10,7 +10,7 @@
     <!-- Tabs navs -->
 
     <!-- Tabs content -->
-    <div class="tab-content border-right border-bottom border-left" id="{{tabname}}-content">
+    <div class="tab-content border-right border-bottom border-left p-4" id="{{tabname}}-content">
         {% for tab in tabs %}
             <!-- Tab {{ tab.n }} -->
             <div class="tab-pane fade{{ tab.n == activetab ? ' active show' }}" id="{{ tab.n }}" role="tabpanel" aria-labelledby="{{ tab.n }}-tab">

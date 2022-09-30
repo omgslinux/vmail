@@ -166,6 +166,7 @@ class DomainController extends AbstractController
         if ($userform->isSubmitted() && $userform->isValid()) {
             $uf->setUser($user);
             $uf->formSubmit($userform);
+            $users[] = $user;
 
             //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
         }

@@ -1,10 +1,8 @@
-{% extends 'crud.html.twig' %}
-
-{% block body %}
+<div class="modal-body">
     {% if delete_form is defined %}
-    <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
+    <h1>{% trans %}User edit{% endtrans %} {{ entity.email }}</h1>
     {% else %}
-    <h1>{% trans %}User creation{% endtrans %} @{{ user.domain.name }}</h1>
+    <h1>{% trans %}User creation{% endtrans %} @{{ parent.name }}</h1>
     {% endif %}
 
     {{ form_start(form) }}
@@ -41,12 +39,12 @@
       </div>
     </div>
 
-    {% if form.reply is not defined and user.id %}
-      {% if user.reply|length == 0 %}
-        <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+    {% if form.reply is not defined and entity.id is defined %}
+      {% if entity.reply|length == 0 %}
+        <p><a href="{{ path('user_autoreply_new', { id: entity.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
       {% endif %}
     {% else %}
-      {% if user.id %}
+      {% if entity.id is defined %}
         <hr>
         <h3>{% trans %}Autoreply{% endtrans %}</h3>
         {{ form_widget(form.reply) }}
@@ -54,17 +52,13 @@
         <hr>
       {% endif %}
     {% endif %}
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Guardar cambios')}}</button>
+    </div>
     {{ form_end(form) }}
 
-      {% if delete_form is defined %}
-        {{ form_start(delete_form) }}
-            <input type="submit" class="btn btn-danger" value="{% trans %}Delete{% endtrans %}">
-        {{ form_end(delete_form) }}
-    {% endif %}
-{% endblock %}
-
-{% block buttons %}
-<div class="record_actions">
-{{ form_widget(form.save, {'label': 'Guardar',  'attr': {'class': 'ladda-button btn btn-primary btn-save', 'data-style': 'zoom-in'} }) }}
-
-{% endblock %}
+{% if delete_form is defined %}
+    {{ include('user/_delete_form.html.twig') }}
+{% endif %}

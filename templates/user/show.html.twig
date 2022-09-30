@@ -1,13 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}User{% endtrans %}</h1>
+    <h1>{% trans %}User{% endtrans %} {{ entity.username }}</h1>
 
-            {% if is_granted('ROLE_MANAGER') %}{% if domain is defined %}{% set editlink = path('manage_user_edit', { 'id': user.id }, { 'domain': domain }) %}
-            {% else %}{% set editlink = path('manage_user_edit', { 'id': user.id }) %}
+        {% set modalId, modalTitle = 'users', 'Edit user' %}
+        {{ include('_modal.html.twig', {
+          'included': 'user/_form',
+          'closeMessage': 'Cerrar',
+          'nobutton': true,
+          })
+        }}
+        {% if is_granted('ROLE_MANAGER') %}
+            {% if domain is defined %}
+                {% set editlink = path(PREFIX ~ 'edit', { 'id': entity.id }, { 'domain': domain }) %}
+            {% else %}
+                {% set editlink = path(PREFIX ~ 'edit', { 'id': entity.id }) %}
             {% endif %}
-            {% else %}{% set editlink = path('user_self_edit') %}
-            {% endif %}
+        {% else %}
+            {% set editlink = path('user_self_edit') %}
+        {% endif %}
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -18,11 +29,12 @@
                 <th>{% trans %}Autoreply{% endtrans %}</th>
             </tr>
             <tr>
-                <td><a href="{{ editlink }}">{{ user.name }}</a></td>
-                <td>{{ user.fullName }}</td>
-                <td>{{ user.isActive ? '√' : '--' }}</td>
-                <td>{{ user.isAdmin ? '√' : '--' }}</td>
-                <td>{% if user.reply %}√{% else %}<a href="{{ path('user_autoreply_new', { id: user.id }) }}">Crear{% endif %}</a></td>
+                {#}<td><a href="{{ editlink }}">{{ entity.name }}</a></td>#}
+                <td><a title="{% trans %}Edit{% endtrans %}" href="#" data-toggle="modal" data-target="#{{ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
+                <td>{{ entity.fullName }}</td>
+                <td>{{ entity.isActive ? '√' : '--' }}</td>
+                <td>{{ entity.isAdmin ? '√' : '--' }}</td>
+            <td>{% if entity.reply %}√{% else %}<a href="{{ path('user_autoreply_new', { id: entity.id }) }}">Crear{% endif %}</a></td>
             </tr>
         </tbody>
     </table>
@@ -30,10 +42,10 @@
     <ul>
         <li>
             {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('admin_domain_show', { 'id': user.domain.id }) }}">{% trans %}Back to domain{% endtrans %}</a>
+            <a href="{{ path('admin_domain_show', { 'id': entity.domain.id }) }}">{% trans %}Back to domain{% endtrans %}</a>
             {% else %}
               {% if is_granted('ROLE_MANAGER') %}
-              <a href="{{ path('manage_user_index') }}">{% trans %}Back to the list{% endtrans %}</a>
+              <a href="{{ path(PREFIX ~ 'index') }}">{% trans %}Back to the list{% endtrans %}</a>
               {% else %}
               <a href="{{ path('user_self_edit') }}">{% trans %}Back{% endtrans %}</a>
               {% endif %}

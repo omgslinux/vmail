@@ -1,31 +1,40 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}Domain{% endtrans %} {{ domain }}</h1>
+    <h1>{% trans %}Domain{% endtrans %} {{ parent }}</h1>
 
-    <h2>{% trans %}Users in domain{% endtrans %} {{ domain.name }}</h2>
+    <h2>{% trans %}Users in domain{% endtrans %} {{ parent.name }}</h2>
 
     <table class="table table-bordered">
         <tbody>
             <tr>
-                <th>{% trans %}User{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+                <th>{% trans %}User{% endtrans %}</th>
+                <th>{% trans %}Full name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}Admin{% endtrans %}</th>
             </tr>
-            {% for user in users %}{% set email = user.name ~ '@' ~ domain.name %}
+            {% for entity in users %}{% set email = entity.name ~ '@' ~ parent.name %}
             <tr>
-                <td><a href="{{ path('manage_user_show_byemail', { 'email': email } ) }}">{{ email }}</td>
-                <td>{{ user.isActive ? '√' : '--' }}</td>
-                <td>{{ user.isAdmin ? '√' : '--' }}</td>
+                <td><a href="{{ path(PREFIX ~ 'show_byemail', { 'email': email } ) }}">{{ email }}</td>
+                <td>{{ entity.fullname }}</td>
+                <td>{{ entity.isActive ? '√' : '--' }}</td>
+                <td>{{ entity.isAdmin ? '√' : '--' }}</td>
             </tr>
             {% endfor %}
-            <tr>
-                <td>
-                  <a href="{{ path('manage_user_new') }}">{% trans %}Create a new user{% endtrans %}</a>
-                </td>
-            </tr>
         </tbody>
     </table>
+    {% if is_granted('ROLE_MANAGER') %}
+        {% set modalId, modalTitle = 'users', 'Crear usuario en el dominio ' ~ parent.name %}
+        {{ include('_modal.html.twig', {
+          'included': 'domain/users/_form',
+          'included': 'user/_form',
+          'closeMessage': 'Cerrar',
+          'modalSize': 'modal-lg',
+          })
+        }}
+    {% endif %}
 
-    <h2>{% trans %}Aliases in domain{% endtrans %} {{ domain.name }}</h2>
+    <h2>{% trans %}Aliases in domain{% endtrans %} {{ parent.name }}</h2>
 
     {% if lists %}
 
@@ -34,7 +43,7 @@
             <tr>
                 <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th>
             </tr>
-            {% for list in lists %}{% set email = list.name ~ '@' ~ domain.name %}
+            {% for list in lists %}{% set email = list.name ~ '@' ~ parent.name %}
             <tr>
                 <td><a href="{{ path('manage_alias_show', { 'id': list.id } ) }}">{{ email }}</td>
                 <td>{{ list.isActive ? '√' : '--' }}</td>
@@ -45,7 +54,7 @@
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-      <p><a href="{{ path('manage_alias_new', { 'id': domain.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
+      <p><a href="{{ path('manage_alias_new', { 'id': parent.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
       </p>
 
 {% endblock %}

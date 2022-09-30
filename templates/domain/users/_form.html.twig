@@ -12,7 +12,7 @@
       </div>
       <div class="col-lg-1">
       {% if user_form.domain is defined %}
-        {{ form_row(user_form.domain) }}
+        {{ form_label(user_form.domain) }}
         {% else %}
         Dominio
       {% endif %}
@@ -27,9 +27,9 @@
       </div>
       <div class="col-lg-1">
       {% if user_form.domain is defined %}
-        {{ form_widget(user_form.domain, {'attr': {'autocomplete': 'off'}} ) }}
-        {% else %}
-        @{{entity.name}}
+          {{ form_widget(user_form.domain, {'attr': {'autocomplete': 'off'}} ) }}
+      {% else %}
+          @{{entity.name}}
       {% endif %}
       </div>
       <div class="col-lg-7">
