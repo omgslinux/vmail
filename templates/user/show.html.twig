@@ -3,10 +3,11 @@
 {% block body %}
     <h1>{% trans %}User{% endtrans %} {{ entity.username }}</h1>
 
-        {% set modalId, modalTitle = 'users', 'Edit user' %}
+        {% set modalId, modalTitle = 'users', 'Edit user' %}{% set parent = entity.domain %}
         {{ include('_modal.html.twig', {
           'included': 'user/_form',
           'closeMessage': 'Cerrar',
+          'modalSize': 'modal-lg',
           'nobutton': true,
           })
         }}
