@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Domain;
-use App\Utils\UserForm;
 use App\Form\UserType;
 use App\Repository\UserRepository as UR;
 
@@ -26,7 +25,7 @@ class UserController extends AbstractController
      *
      * @Route("/", name="index", methods={"GET", "POST"})
      */
-    public function index(Request $request, UserForm $u)
+    public function index(Request $request, UR $repo)
     {
 
         $parent=$this->getUser()->getDomain();
@@ -51,8 +50,8 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u->setUser($entity);
-            $u->formSubmit($form);
+            $repo->formSubmit($form);
+            $users[] = $form->getData();
 
             //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $user->getId()));
         }
@@ -88,7 +87,7 @@ class UserController extends AbstractController
      *
      * @Route("/show/byemail/{email}", name="show_byemail", methods={"GET", "POST"})
      */
-    public function showByEmailAction(Request $request, UserForm $uf, $email)
+    public function showByEmailAction(Request $request, UR $ur, $email)
     {
         $t=explode('@', $email);
         $em = $this->getDoctrine()->getManager();
@@ -107,8 +106,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $uf->setUser($entity);
-            $uf->formSubmit($form);
+            $ur->formSubmit($form);
 
             //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $user->getId()));
         }
@@ -139,7 +137,7 @@ class UserController extends AbstractController
      *
      * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, UserForm $u, User $entity, $parent = false)
+    public function editAction(Request $request, UR $ur, User $entity, $parent = false)
     {
         $user_form = $this->createForm(
             UserType::class,
@@ -153,8 +151,7 @@ class UserController extends AbstractController
         $user_form->handleRequest($request);
 
         if ($user_form->isSubmitted() && $user_form->isValid()) {
-            $u->setUser($entity);
-            $u->formSubmit($user_form);
+            $ur->formSubmit($user_form);
 
             if ($parent) {
                 return $this->redirectToRoute('admin_domain_show', array('id' => $parent->getId()));

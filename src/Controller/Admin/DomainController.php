@@ -9,7 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Entity\User;
-use App\Utils\UserForm;
 use App\Utils\ReadConfig;
 use App\Form\UserType;
 use App\Form\DomainType;
@@ -78,7 +77,7 @@ class DomainController extends AbstractController
      *
      * @Route("/user/new/{id}", name="user_new", methods={"GET", "POST"})
      */
-    public function newUserAction(Request $request, UserForm $u, Domain $domain)
+    public function newUserAction(Request $request, UR $ur, Domain $domain)
     {
         $user = new User();
         $user->setDomain($domain)->setSendEmail(true)->setActive(true);
@@ -93,8 +92,7 @@ class DomainController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u->setUser($user);
-            $u->formSubmit($form);
+            $ur->formSubmit($form);
 
             return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
         }
@@ -131,7 +129,7 @@ class DomainController extends AbstractController
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByNameAction(Request $request, $name, UR $ur, UserForm $uf, ReadConfig $config, $activetab = 'users')
+    public function showByNameAction(Request $request, $name, UR $ur, ReadConfig $config, $activetab = 'users')
     {
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -164,8 +162,7 @@ class DomainController extends AbstractController
         $userform->handleRequest($request);
 
         if ($userform->isSubmitted() && $userform->isValid()) {
-            $uf->setUser($user);
-            $uf->formSubmit($userform);
+            $ur->formSubmit($userform);
             $users[] = $user;
 
             //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));

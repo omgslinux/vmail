@@ -3,6 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Utils\ReadConfig as RC;
+use App\Utils\PassEncoder as PE;
+use App\Utils\DeliverMail as DM;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -28,10 +31,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
 //lass UserRepository extends EntityRepository implements UserLoaderInterface
 class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
-
-    public function __construct(ManagerRegistry $registry)
+    private $pe;
+    private $config;
+    public function __construct(ManagerRegistry $registry, PE $pe, RC $config, DM $deliver)
     {
         parent::__construct($registry, User::class);
+
+        $this->pe = $pe;
+        $this->config = $config;
+        $this->deliver = $deliver;
     }
 
     //public function loadUserByUsername($username)
@@ -74,6 +82,23 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         }
     }
 
+    public function formSubmit($form)
+    {
+        //$user=$this->user;
+        $user = $form->getData();
+        $plainPassword = $user->getPlainpassword();
+        if (!empty($plainPassword)) {
+            //$encodedPassword = $this->encoder->encodePassword($user, $user->getPlainpassword());
+            //$user->setPassword($encodedPassword);
+            //$user->setPassword(PassEncoder::encodePassword($user->getPlainpassword()));
+            $user->setPassword($this->pe->encodePassword($plainPassword));
+        }
+        $this->add($user, true);
+        if ($form->get('sendemail')) {
+            $this->sendWelcomeMail($user);
+        }
+    }
+
     public function remove(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
@@ -81,6 +106,16 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function sendWelcomeMail(User $user)
+    {
+        $body=$this->config->findParameter('welcome_body');
+        $subject=$this->config->findParameter('welcome_subject');
+        $recipient=$user->getEmail();
+        $sender='welcome@default';
+        $this->deliver->sendMail($subject, $sender, $recipient, $body);
+
     }
 
 //    /**

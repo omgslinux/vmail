@@ -1,13 +1,13 @@
 <div class="modal-body">
     {{ form_start(form) }}
     <p>
-    {{ form_label(form.name, 'Nombre') }}
+    {{ form_label(form.name) }}
     </p>
     <p>
     {{ form_widget(form.name) }}
     </p>
     <p>
-    {{ form_widget(form.active, {'label': 'Activo'}) }}
+    {{ form_widget(form.active) }}
     </p>
 </div>
 <div class="modal-footer">

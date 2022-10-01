@@ -15,6 +15,8 @@ return array(
   'Configs list' => 'Lista de configuraciones',
   'Config creation' => 'Creación de configuración',
   'Config edit' => 'Edición de configuración',
+  'List creation' => 'Creación de listas',
+  'Lists in domain' => 'Listas en el dominio',
   'Domain' => 'Dominio',
   'Domain edit' => 'Edición del dominio',
   'Domain creation' => 'Creación de dominio',

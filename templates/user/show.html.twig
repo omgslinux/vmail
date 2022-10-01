@@ -42,15 +42,11 @@
 
     <ul>
         <li>
-            {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('admin_domain_show', { 'id': entity.domain.id }) }}">{% trans %}Back to domain{% endtrans %}</a>
-            {% else %}
-              {% if is_granted('ROLE_MANAGER') %}
-              <a href="{{ path(PREFIX ~ 'index') }}">{% trans %}Back to the list{% endtrans %}</a>
-              {% else %}
+          {% if is_granted('ROLE_MANAGER') %}
+            <a href="{{ path(PREFIX ~ 'index') }}">{% trans %}Back to the list{% endtrans %}</a>
+          {% else %}
               <a href="{{ path('user_self_edit') }}">{% trans %}Back{% endtrans %}</a>
-              {% endif %}
-            {% endif %}
+          {% endif %}
         </li>
     </ul>
 {% endblock %}

@@ -7,8 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Domain;
-use App\Utils\UserForm;
 use App\Form\UserType;
+use App\Repository\UserRepository as UR;
 
 /**
  * User controller.
@@ -39,7 +39,7 @@ class UserController extends AbstractController
      *
      * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, UserForm $u)
+    public function editAction(Request $request, UR $ur)
     {
         $user=$this->getUser();
         $formOptions['showAutoreply'] = null!==$user->getReply();
@@ -52,8 +52,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u->setUser($user);
-            $u->formSubmit($form);
+            $ur->formSubmit($form);
 
             return $this->redirectToRoute(self::PREFIX . 'show');
         }
