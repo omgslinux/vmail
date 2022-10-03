@@ -18,7 +18,7 @@
     {% else %}
       <p>No hay listas definidas</p>
     {% endif %}
-    {% set modalId, modalTitle = 'lists', 'Crear listas en el dominio' ~ entity.name %}
+    {% set modalId, modalTitle = 'lists', 'Crear lista' %}
     {{ include('_modal.html.twig', {
       'included': 'domain/lists/_form',
       'closeMessage': 'Cerrar',

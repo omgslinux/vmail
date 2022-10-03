@@ -39,12 +39,4 @@ class DomainType extends AbstractType
             'data_class' => Domain::class
         ));
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'appbundle_domain';
-    }
 }

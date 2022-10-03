@@ -43,6 +43,8 @@ class DomainController extends AbstractController
         'PREFIX' => 'admin_domain_',
         'included' => 'domain/_form',
         'tdir' => 'domain',
+        'BASEDIR' => 'domain/',
+        'modalId' => 'domains',
     ];
 
     private $repo;
@@ -71,7 +73,7 @@ class DomainController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        return $this->render(self::VARS['tdir'] . '/index.html.twig', array(
+        return $this->render(self::VARS['BASEDIR'] . '/index.html.twig', array(
             'entities' => $this->repo->findAll(),
             'title' => 'Domain list',
             'form' => $form->createView(),
@@ -92,19 +94,17 @@ class DomainController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->repo->makeMaildir($entity);
-            //$this->repo->add($entity, true);
 
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        return $this->render(self::VARS['tdir'] . '/_form.html.twig', [
+        return $this->render(self::VARS['BASEDIR'] . '/_form.html.twig', [
             'entity' => $entity,
             'modalTitle' => 'Domain edit',
             'form' => $form->createView(),
             'VARS' => self::VARS,
-            'tagPrefix' => 'Editar',
-            'modalId' => 'domains',
-            'nobutton' => true,
+            'ajax' => true,
+            'delete_form' => true,
         ]
         );
     }
@@ -117,13 +117,16 @@ class DomainController extends AbstractController
      */
     public function newUserAction(Request $request, UR $ur, Domain $domain)
     {
-        $user = new User();
-        $user->setDomain($domain)->setSendEmail(true)->setActive(true);
+        $user = (new User())
+        >setDomain($domain)
+        ->setSendEmail(true)
+        ->setActive(true);
+
         $form = $this->createForm(
             UserType::class,
             $user,
             [
-                'action' => $this->generateUrl('user_new', ['id' => $domain->getId()]),
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'user_new', ['id' => $domain->getId()]),
                 'showAutoreply' => false,
             ]
         );
@@ -135,9 +138,9 @@ class DomainController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', array('id' => $domain->getId()));
         }
 
-        return $this->render('user/form.html.twig', [
+        return $this->render(self::VARS['BASEDIR'] . 'users/_form.html.twig', [
             'user' => $user,
-            'form' => $form->createView(),
+            'user_form' => $form->createView(),
             'ajax' => true,
             'VARS' => self::VARS,
         ]
@@ -165,14 +168,23 @@ class DomainController extends AbstractController
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByNameAction(Request $request, $name, UR $ur, ReadConfig $config, $activetab = 'users')
+    public function showByName(Request $request, $name, UR $ur, ReadConfig $config, $activetab = 'users')
     {
 
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
-        $users=$ur->findBy(['domain' => $entity, 'list' => 0]);
-        $lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
+        $users=$lists=[];
+
+        foreach ($entity->getUsers() as $user) {
+            if ($user->isList()) {
+                $lists[]=$user;
+            } else {
+                $users[]=$user;
+            }
+        }
+        //$users=$ur->findBy(['domain' => $entity, 'list' => 0]);
+        //$lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
         $form = $this->createForm(DomainType::class, $entity);
         // Fin de definicion de la entidad
 
@@ -224,6 +236,7 @@ class DomainController extends AbstractController
         // Vamos a ver los POST de los distintos formularios. Sólo puede ser uno
 
         $reload = false;
+
         // Formulario de la entidad
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -235,7 +248,6 @@ class DomainController extends AbstractController
 
             $reload = true;
         }
-dump($form);
 
         // Formulario de los usuarios
         $userform->handleRequest($request);
@@ -268,7 +280,7 @@ dump($form);
         if ($reload) return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
 
 
-        return $this->render(self::VARS['tdir'] . '/show.html.twig', [
+        return $this->render(self::VARS['BASEDIR'] . '/show.html.twig', [
             'entity' => $entity,
             'tabs' => self::TABS,
             'activetab' => $activetab,

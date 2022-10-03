@@ -1,0 +1,5 @@
+<form method="post" action="{{ path(VARS.PREFIX ~ 'delete', {'id': user.id}) }}"
+    onsubmit="return confirm('{% trans %}Are you sure you want to delete this item?{% endtrans %}');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+    <button class="btn btn-danger col-2">{% trans %}Delete{% endtrans %}</button>
+</form>

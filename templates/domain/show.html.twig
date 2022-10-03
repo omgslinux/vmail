@@ -2,6 +2,7 @@
 
 {% block body %}
     <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
+    {% set modalSize, included = VARS.modalSize, VARS.included %}
 
         {% set tagPrefix = 'Edit' %}
         {% set modalId, modalTitle = 'domains', 'Edit domain' %}
@@ -18,10 +19,14 @@
             </tr>
             <tr>
                 {#}<td><a title="{% trans %}Edit{% endtrans %}" href="{{ path(PREFIX ~ 'edit', { 'id': entity.id }) }}">{{ entity.name }}</a></td>#}
-                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
+                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal">{{ entity.name }}</a></td>
                 <td>{{ entity.active ? '√' : '--' }}</td>
             </tr>
         </tbody>
     </table>
-    {{ include('_tabs.html.twig', { 'tdir': 'domain' }) }}
+    {# Para la vuelta de las peticiones es origin #}
+    {{ include('_tabs.html.twig', {
+            'tdir': 'tabs',
+            'origin': entity,
+            }) }}
 {% endblock %}

@@ -26,12 +26,4 @@ class ConfigType extends AbstractType
             'data_class' => Config::class
         ));
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'appbundle_config';
-    }
 }

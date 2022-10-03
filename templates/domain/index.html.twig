@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    {% set tagPrefix = 'create' %}
     <h1>{{ title|trans }}</h1>
 
     <table class="table table-bordered">
@@ -20,7 +21,7 @@
         </tbody>
     </table>
     {% if is_granted('ROLE_ADMIN') %}
-        {% set modalId, modalTitle = 'domains', 'Create domain' %}
+        {% set modalTitle = 'Create domain' %}
         {{ include('_modal.html.twig', {
           'noajax': true
           })

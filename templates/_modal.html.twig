@@ -1,4 +1,4 @@
-{% if tagPrefix is not defined %}{% set tagPrefix = 'create'%}{% endif %}
+{% set modalId = modalId|default(VARS.modalId) %}
 {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
 {% if nobutton is not defined %}
     <!-- Button trigger modal -->
@@ -6,16 +6,19 @@
 {% endif %}
   <!-- Modal -->
   <div class="modal fade" id="{{ modalId2 }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalId2 }}Label" aria-hidden="true">
-      <div class="modal-dialog {{ VARS.modalSize|default('modal-md')}}" role="document">
+      <div class="modal-dialog {{ modalSize|default(VARS.modalSize)}}" role="document">
           <div class="modal-content" id="{{ modalId2 }}-content">
-            {% if noajax is defined %}
                 <div class="modal-header btn-primary">
-                    <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle }}</h5>
+                    <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                {{ include( VARS.included ~ '.html.twig') }}
+            {% if noajax is defined %}
+                {{ include( included|default(VARS.included) ~ '.html.twig', {
+                    'modalId2': tagPrefix ~ modalId ~ "Modal",
+                    }
+                ) }}
             {% else -%}
                 <script>
                     const {{ modalId2}} = $('#{{ modalId2 }}');

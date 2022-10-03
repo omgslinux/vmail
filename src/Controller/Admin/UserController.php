@@ -18,19 +18,40 @@ use App\Repository\UserRepository as UR;
  */
 class UserController extends AbstractController
 {
-    const PREFIX = 'manage_user_';
+    const TABS = [
+        [
+          'n' => 'users',
+          't' => 'Usuarios',
+        ],
+        [
+          'n' => 'aliases',
+          't' => 'Alias',
+        ],
+        [
+          'n' => 'lists',
+          't' => 'Listas',
+        ],
+      ];
+
+    const VARS = [
+        'modalSize' => 'modal-lg',
+        'PREFIX' => 'manage_user_',
+        'included' => 'user/_form',
+        'tdir' => 'user',
+        'modalId' => 'users',
+    ];
 
     /**
      * Lists all user entities.
      *
      * @Route("/", name="index", methods={"GET", "POST"})
      */
-    public function index(Request $request, UR $repo)
+    public function index(Request $request, UR $repo, $activetab = 'users')
     {
 
         $parent=$this->getUser()->getDomain();
-        $users=[];
-        $lists=[];
+        $users=$lists=[];
+        $reload = false;
 
         foreach ($parent->getUsers() as $entity) {
             if ($entity->isList()) {
@@ -47,38 +68,81 @@ class UserController extends AbstractController
         ;
 
         $form = $this->createForm(UserType::class, $entity, ['showDomain' => $showDomain]);
+
+
+        // Pestaña Alias
+        $alias = (new User())
+        ->setDomain($parent)
+        ->setList(false)
+        ->setPassword(false)
+        ;
+        $aliasform = $this->createForm(
+            UserType::class,
+            $alias,
+            [
+                'domain' => $parent->getId(),
+                'showList' => true,
+            ]
+        )
+        ;
+        // Fin pestaña aliases
+
+        // Pestaña listas
+        $list = (new User())
+        ->setDomain($parent)
+        ->setList(true)
+        ->setPassword(false)
+        ;
+        $listform = $this->createForm(
+            UserType::class,
+            $list,
+            [
+                'domain' => $parent->getId(),
+                'showList' => true,
+            ]
+        )
+        ;
+        // Fin pestaña listas
+
+        // Formulario de los alias
+        $aliasform->handleRequest($request);
+        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
+            $ur->add($alias, true);
+
+            $reload = true;
+            $activetab = 'aliases';
+        }
+
+
+        // Formulario de las listas
+        $listform->handleRequest($request);
+        if ($listform->isSubmitted() && $listform->isValid()) {
+            $ur->add($list, true);
+
+            $reload = true;
+            $activetab = 'lists';
+        }
+
+        if ($reload) return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', ['id' => $entity->getId()]);
+
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $repo->formSubmit($form);
-            $users[] = $form->getData();
+            //$users[] = $form->getData();
 
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $user->getId()));
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
         return $this->render('user/index.html.twig', array(
             'parent' => $parent,
+            'tabs' => self::TABS,
+            'activetab' => $activetab,
             'users' => $users,
             'lists' => $lists,
-            'form' => $form->createView(),
-            'PREFIX' => self::PREFIX,
-        ));
-    }
-
-    /**
-     * Finds and displays a user entity.
-     *
-     * @Route("/domain/{id}", name="domain_show", methods={"GET"})
-     */
-    public function showDomainAction(User $entity)
-    {
-        $deleteForm = $this->createDeleteForm($entity);
-
-        return $this->render('user/show.html.twig', array(
-            'entity' => $entity,
-            'delete_form' => $deleteForm->createView(),
-            'domain' => true,
-            'PREFIX' => self::PREFIX,
+            'user_form' => $form->createView(),
+            'VARS' => self::VARS,
         ));
     }
 
@@ -94,12 +158,12 @@ class UserController extends AbstractController
         $parent=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
         if (null==$parent) {
             $this->addFlash('error', 'Correo incorrecto');
-            return $this->redirectToRoute(self::PREFIX . 'index');
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
         $entity=$em->getRepository(User::class)->findOneBy(['domain' => $parent, 'name' => $t[0]]);
         if (null==$entity) {
             $this->addFlash('error', 'Correo incorrecto');
-            return $this->redirectToRoute(self::PREFIX . 'index');
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
         $form = $this->createForm(UserType::class, $entity, ['showDomain' => false]);
@@ -108,13 +172,13 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $ur->formSubmit($form);
 
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $user->getId()));
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $user->getId()]);
         }
 
         return $this->render('user/show.html.twig', array(
             'entity' => $entity,
             'form' => $form->createView(),
-            'PREFIX' => self::PREFIX,
+            'VARS' => self::VARS,
         ));
     }
 
@@ -128,7 +192,7 @@ class UserController extends AbstractController
 
         return $this->render('user/show.html.twig', array(
             'user' => $user,
-            'PREFIX' => self::PREFIX,
+            'VARS' => self::VARS,
         ));
     }
 
@@ -137,7 +201,7 @@ class UserController extends AbstractController
      *
      * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, UR $ur, User $entity, $parent = false)
+    public function editAction(Request $request, UR $ur, User $entity, $origin = null)
     {
         $user_form = $this->createForm(
             UserType::class,
@@ -153,17 +217,18 @@ class UserController extends AbstractController
         if ($user_form->isSubmitted() && $user_form->isValid()) {
             $ur->formSubmit($user_form);
 
-            if ($parent) {
-                return $this->redirectToRoute('admin_domain_show', array('id' => $parent->getId()));
+            if (null==$origin) {
+                return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
             } else {
-                return $this->redirectToRoute(self::PREFIX . 'edit', array('id' => $entity->getId()));
+                return $this->redirectToRoute('admin_domain_show', ['id' => $entity->getDomain()->getId()]);
+                //return $this->redirectToRoute(self::PREFIX . 'edit', array('id' => $entity->getId()));
             }
         }
 
         return $this->render('user/_form.html.twig', array(
             'entity' => $entity,
             'form' => $user_form->createView(),
-            'PREFIX' => self::PREFIX,
+            'VARS' => self::VARS,
         ));
     }
 
@@ -176,6 +241,6 @@ class UserController extends AbstractController
             $repo->remove($entity, true);
         }
 
-        return $this->redirectToRoute(self::PREFIX . 'index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);
     }
 }

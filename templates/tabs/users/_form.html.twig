@@ -1,11 +1,16 @@
-<div class="modal-body">
-    {% if user is defined %}
-    <h1>{% trans %}User edit{% endtrans %} {{ user.email }}</h1>
-    {% else %}
-    <h1>{% trans %}User creation{% endtrans %} @{{ entity.name }}</h1>
-    {% endif %}
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
 
-    {{ form_start(user_form) }}
+
+{{ form_start(user_form) }}
+<div class="modal-body">
     <div class="row">
       <div class="col-lg-4">
         {{ form_label(user_form.name) }}
@@ -71,11 +76,11 @@
     {% endif %}
     </div>
     <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage }}</button>
-        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Guardar cambios')}}</button>
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
     {{ form_end(user_form) }}
 
 {% if delete_user_form is defined %}
-    {{ include('domain/user/_delete_form.html.twig') }}
+    {{ include('_delete_form.html.twig') }}
 {% endif %}

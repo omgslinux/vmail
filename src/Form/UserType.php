@@ -231,12 +231,4 @@ class UserType extends AbstractType
             ]
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'vmailbundle_user';
-    }
 }

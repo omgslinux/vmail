@@ -55,6 +55,7 @@ return array(
   'New' => 'Nuevo',
   'Value' => 'Valor',
   'Save' => 'Guardar',
+  'Save changes' => 'Guardar cambios',
   'Admin' => 'Administrador',
   'Send welcome email' => 'Enviar correo de bienvenida',
   'Autoreply' => 'Respuesta automática',
@@ -73,4 +74,5 @@ return array(
   'Password' => 'Contraseña',
   'Enter username' => 'Introducir nombre de usuario',
   'Enter full name' => 'Introducir el nombre completo',
+  'Are you sure you want to delete this item?' => '¿Está seguro de que desea borrar este elemento?',
 );

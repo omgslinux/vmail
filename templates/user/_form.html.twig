@@ -1,11 +1,11 @@
-<div class="modal-body">
+{{ form_start(form) }}
+    <div class="modal-body">
     {% if entity.id is defined %}
     <h1>{% trans %}User edit{% endtrans %} {{ entity.email }}</h1>
     {% else %}
     <h1>{% trans %}User creation{% endtrans %} @{{ parent }}</h1>
     {% endif %}
 
-    {{ form_start(form) }}
     <div class="row">
       <div class="col-md-2">
         {{ form_row(form.name) }}
@@ -40,26 +40,25 @@
     </div>
 
     {% if form.reply is not defined and entity.id is defined %}
-      {% if entity.reply|length == 0 %}
-        <p><a href="{{ path('user_autoreply_new', { id: entity.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
-      {% endif %}
+        {% if entity.reply|length == 0 %}
+            <p><a href="{{ path('user_autoreply_new', { id: entity.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+        {% endif %}
     {% else %}
-      {% if entity.id is defined %}
-        <hr>
-        <h3>{% trans %}Autoreply{% endtrans %}</h3>
-        {{ form_widget(form.reply) }}
-        {% do form.reply.setRendered %}
-        <hr>
-      {% endif %}
+        {% if entity.id is defined %}
+            <hr>
+            <h3>{% trans %}Autoreply{% endtrans %}</h3>
+            {{ form_widget(form.reply) }}
+            {% do form.reply.setRendered %}
+            <hr>
+        {% endif %}
     {% endif %}
     </div>
     <div class="modal-footer">
         <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')}}</button>
-    {{ form_end(form) }}
+    </div>
+{{ form_end(form) }}
 
     {% if delete_form is defined %}
-        {{ include('user/_delete_form.html.twig') }}
+        {{ include('_delete_form.html.twig') }}
     {% endif %}
-
-    </div>

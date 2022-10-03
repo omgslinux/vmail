@@ -1,0 +1,45 @@
+<h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
+
+{% set form = user_form %}
+{% set modalSize, included = 'modal-lg', 'tabs/users/_form' %}
+{% if users|length > 0 %}
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}User{% endtrans %}</th>
+                <th>{% trans %}Full Name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}Admin{% endtrans %}</th>
+            </tr>
+            {% for user in users %}{% set email = user.name ~ '@' ~ entity.name %}
+            <tr>
+                <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal"
+                {% if origin is defined %}
+                    data-url="{{ path('manage_user_edit', { 'id': user.id, 'origin': true } ) }}">
+                {% else %}
+                    data-url="{{ path('manage_user_edit', { 'id': user.id } ) }}">
+                {% endif %}{{ email }}</a></td>
+                <td>{{ user.fullName }}</td>
+                <td>{{ user.isActive ? '√' : '--' }}</td>
+                <td>{{ user.isAdmin ? '√' : '--' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>{# include('domain/users/edit.html.twig') #}
+    {% set tagPrefix = 'edit' %}
+    {% set modalId, modalTitle = 'users', 'Edit user' %}
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'delete_form': true,
+      })
+    }}
+{% else %}
+    <p>{% trans %}No users in domain{% endtrans %}</p>
+{% endif %}
+    {% set tagPrefix = 'create' %}
+    {% set modalId, modalTitle = 'usercreate', 'Create a new user' %}
+    {{ include('_modal.html.twig', {
+      'noajax': true,
+      })
+    }}
+<br>

@@ -4,65 +4,20 @@
     <h1>{% trans %}Domain{% endtrans %} {{ parent }}</h1>
 
     <h2>{% trans %}Users in domain{% endtrans %} {{ parent }}</h2>
-    {% set modalId = 'users' %}
-    {% set tagPrefix = 'Edit' %}
+    {% set modalId = modalId|default(VARS.modalId) %}
+    {% set tagPrefix = 'edit' %}
     {% if is_granted('ROLE_MANAGER') %}
-        {% set modalTitle = tagPrefix ~ ' user in domain ' ~ parent.name %}
+        {% set modalTitle = 'Edit user in domain ' ~ parent.name %}
         {{ include('_modal.html.twig', {
           'nobutton': true,
+          'delete_form': true,
           })
         }}
     {% endif %}
-
-    <table class="table table-bordered">
-        <tbody>
-            <tr>
-                <th>{% trans %}User{% endtrans %}</th>
-                <th>{% trans %}Full name{% endtrans %}</th>
-                <th>{% trans %}Active{% endtrans %}</th>
-                <th>{% trans %}Admin{% endtrans %}</th>
-            </tr>
-            {% for entity in users %}{% set email = entity.name ~ '@' ~ parent.name %}
-            <tr>
-                {#}<td><a href="{{ path(PREFIX ~ 'show_byemail', { 'email': email } ) }}">{{ email }}</td>#}
-                <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId ~ 'Modal' }}" data-url="{{ path('manage_user_edit', { 'id': entity.id } ) }}">{{ entity.email }}</td>
-                <td>{{ entity.fullname }}</td>
-                <td>{{ entity.isActive ? '√' : '--' }}</td>
-                <td>{{ entity.isAdmin ? '√' : '--' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>{# include('domain/users/edit.html.twig') #}
-    {% if is_granted('ROLE_MANAGER') %}
-        {% set tagPrefix = 'Create' %}
-        {% set modalTitle = tagPrefix ~ ' a new user in domain ' ~ parent.name %}
-        {{ include('_modal.html.twig', {
-          'noajax': true
-          })
-        }}
-    {% endif %}
-
-    <h2>{% trans %}Aliases in domain{% endtrans %} {{ parent.name }}</h2>
-
-    {% if lists %}
-
-    <table class="table table-bordered">
-        <tbody>
-            <tr>
-                <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th>
-            </tr>
-            {% for list in lists %}{% set email = list.name ~ '@' ~ parent.name %}
-            <tr>
-                <td><a href="{{ path('manage_alias_show', { 'id': list.id } ) }}">{{ email }}</td>
-                <td>{{ list.isActive ? '√' : '--' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-      <p>No hay alias definidos</p>
-    {% endif %}
-      <p><a href="{{ path('manage_alias_new', { 'id': parent.id }) }}">{% trans %}Create a new distribution list{% endtrans %}</a>
-      </p>
-
+    {% set entity = entity|default(app.user.domain) %}
+    {# Para la vuelta de las peticiones es origin #}
+    {{ include('_tabs.html.twig', {
+            'tdir': 'tabs',
+            'origin': false,
+            }) }}
 {% endblock %}

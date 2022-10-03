@@ -18,7 +18,7 @@
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-    {% set modalId, modalTitle = 'alias', 'Crear alias en el dominio' ~ entity.name %}
+    {% set modalId, modalTitle = 'alias', 'Crear alias' %}
     {{ include('_modal.html.twig', {
       'included': 'domain/aliases/_form',
       'closeMessage': 'Cerrar',

@@ -1,0 +1,22 @@
+{{ form_start(alias_form) }}
+    <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(alias_form.name) }}
+        </div>
+        <div class="col-md-1">
+        {{ form_widget(alias_form.active) }}
+        </div>
+    </div>
+        <input type="submit" value="Create" />
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Guardar cambios')}}</button>
+    </div>
+{{ form_end(alias_form) }}
+
+{% if delete_alias_form is defined %}
+    {{ include('_delete_form.html.twig') }}
+{% endif %}
