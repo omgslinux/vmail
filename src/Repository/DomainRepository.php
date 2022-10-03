@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Domain as Entity;
+use App\Utils\ReadConfig;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,8 +17,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class DomainRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $config;
+
+    public function __construct(ManagerRegistry $registry, ReadConfig $config)
     {
+        $this->config = $config;
+
         parent::__construct($registry, Entity::class);
     }
 
@@ -37,6 +42,14 @@ class DomainRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function makeMaildir(Entity $entity, bool $add = true)
+    {
+        if ($add) $this->add($entity, true);
+        $base=$this->config->findParameter('virtual_mailbox_base');
+        mkdir($base.'/'.$entity->getId());
+        system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
     }
 
     public function rawsql($rawsql, bool $flush=false): void

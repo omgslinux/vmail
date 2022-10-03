@@ -1,8 +1,8 @@
 <div class="modal-body">
-    {% if delete_form is defined %}
+    {% if entity.id is defined %}
     <h1>{% trans %}User edit{% endtrans %} {{ entity.email }}</h1>
     {% else %}
-    <h1>{% trans %}User creation{% endtrans %} @{{ parent.name }}</h1>
+    <h1>{% trans %}User creation{% endtrans %} @{{ parent }}</h1>
     {% endif %}
 
     {{ form_start(form) }}
@@ -54,11 +54,12 @@
     {% endif %}
     </div>
     <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage }}</button>
-        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Guardar cambios')}}</button>
-    </div>
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')}}</button>
     {{ form_end(form) }}
 
-{% if delete_form is defined %}
-    {{ include('user/_delete_form.html.twig') }}
-{% endif %}
+    {% if delete_form is defined %}
+        {{ include('user/_delete_form.html.twig') }}
+    {% endif %}
+
+    </div>

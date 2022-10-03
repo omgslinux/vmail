@@ -5,10 +5,8 @@
 
         {% set modalId, modalTitle = 'users', 'Edit user' %}{% set parent = entity.domain %}
         {{ include('_modal.html.twig', {
-          'included': 'user/_form',
-          'closeMessage': 'Cerrar',
-          'modalSize': 'modal-lg',
           'nobutton': true,
+          'modalSize': VARS.modalSize
           })
         }}
         {% if is_granted('ROLE_MANAGER') %}

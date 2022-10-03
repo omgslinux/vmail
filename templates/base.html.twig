@@ -16,6 +16,7 @@
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('custom/img/vmaillogo.png') }}" />
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('custom/img/vmaillogo.png') }}" sizes="16x16" />
+        <script src="{{ asset('components/jquery.slim.js') }}"></script>
     </head>
     <body>
         <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar">
@@ -45,7 +46,7 @@
         {% block javascripts %}
           <!-- Optional JavaScript -->
           <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-          <script src="{{ asset('components/jquery.slim.js') }}"></script>
+          {#<script src="{{ asset('components/jquery.slim.js') }}"></script>#}
           <!-- The bootstrap bundle includes the optional popper.js -->
           <script src="{{ asset('components/js/bootstrap.bundle.min.js') }}"></script>
           {# encore_entry_script_tags('app') #}

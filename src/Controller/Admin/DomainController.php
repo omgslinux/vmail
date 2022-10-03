@@ -22,7 +22,6 @@ use App\Repository\UserRepository as UR;
  */
 class DomainController extends AbstractController
 {
-    const PREFIX = 'admin_domain_';
 
     const TABS = [
         [
@@ -39,17 +38,24 @@ class DomainController extends AbstractController
         ],
       ];
 
+    const VARS = [
+        'modalSize' => 'modal-md',
+        'PREFIX' => 'admin_domain_',
+        'included' => 'domain/_form',
+        'tdir' => 'domain',
+    ];
+
     private $repo;
     public function __construct(REPO $repo)
     {
         $this->repo = $repo;
     }
+
     /**
      * Lists all domain entities.
      *
      * @Route("/", name="index", methods={"GET", "POST"})
      */
-    //public function index(Request $request, REPO $repo, ReadConfig $config): Response
     public function index(Request $request, ReadConfig $config): Response
     {
         $entity = new Domain();
@@ -61,14 +67,46 @@ class DomainController extends AbstractController
             $base=$config->findParameter('virtual_mailbox_base');
             mkdir($base.'/'.$entity->getId());
             system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
+
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        return $this->render('domain/index.html.twig', array(
+        return $this->render(self::VARS['tdir'] . '/index.html.twig', array(
             'entities' => $this->repo->findAll(),
             'title' => 'Domain list',
             'form' => $form->createView(),
-            'PREFIX' => self::PREFIX,
+            'VARS' => self::VARS,
         ));
+    }
+
+
+    /**
+     * Edit a domain entity.
+     *
+     * @Route("/{id}/edit/", name="edit", methods={"GET", "POST"})
+     */
+    public function edit(Request $request, Domain $entity, ReadConfig $config): Response
+    {
+        $form = $this->createForm(DomainType::class, $entity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->makeMaildir($entity);
+            //$this->repo->add($entity, true);
+
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+        }
+
+        return $this->render(self::VARS['tdir'] . '/_form.html.twig', [
+            'entity' => $entity,
+            'modalTitle' => 'Domain edit',
+            'form' => $form->createView(),
+            'VARS' => self::VARS,
+            'tagPrefix' => 'Editar',
+            'modalId' => 'domains',
+            'nobutton' => true,
+        ]
+        );
     }
 
 
@@ -94,18 +132,16 @@ class DomainController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $ur->formSubmit($form);
 
-            return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', array('id' => $domain->getId()));
         }
 
-        return $this->render('user/form.html.twig', array(
+        return $this->render('user/form.html.twig', [
             'user' => $user,
-            'action' => 'Create a new user',
-            'backlink' => $this->generateUrl(self::PREFIX . 'index'),
-            'backmessage' => 'Back',
             'form' => $form->createView(),
             'ajax' => true,
-            'PREFIX' => self::PREFIX,
-        ));
+            'VARS' => self::VARS,
+        ]
+        );
     }
 
     /**
@@ -120,7 +156,7 @@ class DomainController extends AbstractController
             $this->repo->remove($entity, true);
         }
 
-        return $this->redirectToRoute(self::PREFIX . 'index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);
     }
 
 
@@ -131,47 +167,28 @@ class DomainController extends AbstractController
      */
     public function showByNameAction(Request $request, $name, UR $ur, ReadConfig $config, $activetab = 'users')
     {
+
+        // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
         $users=$ur->findBy(['domain' => $entity, 'list' => 0]);
-        //$lists=$em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
         $lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
-        //$deleteForm = $this->createDeleteForm($domain);
-        $editform = $this->createForm(DomainType::class, $entity);
-        $editform->handleRequest($request);
-
-        if ($editform->isSubmitted() && $editform->isValid()) {
-            $this->repo->add($entity, true);
-            if ($oldname!=$entity->getName()) {
-                $base=$config->findParameter('virtual_mailbox_base');
-                //system("rm -rf " . $base . "/" . $entity->getName());
-                //system("cd $base;ln -sf " . $entity->getId() . " " . $entity->getName());
-                system("cd $base;mv $oldname " .$entity->getName(). ";ln -sf " . $entity->getId() . " " . $entity->getName());
-            }
-        }
+        $form = $this->createForm(DomainType::class, $entity);
+        // Fin de definicion de la entidad
 
         // Pestaña usuarios
-        $user = new User();
-        $user->setDomain($entity)->setSendEmail(true)->setActive(true);
+        $user = (new User())
+            ->setDomain($entity)->setSendEmail(true)->setActive(true);
         $userform = $this->createForm(UserType::class, $user,
             [
                 'showAutoreply' => false,
             ]
         );
 
-        $userform->handleRequest($request);
-
-        if ($userform->isSubmitted() && $userform->isValid()) {
-            $ur->formSubmit($userform);
-            $users[] = $user;
-
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
-        }
         // Fin pestaña usuarios
 
         // Pestaña Alias
-        $alias = new User();
-        $alias
+        $alias = (new User())
         ->setDomain($entity)
         ->setList(false)
         ->setPassword(false)
@@ -185,17 +202,10 @@ class DomainController extends AbstractController
             ]
         )
         ;
-        $aliasform->handleRequest($request);
-        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
-            $ur->add($alias, true);
-
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
-        }
         // Fin pestaña aliases
 
         // Pestaña listas
-        $list = new User();
-        $list
+        $list = (new User())
         ->setDomain($entity)
         ->setList(true)
         ->setPassword(false)
@@ -209,37 +219,77 @@ class DomainController extends AbstractController
             ]
         )
         ;
+        // Fin pestaña listas
+
+        // Vamos a ver los POST de los distintos formularios. Sólo puede ser uno
+
+        $reload = false;
+        // Formulario de la entidad
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->add($entity, true);
+            if ($oldname!=$entity->getName()) {
+                $base=$config->findParameter('virtual_mailbox_base');
+                system("cd $base;mv $oldname " .$entity->getName(). ";ln -sf " . $entity->getId() . " " . $entity->getName());
+            }
+
+            $reload = true;
+        }
+dump($form);
+
+        // Formulario de los usuarios
+        $userform->handleRequest($request);
+
+        if ($userform->isSubmitted() && $userform->isValid()) {
+            $ur->formSubmit($userform);
+
+            $reload = true;
+        }
+
+
+        // Formulario de los alias
+        $aliasform->handleRequest($request);
+        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
+            $ur->add($alias, true);
+
+            $reload = true;
+        }
+
+
+        // Formulario de las listas
         $listform->handleRequest($request);
         if ($listform->isSubmitted() && $listform->isValid()) {
             $ur->add($list, true);
 
-            //return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $domain->getId()));
+            $reload = true;
         }
-        // Fin pestaña listas
 
 
-        return $this->render('domain/show.html.twig', array(
+        if ($reload) return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
+
+
+        return $this->render(self::VARS['tdir'] . '/show.html.twig', [
             'entity' => $entity,
             'tabs' => self::TABS,
             'activetab' => $activetab,
-            'form' => $editform->createView(),
+            'form' => $form->createView(),
             'user_form' => $userform->createView(),
             'alias_form' => $aliasform->createView(),
             'list_form' => $listform->createView(),
-            'delete_form' => true, // $deleteForm->createView(),
             'users' => $users,
             'lists' => $lists,
-            'PREFIX' => self::PREFIX,
-        ));
+            'VARS' => self::VARS,
+        ]
+        );
     }
 
     /**
-     * Creates a form to show a FundBanks entity.
+     * Creates a form to show a entity.
      *
      * @Route("/show/byid/{id}", name="show", methods={"GET", "POST"})
      */
     public function showAction(Request $request, Domain $domain)
     {
-        return $this->redirectToRoute(self::PREFIX . 'showbyname', ['name' => $domain->getName()]);
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'showbyname', ['name' => $domain->getName()]);
     }
 }

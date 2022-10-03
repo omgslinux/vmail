@@ -3,11 +3,11 @@
 {% block body %}
     <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
 
+        {% set tagPrefix = 'Edit' %}
         {% set modalId, modalTitle = 'domains', 'Edit domain' %}
         {{ include('_modal.html.twig', {
-          'included': 'domain/_form',
-          'closeMessage': 'Cerrar',
           'nobutton': true,
+          'delete_form': true,
           })
         }}
     <table class="table table-bordered">
@@ -18,7 +18,7 @@
             </tr>
             <tr>
                 {#}<td><a title="{% trans %}Edit{% endtrans %}" href="{{ path(PREFIX ~ 'edit', { 'id': entity.id }) }}">{{ entity.name }}</a></td>#}
-                <td><a title="{% trans %}Edit{% endtrans %}" href="#" data-toggle="modal" data-target="#{{ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
+                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
                 <td>{{ entity.active ? '√' : '--' }}</td>
             </tr>
         </tbody>

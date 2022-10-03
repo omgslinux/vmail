@@ -47,6 +47,7 @@ return array(
   'Back to the list' => 'Volver a la lista',
   'Back to domain' => 'Volver al dominio',
   'Edit' => 'Editar',
+  'Edit user in domain' => 'Modificar un usuario en el dominio',
   'Delete' => 'Borrar',
   'Delete?' => '¿Borrar?',
   'Create' => 'Crear',
