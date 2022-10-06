@@ -1,6 +1,7 @@
 <?php
 return array(
   'User'  =>  'Usuario',
+  'Users'  =>  'Usuarios',
   'Management' => 'Gestión',
   'Address' => 'Dirección',
   'Addresses' => 'Direcciones',
