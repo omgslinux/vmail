@@ -1,6 +1,8 @@
 <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
 
 {% set form = user_form %}
+{% set tagPrefix = 'edit' %}
+{% set modalId = 'users' %}
 {% set modalSize, included = 'modal-lg', 'tabs/users/_form' %}
 {% if users|length > 0 %}
     <table class="table table-bordered">
@@ -15,21 +17,21 @@
             <tr>
                 <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal"
                 {% if origin is defined %}
-                    data-url="{{ path('manage_user_edit', { 'id': user.id, 'origin': true } ) }}">
+                    data-url="{{ path('manage_user_edit', { 'id': user.id, 'origin': origin } ) }}">{{ email }}</a></td>
                 {% else %}
-                    data-url="{{ path('manage_user_edit', { 'id': user.id } ) }}">
-                {% endif %}{{ email }}</a></td>
+                    data-url="{{ path('manage_user_edit', { 'id': user.id } ) }}">{{ email }}</a></td>
+                {% endif %}
                 <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
             </tr>
             {% endfor %}
         </tbody>
-    </table>{# include('domain/users/edit.html.twig') #}
-    {% set tagPrefix = 'edit' %}
-    {% set modalId, modalTitle = 'users', 'Edit user' %}
+    </table>
+    {% set modalTitle = 'Edit user' %}
     {{ include('_modal.html.twig', {
       'nobutton': true,
+      'form': user_form,
       'delete_form': true,
       })
     }}
@@ -37,8 +39,9 @@
     <p>{% trans %}No users in domain{% endtrans %}</p>
 {% endif %}
     {% set tagPrefix = 'create' %}
-    {% set modalId, modalTitle = 'usercreate', 'Create a new user' %}
+    {% set modalTitle = 'Create a new user' %}
     {{ include('_modal.html.twig', {
+      'form': user_form,
       'noajax': true,
       })
     }}

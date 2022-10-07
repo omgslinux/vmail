@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Utils\ReadConfig as RC;
 use App\Utils\PassEncoder as PE;
 use App\Utils\DeliverMail as DM;
+use App\Repository\DomainRepository;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -33,13 +34,14 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 {
     private $pe;
     private $config;
-    public function __construct(ManagerRegistry $registry, PE $pe, RC $config, DM $deliver)
+    public function __construct(ManagerRegistry $registry, PE $pe, RC $config, DM $deliver, DomainRepository $dr)
     {
         parent::__construct($registry, User::class);
 
         $this->pe = $pe;
         $this->config = $config;
         $this->deliver = $deliver;
+        $this->dr = $dr;
     }
 
     //public function loadUserByUsername($username)
@@ -86,15 +88,18 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     {
         //$user=$this->user;
         $user = $form->getData();
+        if (null==$user->getDomain()) {
+            $domain = $this->dr->find($form->get('domain'));
+            $user->setDomain($domain);
+            dump($domain);
+        }
+            dump($user, $_POST); die();
         $plainPassword = $user->getPlainpassword();
         if (!empty($plainPassword)) {
-            //$encodedPassword = $this->encoder->encodePassword($user, $user->getPlainpassword());
-            //$user->setPassword($encodedPassword);
-            //$user->setPassword(PassEncoder::encodePassword($user->getPlainpassword()));
             $user->setPassword($this->pe->encodePassword($plainPassword));
         }
         $this->add($user, true);
-        if ($form->get('sendemail')) {
+        if ($form->get('sendEmail')) {
             $this->sendWelcomeMail($user);
         }
     }

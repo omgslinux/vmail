@@ -32,10 +32,6 @@ class DomainController extends AbstractController
           'n' => 'aliases',
           't' => 'Alias',
         ],
-        [
-          'n' => 'lists',
-          't' => 'Listas',
-        ],
       ];
 
     const VARS = [
@@ -111,43 +107,6 @@ class DomainController extends AbstractController
 
 
     /**
-     * Creates a new User in a Domain entity.
-     *
-     * @Route("/user/new/{id}", name="user_new", methods={"GET", "POST"})
-     */
-    public function newUserAction(Request $request, UR $ur, Domain $domain)
-    {
-        $user = (new User())
-        >setDomain($domain)
-        ->setSendEmail(true)
-        ->setActive(true);
-
-        $form = $this->createForm(
-            UserType::class,
-            $user,
-            [
-                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'user_new', ['id' => $domain->getId()]),
-                'showAutoreply' => false,
-            ]
-        );
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $ur->formSubmit($form);
-
-            return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', array('id' => $domain->getId()));
-        }
-
-        return $this->render(self::VARS['BASEDIR'] . 'users/_form.html.twig', [
-            'user' => $user,
-            'user_form' => $form->createView(),
-            'ajax' => true,
-            'VARS' => self::VARS,
-        ]
-        );
-    }
-
-    /**
      * @Route("/{id}/delete", name="delete", methods={"POST"})
      */
     public function delete(Request $request, Domain $entity, REPO $repo, ReadConfig $config): Response
@@ -174,11 +133,11 @@ class DomainController extends AbstractController
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
-        $users=$lists=[];
+        $users=$aliases=[];
 
         foreach ($entity->getUsers() as $user) {
             if ($user->isList()) {
-                $lists[]=$user;
+                $aliases[]=$user;
             } else {
                 $users[]=$user;
             }
@@ -190,7 +149,10 @@ class DomainController extends AbstractController
 
         // Pestaña usuarios
         $user = (new User())
-            ->setDomain($entity)->setSendEmail(true)->setActive(true);
+        ->setDomain($entity)
+        ->setSendEmail(true)
+        ->setActive(true)
+        ;
         $userform = $this->createForm(UserType::class, $user,
             [
                 'showAutoreply' => false,
@@ -209,29 +171,12 @@ class DomainController extends AbstractController
             UserType::class,
             $alias,
             [
-                'domain' => $entity->getId(),
-                'showList' => true,
+                'domainId' => $entity->getId(),
+                'showAlias' => true,
             ]
         )
         ;
         // Fin pestaña aliases
-
-        // Pestaña listas
-        $list = (new User())
-        ->setDomain($entity)
-        ->setList(true)
-        ->setPassword(false)
-        ;
-        $listform = $this->createForm(
-            UserType::class,
-            $list,
-            [
-                'domain' => $entity->getId(),
-                'showList' => true,
-            ]
-        )
-        ;
-        // Fin pestaña listas
 
         // Vamos a ver los POST de los distintos formularios. Sólo puede ser uno
 
@@ -268,15 +213,6 @@ class DomainController extends AbstractController
         }
 
 
-        // Formulario de las listas
-        $listform->handleRequest($request);
-        if ($listform->isSubmitted() && $listform->isValid()) {
-            $ur->add($list, true);
-
-            $reload = true;
-        }
-
-
         if ($reload) return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
 
 
@@ -287,9 +223,8 @@ class DomainController extends AbstractController
             'form' => $form->createView(),
             'user_form' => $userform->createView(),
             'alias_form' => $aliasform->createView(),
-            'list_form' => $listform->createView(),
             'users' => $users,
-            'lists' => $lists,
+            'aliases' => $aliases,
             'VARS' => self::VARS,
         ]
         );

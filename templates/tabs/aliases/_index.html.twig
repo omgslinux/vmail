@@ -1,27 +1,35 @@
     <h2>{% trans %}Aliases in domain{% endtrans %} {{ entity.name }}</h2>
+    {% set modalId = 'aliases' %}
+    {% set modalSize, included = 'modal-md', 'tabs/aliases/_form' %}
 
-    {% if lists %}
+    {% if aliases %}
+    {% set tagPrefix = 'edit' %}
 
     <table class="table table-bordered">
         <tbody>
             <tr>
                 <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
             </tr>
-            {% for user in lists %}{% set email = user.name ~ '@' ~ entity.name %}
+            {% for alias in lists %}{% set email = alias.name ~ '@' ~ alias.domain.name %}
             <tr>
-                <td><a href="{{ path('manage_alias_show', { 'id': user.id } ) }}">{{ email }}</td>
-                <td>{{ user.isActive ? '√' : '--' }}</td>
+                <td><a href="{{ path('manage_alias_show', { 'id': alias.id } ) }}">{{ email }}</td>
+                <td>{{ alias.isActive ? '√' : '--' }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+        {{ include('_modal.html.twig', {
+          'nobutton': true,
+          'delete_form': true,
+        })
+        }}
     {% else %}
       <p>No hay alias definidos</p>
     {% endif %}
-    {% set modalId, modalTitle = 'alias', 'Crear alias' %}
+    {% set tagPrefix = 'create' %}
+    {% set modalTitle = 'Create a new alias' %}
     {{ include('_modal.html.twig', {
-      'included': 'domain/aliases/_form',
-      'closeMessage': 'Cerrar',
-      'modalSize': 'modal-md',
+      'noajax': true,
       })
     }}
+<br>

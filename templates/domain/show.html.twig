@@ -27,6 +27,6 @@
     {# Para la vuelta de las peticiones es origin #}
     {{ include('_tabs.html.twig', {
             'tdir': 'tabs',
-            'origin': entity,
+            'origin': entity.name,
             }) }}
 {% endblock %}

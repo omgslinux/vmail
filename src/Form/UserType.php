@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -31,31 +32,29 @@ class UserType extends AbstractType
     {
         $userLabel='User';
         $fullNameLabel='Full Name';
-        $domain=$options['domain'];
+        $domain=$options['domainId'];
         $managePassword=true;
-        if ($options['showAlias'] || $options['showList']) {
+        if ($options['showAlias']) {
             $managePassword=false;
             $options['showAutoreply']=false;
             $userLabel='Alias';
             $fullNameLabel='Description';
-            if ($options['showAlias']) {
-                $builder
-                ->add(
-                    'aliasnames',
-                    CollectionType::class,
-                    [
-                      'entry_type' => AliasType::class,
-                      'by_reference' => false,
-                      'allow_add' => true,
-                      'allow_delete' => true,
-                      'entry_options' =>
-                      [
-                        'domain' => $domain
-                      ]
-                    ]
-                )
-                ;
-            }
+            $builder
+            ->add(
+                'aliasnames',
+                CollectionType::class,
+                [
+                  'entry_type' => AliasType::class,
+                  'by_reference' => false,
+                  'allow_add' => true,
+                  'allow_delete' => true,
+                  'entry_options' =>
+                  [
+                    'domainId' => $domain
+                  ]
+                ]
+            )
+            ;
         } else {
             $builder
             ->add(
@@ -75,7 +74,7 @@ class UserType extends AbstractType
                 ]
             )
             ->add(
-                'sendemail',
+                'sendEmail',
                 CheckboxType::class,
                 [
                   'label' => 'Send welcome email',
@@ -101,7 +100,7 @@ class UserType extends AbstractType
             ;
 
             $builder
-            ->get('sendemail')
+            ->get('sendEmail')
             ->addModelTransformer(
                 new CallbackTransformer(
                     function ($booleanAsString) {
@@ -170,7 +169,7 @@ class UserType extends AbstractType
                 RepeatedType::class,
                 [
                     'type' => PasswordType::class,
-                    'required' => false,
+                    'required' => false!==$options['showAutoreply'],
                     'first_options' =>
                     [
                         'label' => 'Password',
@@ -191,13 +190,25 @@ class UserType extends AbstractType
             $builder
             ->add(
                 'domain',
-                EntityType::class,
+                null
+                /*EntityType::class,
                 [
                     'class' => Domain::class,
                     'label' => 'Domain'
                 ]
+                */
             )
             ;
+        /* } else {
+            $builder
+            ->add(
+                'domain',
+                HiddenType::class,
+                [
+                    'data' => $domain,
+                ]
+            )
+            ; */
         }
         if ($options['showAutoreply']) {
             $builder
@@ -225,9 +236,8 @@ class UserType extends AbstractType
                 'data_class' => User::class,
                 'showDomain' => false,
                 'showAutoreply' => false,
-                'showList' => false,
                 'showAlias' => false,
-                'domain' => false,
+                'domainId' => false,
             ]
         );
     }

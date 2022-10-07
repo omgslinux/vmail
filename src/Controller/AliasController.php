@@ -36,7 +36,7 @@ class AliasController extends AbstractController
         }
 
         $em = $this->getDoctrine()->getManager();
-        $aliases = $em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
+        $aliases = $em->getRepository(User::class)->findBy(['domainId' => $domain->getId(), 'list' => 1]);
 
         return $this->render('alias/index.html.twig', array(
             'items' => $aliases,
@@ -88,8 +88,8 @@ class AliasController extends AbstractController
             UserType::class,
             $alias,
             [
-                'domain' => $domain->getId(),
-                'showList' => true
+                'domainId' => $domain->getId(),
+                'showAlias' => true
             ]
         )
         ;

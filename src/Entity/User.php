@@ -100,7 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var boolean
      *
      */
-    private $sendEmail;
+    private $sendEmail = false;
 
 
     public function __construct()

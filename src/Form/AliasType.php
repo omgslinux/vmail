@@ -19,7 +19,7 @@ class AliasType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $domain=$options['domain'];
+        $domain=$options['domainId'];
         $builder
         ->add(
             'addressname',
@@ -73,7 +73,7 @@ class AliasType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => Alias::class,
-            'domain' => 0,
+            'domainId' => 0,
         ));
     }
 

@@ -1,3 +1,13 @@
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
 {{ form_start(form) }}
     <div class="modal-body">
     {% if entity.id is defined %}
@@ -30,7 +40,7 @@
         {{ form_widget(form.active) }}
       </div>
       <div class="col-md-3">
-        {{ form_widget(form.sendemail) }}
+        {{ form_widget(form.sendEmail) }}
       </div>
     </div>
     <div class="row">

@@ -3,18 +3,9 @@
 {% block body %}
     <h1>{% trans %}Domain{% endtrans %} {{ parent }}</h1>
 
-    <h2>{% trans %}Users in domain{% endtrans %} {{ parent }}</h2>
     {% set modalId = modalId|default(VARS.modalId) %}
-    {% set tagPrefix = 'edit' %}
-    {% if is_granted('ROLE_MANAGER') %}
-        {% set modalTitle = 'Edit user in domain ' ~ parent.name %}
-        {{ include('_modal.html.twig', {
-          'nobutton': true,
-          'delete_form': true,
-          })
-        }}
-    {% endif %}
     {% set entity = entity|default(app.user.domain) %}
+
     {# Para la vuelta de las peticiones es origin #}
     {{ include('_tabs.html.twig', {
             'tdir': 'tabs',

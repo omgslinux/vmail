@@ -16,7 +16,7 @@
                 </div>
             {% if noajax is defined %}
                 {{ include( included|default(VARS.included) ~ '.html.twig', {
-                    'modalId2': tagPrefix ~ modalId ~ "Modal",
+                    'modalId2': modalId2,
                     }
                 ) }}
             {% else -%}
