@@ -12,6 +12,8 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack as RS;
 
 /**
  * usersRepository
@@ -34,7 +36,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 {
     private $pe;
     private $config;
-    public function __construct(ManagerRegistry $registry, PE $pe, RC $config, DM $deliver, DomainRepository $dr)
+    public function __construct(ManagerRegistry $registry, RS $RS, PE $pe, RC $config, DM $deliver, DomainRepository $dr)
     {
         parent::__construct($registry, User::class);
 
@@ -42,6 +44,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         $this->config = $config;
         $this->deliver = $deliver;
         $this->dr = $dr;
+        $this->RS = $RS;
     }
 
     //public function loadUserByUsername($username)
@@ -93,10 +96,11 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
             $user->setDomain($domain);
             dump($domain);
         }
-            dump($user, $_POST); die();
+            //dump($user, $_POST); die();
         $plainPassword = $user->getPlainpassword();
         if (!empty($plainPassword)) {
             $user->setPassword($this->pe->encodePassword($plainPassword));
+            $this->RS->getSession()->getFlashBag()->add('success', 'Password successfully modified');
         }
         $this->add($user, true);
         if ($form->get('sendEmail')) {
