@@ -12,11 +12,18 @@ use App\Entity\Alias;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 /**
  * User
  *
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="user", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"domain_id", "user"})})
+ * @UniqueEntity(
+ *       fields={"name", "domain"},
+ *       message="Ya existe ese usuario",
+ *       errorPath="name"
+ * )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
