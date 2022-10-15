@@ -68,21 +68,17 @@ class UserController extends AbstractController
             UserType::class,
             $entity,
             [
-                //'action' => self::VARS['PREFIX'] . 'index',
                 'showDomain' => $showDomain,
                 'showAutoreply' => false,
             ]
         );
 
-        //if ($form->isSubmitted() && $form->isValid()) {
-        if ($userform->isSubmitted()) {
-    dump($userform); die();
-            if ($userform->isValid()) {
-                $ur->formSubmit($userform);
+        $userform->handleRequest($request);
+        if ($userform->isSubmitted() && $userform->isValid()) {
+            $repo->formSubmit($userform);
 
-                $reload = true;
-                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-            }
+            $reload = true;
+            //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
 
