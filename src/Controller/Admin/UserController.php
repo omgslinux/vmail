@@ -101,18 +101,16 @@ class UserController extends AbstractController
         ;
         // Fin pestaña aliases
 
-        dump($userform, $aliasform, $_POST);
         // Formulario de los alias
         $aliasform->handleRequest($request);
         if ($aliasform->isSubmitted() && $aliasform->isValid()) {
             $ur->add($alias, true);
-die();
+
             $reload = true;
             $activetab = 'aliases';
         }
 
         if ($reload) {
-            die();
             return $this->redirectToRoute(
                 self::VARS['PREFIX'] . 'index',
                 [
@@ -123,7 +121,6 @@ die();
         }
 
         return $this->render(self::VARS['BASEDIR'] . 'index.html.twig', array(
-            //'parent' => $parent,
             'tabs' => self::TABS,
             'activetab' => $activetab,
             'users' => $users,
@@ -218,7 +215,7 @@ die();
         if ($user_form->isSubmitted() && $user_form->isValid()) {
             $origin = $session->get('useredit');
             $session->remove('useredit');
-            //dump($entity, $origin, $session);die();
+
             $ur->formSubmit($user_form);
 
             if (null==$origin) {
