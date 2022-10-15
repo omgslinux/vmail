@@ -6,6 +6,7 @@ use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use App\Entity\Domain;
 use App\Form\UserType;
 use App\Repository\UserRepository as UR;
@@ -41,23 +42,35 @@ class UserController extends AbstractController
      */
     public function editAction(Request $request, UR $ur)
     {
-        $user=$this->getUser();
+        $user=($this->getUser())
+        ->setSendEmail(false);
         $formOptions['showAutoreply'] = null!==$user->getReply();
-        $form = $this->createForm(UserType::class, $user, $formOptions);
+        $form = $this->createForm(
+            UserType::class,
+            $user,
+            [
+                'showAutoreply' => null!==$user->getReply(),
+                'action' => $this->generateUrl(self::PREFIX . 'edit'),
+            ]
+        );
         $form
           ->remove('name')
+          ->remove('fullname')
+          ->remove('active')
           ->remove('admin')
           ->remove('quota')
-          ->remove('domain');
+          ->remove('domain')
+          ->remove('sendEmail')
+          ->add('sendEmail', HiddenType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $ur->formSubmit($form);
 
-            return $this->redirectToRoute(self::PREFIX . 'show');
+            return $this->redirectToRoute('homepage');
         }
 
-        return $this->render('user/self.html.twig', array(
+        return $this->render('user/_self.html.twig', array(
             'user' => $user,
             'form' => $form->createView(),
             'PREFIX' => self::PREFIX,

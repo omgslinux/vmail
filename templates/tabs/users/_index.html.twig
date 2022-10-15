@@ -1,6 +1,5 @@
 <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
 
-{% set form = user_form %}
 {% set tagPrefix = 'edit' %}
 {% set modalId = 'users' %}
 {% set modalSize, included = 'modal-lg', 'tabs/users/_form' %}
@@ -41,7 +40,6 @@
     {% set tagPrefix = 'create' %}
     {% set modalTitle = 'Create a new user' %}
     {{ include('_modal.html.twig', {
-      'form': user_form,
       'noajax': true,
       })
     }}

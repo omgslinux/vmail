@@ -23,7 +23,6 @@ class AliasRepository extends \Doctrine\ORM\EntityRepository
         ;
         $query = $qb->getQuery();
         return $query->getResult();
-
     }
 
     public function findAliasByDomain($domain)
@@ -38,7 +37,5 @@ class AliasRepository extends \Doctrine\ORM\EntityRepository
         ;
         $query = $qb->getQuery();
         return $query->getResult();
-
     }
-
 }

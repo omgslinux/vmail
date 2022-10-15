@@ -1,4 +1,7 @@
-{% set modalId = modalId|default(VARS.modalId) %}
+{% if VARS is defined %}
+    {% set modalId = modalId|default(VARS.modalId) %}
+    {% set modalSize = modalSize|default(VARS.modalSize) %}
+{% endif %}
 {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
 {% if nobutton is not defined %}
     <!-- Button trigger modal -->
@@ -6,7 +9,7 @@
 {% endif %}
   <!-- Modal -->
   <div class="modal fade" id="{{ modalId2 }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalId2 }}Label" aria-hidden="true">
-      <div class="modal-dialog {{ modalSize|default(VARS.modalSize)}}" role="document">
+      <div class="modal-dialog {{ modalSize }}" role="document">
           <div class="modal-content" id="{{ modalId2 }}-content">
                 <div class="modal-header btn-primary">
                     <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>

@@ -94,14 +94,16 @@ class DomainController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        return $this->render(self::VARS['BASEDIR'] . '/_form.html.twig', [
-            'entity' => $entity,
-            'modalTitle' => 'Domain edit',
-            'form' => $form->createView(),
-            'VARS' => self::VARS,
-            'ajax' => true,
-            'delete_form' => true,
-        ]
+        return $this->render(
+            self::VARS['BASEDIR'] . '/_form.html.twig',
+            [
+                'entity' => $entity,
+                'modalTitle' => 'Domain edit',
+                'form' => $form->createView(),
+                'VARS' => self::VARS,
+                'ajax' => true,
+                'delete_form' => true,
+            ]
         );
     }
 
@@ -153,7 +155,9 @@ class DomainController extends AbstractController
         ->setSendEmail(true)
         ->setActive(true)
         ;
-        $userform = $this->createForm(UserType::class, $user,
+        $userform = $this->createForm(
+            UserType::class,
+            $user,
             [
                 'showAutoreply' => false,
             ]
@@ -186,9 +190,10 @@ class DomainController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->repo->add($entity, true);
-            if ($oldname!=$entity->getName()) {
+            $newName = $entity->getName();
+            if ($oldname!=$newName) {
                 $base=$config->findParameter('virtual_mailbox_base');
-                system("cd $base;mv $oldname " .$entity->getName(). ";ln -sf " . $entity->getId() . " " . $entity->getName());
+                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
             }
 
             $reload = true;
@@ -213,20 +218,24 @@ class DomainController extends AbstractController
         }
 
 
-        if ($reload) return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
+        if ($reload) {
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
+        }
 
 
-        return $this->render(self::VARS['BASEDIR'] . '/show.html.twig', [
-            'entity' => $entity,
-            'tabs' => self::TABS,
-            'activetab' => $activetab,
-            'form' => $form->createView(),
-            'user_form' => $userform->createView(),
-            'alias_form' => $aliasform->createView(),
-            'users' => $users,
-            'aliases' => $aliases,
-            'VARS' => self::VARS,
-        ]
+        return $this->render(
+            self::VARS['BASEDIR'] . '/show.html.twig',
+            [
+                'entity' => $entity,
+                'tabs' => self::TABS,
+                'activetab' => $activetab,
+                'form' => $form->createView(),
+                'user_form' => $userform->createView(),
+                'alias_form' => $aliasform->createView(),
+                'users' => $users,
+                'aliases' => $aliases,
+                'VARS' => self::VARS,
+            ]
         );
     }
 

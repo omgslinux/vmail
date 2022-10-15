@@ -25,7 +25,7 @@ security:
               username_parameter: _username
               password_parameter: _password
             logout:
-              path: /logout
+              path: logout
               target: /
 
             # activate different ways to authenticate

@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>{% trans %}Domain{% endtrans %} {{ parent }}</h1>
 
     {% set modalId = modalId|default(VARS.modalId) %}
     {% set entity = entity|default(app.user.domain) %}
+    <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
 
     {# Para la vuelta de las peticiones es origin #}
     {{ include('_tabs.html.twig', {

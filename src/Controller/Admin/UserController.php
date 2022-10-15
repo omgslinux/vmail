@@ -64,23 +64,26 @@ class UserController extends AbstractController
         ->setSendEmail(true)
         ->setActive(true)
         ;
-        $form = $this->createForm(UserType::class, $entity,
-        [
-            //'action' => self::VARS['PREFIX'] . 'index',
-            'showDomain' => $showDomain,
-            'showAutoreply' => false,
-        ]);
+        $userform = $this->createForm(
+            UserType::class,
+            $entity,
+            [
+                //'action' => self::VARS['PREFIX'] . 'index',
+                'showDomain' => $showDomain,
+                'showAutoreply' => false,
+            ]
+        );
 
         //if ($form->isSubmitted() && $form->isValid()) {
-        if ($form->isSubmitted()) {
-    dump($form); die();
-            if ($form->isValid()) {
-            $ur->formSubmit($form);
+        if ($userform->isSubmitted()) {
+    dump($userform); die();
+            if ($userform->isValid()) {
+                $ur->formSubmit($userform);
 
-            $reload = true;
-            //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+                $reload = true;
+                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+            }
         }
-    }
 
 
 
@@ -90,7 +93,8 @@ class UserController extends AbstractController
         ->setList(false)
         ->setPassword(false)
         ;
-        $aliasform = $ff->createNamed('alias',
+        $aliasform = $ff->createNamed(
+            'alias',
             UserType::class,
             $alias,
             [
@@ -101,7 +105,7 @@ class UserController extends AbstractController
         ;
         // Fin pestaña aliases
 
-        dump($form, $aliasform, $_POST);
+        dump($userform, $aliasform, $_POST);
         // Formulario de los alias
         $aliasform->handleRequest($request);
         if ($aliasform->isSubmitted() && $aliasform->isValid()) {
@@ -114,7 +118,7 @@ die();
         if ($reload) {
             die();
             return $this->redirectToRoute(
-            self::VARS['PREFIX'] . 'index',
+                self::VARS['PREFIX'] . 'index',
                 [
                     'id' => $entity->getId(),
                     'activetab' => $activetab,
@@ -123,12 +127,12 @@ die();
         }
 
         return $this->render(self::VARS['BASEDIR'] . 'index.html.twig', array(
-            'parent' => $parent,
+            //'parent' => $parent,
             'tabs' => self::TABS,
             'activetab' => $activetab,
             'users' => $users,
             'aliases' => $aliases,
-            'user_form' => $form->createView(),
+            'user_form' => $userform->createView(),
             'alias_form' => $aliasform->createView(),
             'VARS' => self::VARS,
         ));
@@ -154,7 +158,9 @@ die();
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        $form = $this->createForm(UserType::class, $entity,
+        $form = $this->createForm(
+            UserType::class,
+            $entity,
             [
                 'showDomain' => false,
                 'showAutoreply' => false,
