@@ -51,6 +51,9 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     public function loadUserByIdentifier(string $username): ?UserInterface
     {
         $a=explode('@', $username);
+        if (count($a) != 2) {
+            return null;
+        }
         $user=$a[0];
         $domain=$a[1];
         return $this->createQueryBuilder('u')
@@ -60,17 +63,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
             ->setParameter('domain', $domain)
             ->getQuery()
             ->getOneOrNullResult();
-        /*return $this->getEntityManager()->createQuery(
-                'SELECT u
-                FROM App\Entity\User u
-                JOIN App\Entity\Domain d
-                WITH u.domain = d.id
-                WHERE u.name = :user AND d.name = :domain'
-            )
-            ->setParameter('user', $user)
-            ->setParameter('domain', $domain)
-            ->getOneOrNullResult(); */
-     }
+    }
 
     /** @deprecated since Symfony 5.3 */
     public function loadUserByUsername(string $username)
@@ -122,7 +115,6 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         $recipient=$user->getEmail();
         $sender='welcome@default';
         $this->deliver->sendMail($subject, $sender, $recipient, $body);
-
     }
 
 //    /**
