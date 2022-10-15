@@ -139,12 +139,14 @@ class PassEncoder implements PasswordHasherInterface
 
     public function hash(string $plainPassword): string
     {
-        return "";
+        // Tiene que devolver la $plainPassword encriptada
+        return $this->encodePassword($plainPassword);
     }
 
     public function verify(string $hashedPassword, string $plainPassword): bool
     {
-        return true;
+        // Tiene que comparar la plain y la hashed y devolver true o false
+        return $hashedPassword === $this->encodePassword($plainPassword);
     }
 
     public function needsRehash(string $encoded): bool
