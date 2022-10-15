@@ -48,7 +48,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     }
 
     //public function loadUserByUsername($username)
-    public function loadUserByIdentifier(string $username): UserInterface
+    public function loadUserByIdentifier(string $username): ?UserInterface
     {
         $a=explode('@', $username);
         $user=$a[0];
@@ -94,9 +94,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         if (null==$user->getDomain()) {
             $domain = $this->dr->find($form->get('domain'));
             $user->setDomain($domain);
-            dump($domain);
         }
-            //dump($user, $_POST); die();
         $plainPassword = $user->getPlainpassword();
         if (!empty($plainPassword)) {
             $user->setPassword($this->pe->encodePassword($plainPassword));
