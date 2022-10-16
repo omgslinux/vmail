@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Traits\ActivableEntityTrait;
 use App\Entity\AutoreplyCache;
 use App\Entity\Autoreply;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Autoreply
@@ -36,6 +37,7 @@ class Autoreply
     /**
      * @var message
      *
+     * @Assert\NotBlank
      * @ORM\Column(name="message", type="text")
      */
     private $message;

@@ -38,11 +38,11 @@ class AutoreplyType extends AbstractType
             ]
         )
         ->add('startdate', DateTimeType::class, array(
-          //'widget' => 'single_text',
+          'widget' => 'single_text',
           'label' => 'Start date',
         ))
         ->add('enddate', DateTimeType::class, array(
-          //'widget' => 'single_text',
+          'widget' => 'single_text',
           'label' => 'End date',
         ))
         ->add(
@@ -54,7 +54,7 @@ class AutoreplyType extends AbstractType
             ]
         )
         ;
-        $builder
+        /* $builder
         ->get('active')
         ->addModelTransformer(
             new CallbackTransformer(
@@ -67,7 +67,7 @@ class AutoreplyType extends AbstractType
                     return (string)(int)$stringAsBoolean;
                 }
             )
-        );
+        ); */
     }
 
     /**
@@ -83,8 +83,8 @@ class AutoreplyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    /*public function getBlockPrefix()
     {
         return 'vmailbundle_autoreply';
-    }
+    } */
 }
