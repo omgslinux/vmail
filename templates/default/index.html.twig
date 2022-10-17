@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+
+
 <style>
 .dashboard {
     width: 500px;
@@ -54,17 +56,20 @@
                 <a class="btn btn-primary" href="{{ path('user_self_edit') }}">
                 {% trans %}Change password{% endtrans %}
                 </a>
-            </li>
+            </li>{% set modalTitle = 'Change password' %}
+    {% set tagPrefix = 'edit' %}
+    {% set modalId = 'users' %}
+    {% set modalSize, included = 'modal-md', 'user/_pass' %}
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'form': user_form,
+      })
+    }}
+
             <li>
                 <a class="btn btn-primary" href="{{ path('manage_user_index') }}">
                 {% trans %}Autoreply{% endtrans %}
                 </a>
-            </li>
-        </div>
-        <hr>
-        <div>
-            <li class="col-12 btn btn-danger">
-                <a href="{{ path('logout') }}">{% trans %}Logout{% endtrans %}</a>
             </li>
         </div>
         {% endif %}

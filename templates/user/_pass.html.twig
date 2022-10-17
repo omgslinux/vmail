@@ -1,0 +1,23 @@
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
+{{ form_start(form) }}
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-5">
+                {{ form_widget(form.plainPassword) }}
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
+    </div>
+{{ form_end(form) }}

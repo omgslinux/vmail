@@ -84,18 +84,25 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     {
         //$user=$this->user;
         $user = $form->getData();
-        if (null==$user->getDomain()) {
+        if (null==$user->getDomain() && $form->get('domain')) {
             $domain = $this->dr->find($form->get('domain'));
             $user->setDomain($domain);
         }
         $plainPassword = $user->getPlainpassword();
         if (!empty($plainPassword)) {
-            $user->setPassword($this->pe->encodePassword($plainPassword));
+            $user->setPassword($this->encodePassword($plainPassword));
             $this->RS->getSession()->getFlashBag()->add('success', 'Password successfully modified');
         }
         $this->add($user, true);
         if ($form->get('sendEmail')) {
             $this->sendWelcomeMail($user);
+        }
+    }
+
+    public function encodePassword($plainPassword = null): ?string
+    {
+        if (null!=$plainPassword) {
+            return $this->pe->encodePassword($plainPassword);
         }
     }
 

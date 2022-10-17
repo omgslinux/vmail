@@ -46,13 +46,15 @@ class DomainRepository extends ServiceEntityRepository
 
     public function makeMaildir(Entity $entity, bool $add = true)
     {
-        if ($add) $this->add($entity, true);
+        if ($add) {
+            $this->add($entity, true);
+        }
         $base=$this->config->findParameter('virtual_mailbox_base');
         mkdir($base.'/'.$entity->getId());
         system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
     }
 
-    public function rawsql($rawsql, bool $flush=false): void
+    public function rawsql($rawsql, bool $flush = false): void
     {
         $conn=$this->getEntityManager()->getConnection();
         $conn->exec($rawsql);
@@ -60,7 +62,6 @@ class DomainRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
-
     }
 
 //    /**

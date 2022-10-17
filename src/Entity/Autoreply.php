@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Autoreply
  *
  * @ORM\Table(name="autoreply")
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\AutoreplyRepository")
  */
 class Autoreply
 {
@@ -67,7 +67,7 @@ class Autoreply
     public function __construct()
     {
         $this->startdate=new \DateTime();
-        $this->startdate->format('Y-m-d');
+        //$this->startdate->format('Y-m-d');
         $this->enddate=$this->startdate;
         $this->replys=new ArrayCollection();
     }

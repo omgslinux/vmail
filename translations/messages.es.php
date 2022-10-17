@@ -40,6 +40,7 @@ return array(
   'Name' => 'Nombre',
   'Active' => 'Activo',
   'Actions' => 'Acciones',
+  'Close' => 'Cerrar',
   'show' => 'Mostrar',
   'edit' => 'Editar',
   'Back' => 'Volver',

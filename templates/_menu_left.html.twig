@@ -1,21 +1,4 @@
     {# Menú de usuario #}
     {% if is_granted('ROLE_USER') %}
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ app.user }}<span class="caret"></span></a>
-          <div class="dropdown-menu">
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editselfModal" data-url="{{ path('user_self_edit')}}">{% trans %}User profile{% endtrans %}</a>
-          </div>
-    </li>
-    {{ include('_modal.html.twig', {
-        'modalTitle': 'User profile',
-        'nobutton': true,
-        'tagPrefix': 'edit',
-        'VARS.modalId': 'self',
-        'modalId': 'self',
-        'modalSize':'modal-md',
-        'included': 'users/_self',
-      })
-    }}
-
+        <a class="btn" href="{{ path('homepage')}}" img="{{ asset('custom/img/vmaillogo.png') }}">Inicio</a>
     {% endif %}

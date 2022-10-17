@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+//use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
@@ -37,14 +37,22 @@ class AutoreplyType extends AbstractType
                 ]
             ]
         )
-        ->add('startdate', DateTimeType::class, array(
-          'widget' => 'single_text',
-          'label' => 'Start date',
-        ))
-        ->add('enddate', DateTimeType::class, array(
-          'widget' => 'single_text',
-          'label' => 'End date',
-        ))
+        ->add(
+            'startdate',
+            null,
+            [
+                'widget' => 'single_text',
+                'label' => 'Start date',
+            ]
+        )
+        ->add(
+            'enddate',
+            null,
+            [
+                'widget' => 'single_text',
+                'label' => 'End date',
+            ]
+        )
         ->add(
             'active',
             CheckboxType::class,
