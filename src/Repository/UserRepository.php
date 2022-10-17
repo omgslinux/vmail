@@ -29,15 +29,19 @@ use Symfony\Component\HttpFoundation\RequestStack as RS;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-//class DomainRepository extends ServiceEntityRepository
 
-//lass UserRepository extends EntityRepository implements UserLoaderInterface
 class UserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
     private $pe;
     private $config;
-    public function __construct(ManagerRegistry $registry, RS $RS, PE $pe, RC $config, DM $deliver, DomainRepository $dr)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        RS $RS,
+        PE $pe,
+        RC $config,
+        DM $deliver,
+        DomainRepository $dr
+    ) {
         parent::__construct($registry, User::class);
 
         $this->pe = $pe;
@@ -82,7 +86,6 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 
     public function formSubmit($form)
     {
-        //$user=$this->user;
         $user = $form->getData();
         if (null==$user->getDomain() && $form->get('domain')) {
             $domain = $this->dr->find($form->get('domain'));
@@ -94,7 +97,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
             $this->RS->getSession()->getFlashBag()->add('success', 'Password successfully modified');
         }
         $this->add($user, true);
-        if ($form->get('sendEmail')) {
+        if ($user->getSendEmail()) {
             $this->sendWelcomeMail($user);
         }
     }

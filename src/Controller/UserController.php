@@ -38,12 +38,12 @@ class UserController extends AbstractController
     public function index(Request $request, UR $ur): Response
     {
         $entity = $this->getUser();
-dump($entity);
+
         $passform = $this->createForm(ManagePasswordType::class, $entity);
         $passform->handleRequest($request);
 
         if ($passform->isSubmitted() && $passform->isValid()) {
-            $ur->submitForm($entity, true);
+            $ur->formSubmit($passform);
 
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
