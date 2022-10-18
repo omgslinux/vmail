@@ -191,26 +191,10 @@ class UserType extends AbstractType
             ->add(
                 'domain',
                 null
-                /*EntityType::class,
-                [
-                    'class' => Domain::class,
-                    'label' => 'Domain'
-                ]
-                */
             )
             ;
-        /* } else {
-            $builder
-            ->add(
-                'domain',
-                HiddenType::class,
-                [
-                    'data' => $domain,
-                ]
-            )
-            ; */
         }
-        if ($options['showAutoreply']) {
+        /* if ($options['showAutoreply']) {
             $builder
             ->add(
                 'reply',
@@ -223,7 +207,7 @@ class UserType extends AbstractType
             )
             ;
         }
-        ;
+        ; */
     }
 
     /**

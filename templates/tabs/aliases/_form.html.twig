@@ -11,15 +11,28 @@
 {{ form_start(alias_form) }}
     <div class="modal-body">
 
-    <div class="row">
-      <div class="col-md-5">
-        {{ form_widget(alias_form.name) }}
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_label(alias_form.name) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(alias_form.fullname) }}
+            </div>
+            <div class="col-md-1">
+                {{ form_label(alias_form.active) }}
+            </div>
         </div>
-        <div class="col-md-1">
-        {{ form_widget(alias_form.active) }}
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_widget(alias_form.name) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_widget(alias_form.fullname) }}
+            </div>
+            <div class="col-md-1">
+                {{ form_widget(alias_form.active) }}
+            </div>
         </div>
-    </div>
-        <input type="submit" value="Create" />
     </div>
     <div class="modal-footer">
         <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>

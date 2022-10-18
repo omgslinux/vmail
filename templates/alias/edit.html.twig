@@ -36,7 +36,7 @@
               </tr>
             </thead>
             <tbody>
-            {% set assetjs = asset('/shared/js/user-aliasnames.js') %}
+            {% set assetjs = asset('/custom/js/user-aliasnames.js') %}
               {% for address in form.aliasnames %}
                 {{ form_widget(address) }}
               {% endfor %}

@@ -20,7 +20,7 @@ use App\Repository\UserRepository as UR;
  *
  * @Route("/user/self", name="user_self_")
  */
-class UserController extends AbstractController
+class SelfController extends AbstractController
 {
     const VARS = [
         'modalSize' => 'modal-md',

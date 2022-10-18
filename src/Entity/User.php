@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\BooleanType;
 use App\Entity\Domain;
 use App\Entity\Traits\ActivableEntityTrait;
 use App\Entity\Traits\UserInterfaceEntityTrait;
+use App\Entity\Autoreply;
 use App\Entity\Alias;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping\UniqueConstraint;
@@ -83,9 +84,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $list=false;
 
     /**
-     * @var ArrayCollection
+     * @var Autoreply
      *
-     * @ORM\OneToOne(targetEntity="Autoreply", mappedBy="user", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity="Autoreply", mappedBy="user", cascade={"persist", "remove"})
      */
     private $reply;
 
@@ -112,7 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->replys=new ArrayCollection();
+        //$this->reply=new ArrayCollection();
         $this->aliasnames=new ArrayCollection();
         $this->addresses=new ArrayCollection();
     }

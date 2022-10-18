@@ -36,7 +36,7 @@ class AliasController extends AbstractController
         }
 
         $em = $this->getDoctrine()->getManager();
-        $aliases = $em->getRepository(User::class)->findBy(['domainId' => $domain->getId(), 'list' => 1]);
+        $aliases = $em->getRepository(User::class)->findBy(['domain' => $domain->getId(), 'list' => 1]);
 
         return $this->render('alias/index.html.twig', array(
             'items' => $aliases,
@@ -211,37 +211,14 @@ class AliasController extends AbstractController
     }
 
     /**
-     * Deletes a alias entity.
-     *
-     * @Route("/delete/{id}", name="delete", methods={"DELETE"})
+     * @Route("/{id}/delete", name="delete", methods={"POST"})
      */
-    public function deleteAction(Request $request, User $alias)
+    public function delete(Request $request, User $entity, UR $repo): Response
     {
-        $form = $this->createDeleteForm($alias);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($alias);
-            $em->flush();
+        if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
+            $repo->remove($entity, true);
         }
 
-        return $this->redirectToRoute(self::PREFIX . 'index');
-    }
-
-    /**
-     * Creates a form to delete an alias entity.
-     *
-     * @param User $alias The alias
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(User $alias)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('delete', array('id' => $alias->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);
     }
 }

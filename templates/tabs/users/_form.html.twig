@@ -61,6 +61,7 @@
       </div>
     </div>
 
+    {#}
     {% if user_form.reply is not defined and user.id is defined %}
       {% if user.reply|length == 0 %}
         <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
@@ -74,6 +75,7 @@
         <hr>
       {% endif %}
     {% endif %}
+    #}
     </div>
     <div class="modal-footer">
         <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Closes')|trans }}</button>

@@ -49,6 +49,7 @@
       </div>
     </div>
 
+    {#}
     {% if form.reply is not defined and entity.id is defined %}
         {% if entity.reply|length == 0 %}
             <p><a href="{{ path('user_autoreply_new', { id: entity.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
@@ -62,6 +63,7 @@
             <hr>
         {% endif %}
     {% endif %}
+    #}
     </div>
     <div class="modal-footer">
         <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>

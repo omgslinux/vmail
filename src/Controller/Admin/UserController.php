@@ -44,9 +44,8 @@ class UserController extends AbstractController
      *
      * @Route("/", name="index", methods={"GET", "POST"})
      */
-    public function index(Request $request, FormFactoryInterface $ff, UR $repo, $activetab = 'users')
+    public function index(Request $request, FormFactoryInterface $ff, UR $repo, $activetab = null)
     {
-
         $parent=$this->getUser()->getDomain();
         $users=$aliases=[];
         $reload = false;
@@ -82,13 +81,13 @@ class UserController extends AbstractController
         }
 
 
-
         // Pestaña Alias
         $alias = (new User())
         ->setDomain($parent)
-        ->setList(false)
+        ->setList(true)
         ->setPassword(false)
         ;
+        // createNamed es para dar un nombre al formulario para que no sean ambos 'user'
         $aliasform = $ff->createNamed(
             'alias',
             UserType::class,
@@ -104,7 +103,8 @@ class UserController extends AbstractController
         // Formulario de los alias
         $aliasform->handleRequest($request);
         if ($aliasform->isSubmitted() && $aliasform->isValid()) {
-            $ur->add($alias, true);
+dump($alias);
+            $repo->add($alias, true);
 
             $reload = true;
             $activetab = 'aliases';
@@ -118,6 +118,8 @@ class UserController extends AbstractController
                     'activetab' => $activetab,
                 ]
             );
+        } else {
+            $activetab = $request->get('activetab')??'users';
         }
 
         return $this->render(self::VARS['BASEDIR'] . 'index.html.twig', array(

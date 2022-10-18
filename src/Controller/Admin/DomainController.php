@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\FormFactoryInterface;
 use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Entity\User;
@@ -129,7 +130,7 @@ class DomainController extends AbstractController
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByName(Request $request, $name, UR $ur, ReadConfig $config, $activetab = 'users')
+    public function showByName(Request $request, FormFactoryInterface $ff, $name, UR $ur, ReadConfig $config, $activetab = null)
     {
 
         // Para la entidad (el dominio)
@@ -168,10 +169,12 @@ class DomainController extends AbstractController
         // Pestaña Alias
         $alias = (new User())
         ->setDomain($entity)
-        ->setList(false)
+        ->setList(true)
         ->setPassword(false)
         ;
-        $aliasform = $this->createForm(
+        // createNamed es para dar un nombre al formulario para que no sean ambos 'user'
+        $aliasform = $ff->createNamed(
+            'alias',
             UserType::class,
             $alias,
             [
@@ -220,6 +223,8 @@ class DomainController extends AbstractController
 
         if ($reload) {
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
+        } else {
+            $activetab = $request->get('activetab')??'users';
         }
 
 
