@@ -240,6 +240,7 @@ class DomainController extends AbstractController
                 'users' => $users,
                 'aliases' => $aliases,
                 'VARS' => self::VARS,
+                'origin' => $this->generateUrl(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]),
             ]
         );
     }

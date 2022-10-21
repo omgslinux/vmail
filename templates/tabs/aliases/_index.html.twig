@@ -9,7 +9,9 @@
     <table class="table table-bordered">
         <tbody>
             <tr>
-                <th>{% trans %}List{% endtrans %}</th><th>{% trans %}Active{% endtrans %}</th><th>{% trans %}Admin{% endtrans %}</th>
+                <th>{% trans %}List{% endtrans %}</th>
+                <th>{% trans %}Description{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
             </tr>
             {% for alias in aliases %}{% set email = alias.name ~ '@' ~ alias.domain.name %}
             <tr>
@@ -19,6 +21,7 @@
                 {% else %}
                     data-url="{{ path('manage_alias_edit', { 'id': alias.id } ) }}">{{ email }}</a></td>
                 {% endif %}
+                <td>{{ alias.fullname }}</td>
                 <td>{{ alias.isActive ? '√' : '--' }}</td>
             </tr>
             {% endfor %}

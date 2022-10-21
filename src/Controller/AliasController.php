@@ -179,14 +179,14 @@ class AliasController extends AbstractController
     public function editAction(Request $request, User $alias)
     {
         $domain=$alias->getDomain();
-        $deleteForm = $this->createDeleteForm($alias);
         $editForm = $this->createForm(
             UserType::class,
             $alias,
             [
-                'domain' => $domain->getId(),
+                'domainId' => $domain->getId(),
                 'showAlias' => true,
-                'showList' => true
+                //'showList' => true
+                'action' => $this->generateUrl(self::PREFIX . 'edit', ['id' => $alias->getId()]),
             ]
         );
         $editForm->handleRequest($request);
@@ -199,11 +199,10 @@ class AliasController extends AbstractController
             return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
         }
 
-        return $this->render('alias/edit.html.twig', array(
+        return $this->render('tabs/aliases/_form.html.twig', array(
             'domain' => $domain,
             'title' => 'Alias edit',
-            'form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'alias_form' => $editForm->createView(),
             'jsfieldname' => 'alias',
             'jsfieldlabel' => 'correo',
             'PREFIX' => self::PREFIX,
