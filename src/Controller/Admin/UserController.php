@@ -220,7 +220,7 @@ dump($alias);
             $session->remove('useredit');
 
             $ur->formSubmit($user_form);
-dump($origin);
+
             if (null==$origin) {
                 return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
             } else {
