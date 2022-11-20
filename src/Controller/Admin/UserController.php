@@ -220,11 +220,11 @@ dump($alias);
             $session->remove('useredit');
 
             $ur->formSubmit($user_form);
-
+dump($origin);
             if (null==$origin) {
                 return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
             } else {
-                return $this->redirectToRoute($origin);
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $origin ]);
                 //return $this->redirectToRoute('admin_domain_show', ['id' => $entity->getDomain()->getId()]);
                 //return $this->redirectToRoute(self::PREFIX . 'edit', array('id' => $entity->getId()));
             }
