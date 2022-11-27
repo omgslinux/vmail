@@ -34,6 +34,25 @@
             </div>
         </div>
     </div>
+        {% if alias_form.aliasnames is defined and domain is defined %}
+          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
+          <table id="aliasnames-container" class="table table-bordered"
+            data-prototype="{{ form_widget(alias_form.aliasnames.vars.prototype)|e('html_attr') }}">
+            <thead>
+              <tr>
+                  <th>{% trans %}Email{% endtrans %}</th>
+                  <th>{% trans %}Active{% endtrans %}</th>
+                  <th>{% trans %}Delete?{% endtrans %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for address in alias_form.aliasnames %}
+                {{ form_widget(address) }}
+              {% endfor %}
+              {% do alias_form.aliasnames.setRendered %}
+            </tbody>
+          </table>
+        {% endif %}
     <div class="modal-footer">
         <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
