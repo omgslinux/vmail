@@ -1,14 +1,16 @@
 jQuery(document).ready(function() {
-    var $aliasesTable = $('#aliasnames-container');
-    var $collectionHolder = $aliasesTable.find('tbody');
-    var $addLink = $('#add-aliasname');
+    var $aliasesModal = $('#editaliasesModal');
+    //var $addLink = $('#add-aliasname');
 
-    $collectionHolder.data('index', $collectionHolder.find('tr').length);
 
-    $addLink.on('click', function(e) {
+    $aliasesModal.on('click', '#add-aliasname', function(e) {
         e.preventDefault();
 
+        var $aliasesTable = $('#aliasnames-container');
+        var $collectionHolder = $aliasesTable.find('tbody');
+        $collectionHolder.data('index', $collectionHolder.find('tr').length);
         var index = $collectionHolder.data('index');
+        console.log($aliasesTable);
         var prototype = $aliasesTable.data('prototype');
         var newForm = prototype.replace(/__name__/g, index);
 
@@ -16,11 +18,12 @@ jQuery(document).ready(function() {
 
         var $newRow = $(newForm);
         $collectionHolder.append($newRow);
+
+        $collectionHolder.on('click', '.delete-aliasname', function(e) {
+            e.preventDefault();
+
+            $(this).parents('tr').remove();
+        });
     });
 
-    $collectionHolder.on('click', '.delete-aliasname', function(e) {
-        e.preventDefault();
-
-        $(this).parents('tr').remove();
-    });
 });
