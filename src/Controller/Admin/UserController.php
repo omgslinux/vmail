@@ -10,7 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormFactoryInterface;
 use App\Entity\Domain;
 use App\Form\UserType;
-use App\Repository\UserRepository as UR;
+use App\Repository\UserRepository as REPO;
+use App\Repository\DomainRepository;
 
 /**
  * User controller.
@@ -39,12 +40,18 @@ class UserController extends AbstractController
         'modalId' => 'users',
     ];
 
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * Lists all user entities.
      *
      * @Route("/", name="index", methods={"GET", "POST"})
      */
-    public function index(Request $request, FormFactoryInterface $ff, UR $repo, $activetab = null)
+    public function index(Request $request, FormFactoryInterface $ff, $activetab = null)
     {
         $parent=$this->getUser()->getDomain();
         $users=$aliases=[];
@@ -74,7 +81,7 @@ class UserController extends AbstractController
 
         $userform->handleRequest($request);
         if ($userform->isSubmitted() && $userform->isValid()) {
-            $repo->formSubmit($userform);
+            $this->repo->formSubmit($userform);
 
             $reload = true;
             //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
@@ -103,8 +110,7 @@ class UserController extends AbstractController
         // Formulario de los alias
         $aliasform->handleRequest($request);
         if ($aliasform->isSubmitted() && $aliasform->isValid()) {
-dump($alias);
-            $repo->add($alias, true);
+            $this->repo->add($alias, true);
 
             $reload = true;
             $activetab = 'aliases';
@@ -139,16 +145,18 @@ dump($alias);
      *
      * @Route("/show/byemail/{email}", name="show_byemail", methods={"GET", "POST"})
      */
-    public function showByEmailAction(Request $request, UR $ur, $email)
+    public function showByEmailAction(Request $request, DomainRepository $DR, $email)
     {
         $t=explode('@', $email);
-        $em = $this->getDoctrine()->getManager();
-        $parent=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
+        //$em = $this->getDoctrine()->getManager();
+        //$parent=$em->getRepository(Domain::class)->findOneBy(['name' => $t[1]]);
+        $parent=$DR->findOneBy(['name' => $t[1]]);
         if (null==$parent) {
             $this->addFlash('error', 'Correo incorrecto');
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
-        $entity=$em->getRepository(User::class)->findOneBy(['domain' => $parent, 'name' => $t[0]]);
+        //$entity=$em->getRepository(User::class)->findOneBy(['domain' => $parent, 'name' => $t[0]]);
+        $entity=$this->repo->findOneBy(['domain' => $parent, 'name' => $t[0]]);
         if (null==$entity) {
             $this->addFlash('error', 'Correo incorrecto');
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
@@ -165,7 +173,7 @@ dump($alias);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $ur->formSubmit($form);
+            $this->repo->formSubmit($form);
 
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $user->getId()]);
         }
@@ -196,7 +204,7 @@ dump($alias);
      *
      * @Route("/{id}/edit/{origin}", name="edit", methods={"GET", "POST"})
      */
-    public function edit(Request $request, UR $ur, User $entity, $origin = null)
+    public function edit(Request $request, User $entity, $origin = null)
     {
         $user_form = $this->createForm(
             UserType::class,
@@ -219,7 +227,7 @@ dump($alias);
             $origin = $session->get('useredit');
             $session->remove('useredit');
 
-            $ur->formSubmit($user_form);
+            $this->repo->formSubmit($user_form);
 
             if (null==$origin) {
                 return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
@@ -241,10 +249,10 @@ dump($alias);
     /**
      * @Route("/{id}/delete", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, User $entity, UR $repo): Response
+    public function delete(Request $request, User $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
-            $repo->remove($entity, true);
+            $this->repo->remove($entity, true);
         }
 
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);

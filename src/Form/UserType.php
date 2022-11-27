@@ -169,7 +169,7 @@ class UserType extends AbstractType
                 RepeatedType::class,
                 [
                     'type' => PasswordType::class,
-                    'required' => false!==$options['showAutoreply'],
+                    'required' => false!==$options['showAlias'],
                     'first_options' =>
                     [
                         'label' => 'Password',

@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Form\UserType;
+use App\Repository\UserRepository as REPO;
 
 /**
  * Alias controller.
@@ -18,6 +19,13 @@ use App\Form\UserType;
 class AliasController extends AbstractController
 {
     const PREFIX = 'manage_alias_';
+
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * Lists all alias entities.
      *
@@ -35,8 +43,9 @@ class AliasController extends AbstractController
             );
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $aliases = $em->getRepository(User::class)->findBy(['domain' => $domain->getId(), 'list' => 1]);
+        //$em = $this->getDoctrine()->getManager();
+        //$aliases = $em->getRepository(User::class)->findBy(['domain' => $domain->getId(), 'list' => 1]);
+        $aliases = $this->repo->findBy(['domain' => $domain->getId(), 'list' => 1]);
 
         return $this->render('alias/index.html.twig', array(
             'items' => $aliases,
@@ -55,8 +64,9 @@ class AliasController extends AbstractController
             return $this->redirectToRoute(self::PREFIX . 'index', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
-        $em = $this->getDoctrine()->getManager();
-        $aliases = $em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
+        //$em = $this->getDoctrine()->getManager();
+        //$aliases = $em->getRepository(User::class)->findBy(['domain' => $domain, 'list' => 1]);
+        $aliases = $this->repo->findBy(['domain' => $domain, 'list' => 1]);
 
         return $this->render('alias/index.html.twig', array(
             'domain' => $domain,
@@ -76,7 +86,7 @@ class AliasController extends AbstractController
             return $this->redirectToRoute('manage_domain_alias_new', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
-        $em = $this->getDoctrine()->getManager();
+        //$em = $this->getDoctrine()->getManager();
 
         $alias = new User();
         $alias
@@ -96,9 +106,10 @@ class AliasController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($alias);
-            $em->flush();
+            //$em = $this->getDoctrine()->getManager();
+            //$em->persist($alias);
+            //$em->flush();
+            $this->repo->add($alias, true);
 
             return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
         }
@@ -143,9 +154,10 @@ class AliasController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($alias);
-            $em->flush();
+            //$em = $this->getDoctrine()->getManager();
+            //$em->persist($alias);
+            //$em->flush();
+            $this->repo->add($alias, true);
 
             return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
         }
@@ -174,10 +186,11 @@ class AliasController extends AbstractController
     /**
      * Displays a form to edit an existing alias entity.
      *
-     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
+     * @Route("/{id}/edit/{origin}", name="edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, User $alias)
+    public function editAction(Request $request, User $alias, $origin = null)
     {
+        $ORIGIN = 'aliasedit';
         $domain=$alias->getDomain();
         $editForm = $this->createForm(
             UserType::class,
@@ -189,33 +202,43 @@ class AliasController extends AbstractController
                 'action' => $this->generateUrl(self::PREFIX . 'edit', ['id' => $alias->getId()]),
             ]
         );
+
+        $session = $request->getSession();
+        if ($origin) {
+            $session->remove($ORIGIN);
+            $session->set($ORIGIN, $origin);
+        }
         $editForm->handleRequest($request);
-
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em=$this->getDoctrine()->getManager();
-            $em->persist($alias);
-            $em->flush();
+            $origin = $session->get($ORIGIN);
+            $session->remove($ORIGIN);
 
-            return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
+            if (null==$origin) {
+                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+                return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
+            } else {
+                $session->set('activetab', 'aliases');
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $origin ]);
+            }
         }
 
-        return $this->render('tabs/aliases/_form.html.twig', array(
+        return $this->render('tabs/aliases/_form.html.twig', [
             'domain' => $domain,
             'title' => 'Alias edit',
             'alias_form' => $editForm->createView(),
             'jsfieldname' => 'alias',
             'jsfieldlabel' => 'correo',
             'PREFIX' => self::PREFIX,
-        ));
+        ]);
     }
 
     /**
      * @Route("/{id}/delete", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, User $entity, UR $repo): Response
+    public function delete(Request $request, User $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
-            $repo->remove($entity, true);
+            $this->repo->remove($entity, true);
         }
 
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);

@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormFactoryInterface as FFI;
 use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Entity\User;
@@ -130,9 +130,10 @@ class DomainController extends AbstractController
      *
      * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
-    public function showByName(Request $request, FormFactoryInterface $ff, $name, UR $ur, ReadConfig $config, $activetab = null)
+    public function showByName(Request $request, FFI $ff, $name, UR $ur, ReadConfig $config)
     {
-
+        $activetab = 'users';
+        $session = $request->getSession();
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -216,6 +217,7 @@ class DomainController extends AbstractController
         $aliasform->handleRequest($request);
         if ($aliasform->isSubmitted() && $aliasform->isValid()) {
             $ur->add($alias, true);
+            $session->set('activetab', 'aliases');
 
             $reload = true;
         }
@@ -224,7 +226,10 @@ class DomainController extends AbstractController
         if ($reload) {
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
         } else {
-            $activetab = $request->get('activetab')??'users';
+            if (null!=$session->get('activetab')) {
+                $activetab = $session->get('activetab');
+                $session->remove('activetab');
+            }
         }
 
 
