@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -10,22 +10,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Utils\DeliverMail;
 use Doctrine\ORM\EntityManager;
 
-class PostfixCheckCommand extends ContainerAwareCommand
+class PostfixCheckCommand extends Command
 {
     protected $body;
 
-    protected function configure()
+    protected static $defaultName = 'vmail:check:postfix';
+    protected static $defaultDescription = 'Check postfix config files from database parameters';
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    protected function configure(): void
     {
         $this
-            ->setName('vmail:check:postfix')
-            ->setDescription('Check postfix config files from database parameters')
             ->addOption('key', 'k', InputOption::VALUE_REQUIRED, 'Key to be checked')
             ->addOption('source', 's', InputOption::VALUE_OPTIONAL, 'Source directory', '/etc/postfix/vmail')
             ->addArgument('file', InputArgument::REQUIRED, 'Config file')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $key = $input->getOption('key');
         $source = $input->getOption('source');
@@ -74,5 +80,6 @@ class PostfixCheckCommand extends ContainerAwareCommand
             $output->writeln("File $file is not valid");
         }
 
+        return Command::SUCCESS;
     }
 }
