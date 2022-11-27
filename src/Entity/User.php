@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\BooleanType;
 use App\Entity\Domain;
 use App\Entity\Traits\ActivableEntityTrait;
 use App\Entity\Traits\UserInterfaceEntityTrait;
