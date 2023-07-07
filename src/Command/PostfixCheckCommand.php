@@ -10,12 +10,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Utils\DeliverMail;
 use Doctrine\ORM\EntityManager;
 
+#[AsCommand(
+    name: 'vmail:check:postfix',
+    description: 'Check postfix config files from database parameters',
+)]
 class PostfixCheckCommand extends Command
 {
     protected $body;
-
-    protected static $defaultName = 'vmail:check:postfix';
-    protected static $defaultDescription = 'Check postfix config files from database parameters';
 
     public function __construct()
     {
@@ -37,7 +38,7 @@ class PostfixCheckCommand extends Command
         $source = $input->getOption('source');
         $file = $input->getArgument('file');
 
-        $output->writeln("Source: ${source}, file: ${file}");
+        $output->writeln("Source: {%source}, file: {$file}");
 
         // Check paths
         $exists=false;

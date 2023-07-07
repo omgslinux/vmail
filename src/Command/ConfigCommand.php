@@ -11,13 +11,14 @@ use App\Entity\Config;
 use App\Repository\ConfigRepository as CR;
 use Doctrine\ORM\EntityManager;
 
+#[AsCommand(
+    name: 'vmail:config',
+    description: 'Manage database config parameters',
+)]
 class ConfigCommand extends Command
 {
     protected $body;
     private $CR;
-
-    protected static $defaultName = 'vmail:config';
-    protected static $defaultDescription = 'Manage database config parameters';
 
     public function __construct(CR $CR)
     {

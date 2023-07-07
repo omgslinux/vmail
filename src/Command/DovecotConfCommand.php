@@ -13,11 +13,13 @@ use Doctrine\ORM\EntityManagerInterface as EM;
 use App\Entity\Config;
 use Twig\Environment as TW;
 
+#[AsCommand(
+    name: 'vmail:conffiles:dovecot',
+    description: 'Writes dovecot config files from database parameters',
+)]
 class DovecotConfCommand extends Command
 {
     protected $body;
-    protected static $defaultName = 'vmail:conffiles:dovecot';
-    protected static $defaultDescription = 'Writes dovecot config files from database parameters';
 
     private $CR;
     private $TW;

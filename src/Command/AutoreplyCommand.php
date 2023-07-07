@@ -9,14 +9,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Utils\AutoreplyMail;
 
+#[AsCommand(
+    name: 'vmail:autoreply',
+    description: 'Manages autoreply',
+)]
 class AutoreplyCommand extends ContainerAwareCommand
 {
 
     protected function configure()
     {
         $this
-            ->setName('vmail:autoreply')
-            ->setDescription('Manages autoreply')
             ->addArgument('sender', InputArgument::OPTIONAL, 'Postfix sender')
             ->addArgument('recipient', InputArgument::OPTIONAL, 'Postfix recipient')
             ->addOption('option', null, InputOption::VALUE_NONE, 'Option description')

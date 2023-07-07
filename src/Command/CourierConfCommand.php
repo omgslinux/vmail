@@ -13,11 +13,13 @@ use Doctrine\ORM\EntityManagerInterface as EM;
 use App\Entity\Config;
 use Twig\Environment as TW;
 
+#[AsCommand(
+    name: 'vmail:conffiles:courier',
+    description: 'Writes courier config files from database parameters',
+)]
 class CourierConfCommand extends Command
 {
     protected $body;
-    protected static $defaultName = 'vmail:conffiles:courier';
-    protected static $defaultDescription = 'Writes courier config files from database parameters';
 
     private $CR;
     private $TW;
