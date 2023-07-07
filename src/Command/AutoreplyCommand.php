@@ -30,7 +30,7 @@ class AutoreplyCommand extends ContainerAwareCommand
         $bodyfile=trim(file_get_contents('php://STDIN'));
         $body=file_get_contents($bodyfile);
 
-        $output->writeln("Sender: ${sender}, recipient: ${recipient}. Body: " . $body);
+        $output->writeln("Sender: {$sender}, recipient: {$recipient}. Body: " . $body);
         $now=new \DateTime();
         syslog(
             LOG_INFO,

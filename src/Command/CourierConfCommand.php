@@ -62,7 +62,7 @@ class CourierConfCommand extends Command
         $uid=$stat['uid'];
         $gid=$stat['gid'];
 
-        $output->writeln("Source: ${source}, destination: ${destination}");
+        $output->writeln("Source: {$source}, destination: {$destination}");
         $sourcefiles = array_slice(scandir($source), 2);
 
         foreach ($sourcefiles as $sourcefile) {

@@ -7,18 +7,17 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-//use App\Utils\DeliverMail;
-//use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManager;
 use App\Repository\ConfigRepository as CR;
-//use App\Entity\Config;
+use Doctrine\ORM\EntityManagerInterface as EM;
+use App\Entity\Config;
 use Twig\Environment as TW;
 
-class PostfixConfCommand extends Command
+class DovecotConfCommand extends Command
 {
     protected $body;
-
-    protected static $defaultName = 'vmail:conffiles:postfix';
-    protected static $defaultDescription = 'Writes postfix config files from database parameters';
+    protected static $defaultName = 'vmail:conffiles:dovecot';
+    protected static $defaultDescription = 'Writes dovecot config files from database parameters';
 
     private $CR;
     private $TW;
@@ -30,7 +29,6 @@ class PostfixConfCommand extends Command
 
         parent::__construct();
     }
-
     protected function configure()
     {
         $this
@@ -39,31 +37,30 @@ class PostfixConfCommand extends Command
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'Source directory',
-                'templates/conffiles/postfix/vmail/'
+                'templates/conffiles/dovecot/'
             )
-            ->addOption(
-                'destination',
-                'd',
-                InputOption::VALUE_OPTIONAL,
-                'Destination directory',
-                '/etc/postfix/vmail/'
-            )
+            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, 'Destination directory', '/etc/dovecot/')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$c=$this->getContainer();
-        //$source = $c->getParameter('vmail.conffiles') . '/postfix/vmail/';
         $source = $input->getOption('source');
         $destination = $input->getOption('destination');
-        print getcwd();
 
         $dbname=$this->CR->param('dbname');
         $dbuser=$this->CR->param('user');
         $dbhost=$this->CR->param('host');
         $dbpass=$this->CR->param('password');
         $dbport=$this->CR->param('port');
+        $virtual_mailbox_base=$this->CR->findOneBy(
+            [
+                'name' => 'virtual_mailbox_base'
+            ]
+        )->getValue();
+        $stat=stat($virtual_mailbox_base);
+        $uid=$stat['uid'];
+        $gid=$stat['gid'];
 
         $output->writeln("Source: {$source}, destination: {$destination}");
         $sourcefiles = array_slice(scandir($source), 2);
@@ -74,17 +71,24 @@ class PostfixConfCommand extends Command
             file_put_contents(
                 $destination . '/' . $destfile,
                 $this->TW->render(
-                    'conffiles/postfix/vmail/' . $sourcefile,
+                    'conffiles/courier/' . $sourcefile,
                     [
-                    'dbname' => $dbname,
-                    'dbuser' => $dbuser,
-                    'dbhost' => $dbhost,
-                    'dbpass' => $dbpass
+                        'dbname' => $dbname,
+                        'dbuser' => $dbuser,
+                        'dbhost' => $dbhost,
+                        'dbpass' => $dbpass,
+                        'dbport' => $dbport,
+                        'UID' => $uid,
+                        'GID' => $gid,
+                        //'enctype' => strtoupper($c->getParameter('vmail.algorithm')),
+                        'enctype' => strtoupper('sha512'),
+                    'virtual_mailbox_base'=> $virtual_mailbox_base,
                     ]
                 )
             );
             $output->writeln("\n");
+
+            return Command::SUCCESS;
         }
-        return Command::SUCCESS;
     }
 }

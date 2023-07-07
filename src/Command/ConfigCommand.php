@@ -40,7 +40,7 @@ class ConfigCommand extends Command
         $name = $input->getArgument('name');
         $value = $input->getArgument('value');
 
-        $output->writeln("Arguments: all: $all, name: ${name}, value: ${value}");
+        $output->writeln("Arguments: all: $all, name: {$name}, value: {$value}");
         if ($all) {
             //$configs=$em->getRepository(Config::class)->findAll();
             $configs=$this->CR->findAll();
