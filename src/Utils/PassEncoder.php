@@ -41,13 +41,13 @@ class PassEncoder implements PasswordHasherInterface
         $this->setType($type);
     }
 
-    public function setType($type)
+    public function setType($type): void
     {
         $this->cryptType=$type;
         //$this->setSalt($type);
     }
 
-    public function encodePassword($raw, $saltPrefix = null)
+    public function encodePassword($raw, $saltPrefix = null): string
     {
         // Implementamos nuestro encoder personalizado
         if (null==$saltPrefix) {
@@ -58,12 +58,12 @@ class PassEncoder implements PasswordHasherInterface
         //return hash('sha1', $salt . $raw);
     }
 
-    public function isPasswordValid($encoded, $raw, $salt = null)
+    public function isPasswordValid($encoded, $raw, $salt = null): bool
     {
         return $encoded === $this->encodePassword($raw, $salt);
     }
 
-    public function getSaltPrefix($type)
+    public function getSaltPrefix($type): string
     {
         if (is_null($this->saltPrefix)) {
             $this->checkType($type);
@@ -72,14 +72,14 @@ class PassEncoder implements PasswordHasherInterface
         return $this->saltPrefix;
     }
 
-    public function setSaltPrefix($prefix)
+    public function setSaltPrefix($prefix): self
     {
         $this->saltPrefix=$prefix;
 
         return $this;
     }
 
-    private function checkType($type)
+    private function checkType($type): string
     {
         //$salt='';
         list($prefix, $chars, $suffix) = $this->crypt_params[$type];
@@ -118,7 +118,7 @@ class PassEncoder implements PasswordHasherInterface
         return $type;
     }
 
-    public function getRandomString($size, $use_specialchars = false)
+    public function getRandomString($size, $use_specialchars = false): string
     {
       // we need special chars
         if ($use_specialchars) {
