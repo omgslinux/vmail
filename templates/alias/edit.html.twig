@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>{{ title|trans }}</h2>
+
+    {{ form_start(form) }}
+        <div class="row">
+            <div class="col-md-2">
+              {{ form_row(form.name) }}
+            </div>
+            <div class="col-md-1">
+              <div class="form-group">
+                <label class="control-label required" for="vmailbundle_domain">Dominio</label>
+                <input type="hidden">@{% if domain.id ==0 %}$my_destination{% else %}{{ domain.name }}{% endif %}
+              </div>
+            </div>
+            <div class="col-md-9">
+              {{ form_row(form.fullname) }}
+            </div>
+            <div class="col-md-2">{{ form_widget(form.active) }}
+            </div>
+        </div>
+
+        {% if domain is defined %}{% set backpath = path('manage_alias_index', { 'id': domain.id }) %}
+        {% else %}{% set backpath = path('manage_alias_index', { 'id': 0 }) %}
+        {% endif %}
+        {% if form.aliasnames is defined and domain is defined %}
+          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
+          <table id="aliasnames-container" class="table table-bordered"
+            data-prototype="{{ form_widget(form.aliasnames.vars.prototype)|e('html_attr') }}">
+            <thead>
+              <tr>
+                  <th>{% trans %}Email{% endtrans %}</th>
+                  <th>{% trans %}Active{% endtrans %}</th>
+                  <th>{% trans %}Delete?{% endtrans %}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% set assetjs = asset('/custom/js/user-aliasnames.js') %}
+              {% for address in form.aliasnames %}
+                {{ form_widget(address) }}
+              {% endfor %}
+              {% do form.aliasnames.setRendered %}
+            </tbody>
+          </table>
+          <script type="text/javascript" src="{{ assetjs }}"></script>
+        {% endif %}
+    {{ form_end(form) }}
+    <ul>
+        <li>
+            <a href="{{ backpath }}">{% trans %}Back to the list{% endtrans %}</a>
+        </li>
+    </ul>
+{% endblock %}

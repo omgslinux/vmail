@@ -1,0 +1,41 @@
+{% if VARS is defined %}
+    {% set modalId = modalId|default(VARS.modalId) %}
+    {% set modalSize = modalSize|default(VARS.modalSize) %}
+{% endif %}
+{% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+{% if nobutton is not defined %}
+    <!-- Button trigger modal -->
+    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+{% endif %}
+  <!-- Modal -->
+  <div class="modal fade" id="{{ modalId2 }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalId2 }}Label" aria-hidden="true">
+      <div class="modal-dialog {{ modalSize }}" role="document">
+          <div class="modal-content" id="{{ modalId2 }}-content">
+                <div class="modal-header btn-primary">
+                    <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% if noajax is defined %}
+                {{ include( included|default(VARS.included) ~ '.html.twig', {
+                    'modalId2': modalId2,
+                    }
+                ) }}
+            {% else -%}
+                <script>
+                    const {{ modalId2}} = $('#{{ modalId2 }}');
+
+                    {{ modalId2 }}.on('show.bs.modal', function (e) {
+                        console.log(e.relatedTarget);
+                        fetch(e.relatedTarget.dataset.url)
+                        .then( response => response.text())
+                        .then( body => document.getElementById('{{ modalId2 }}-content').innerHTML=body );
+                    }
+                );
+                </script>
+
+                {% endif %}
+          </div>
+      </div>
+  </div>

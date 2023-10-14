@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}User{% endtrans %} {{ entity.username }}</h1>
+
+        {% set modalId, modalTitle = 'users', 'Edit user' %}{% set parent = entity.domain %}
+        {{ include('_modal.html.twig', {
+          'nobutton': true,
+          'modalSize': VARS.modalSize
+          })
+        }}
+        {% if is_granted('ROLE_MANAGER') %}
+            {% if domain is defined %}
+                {% set editlink = path(PREFIX ~ 'edit', { 'id': entity.id }, { 'domain': domain }) %}
+            {% else %}
+                {% set editlink = path(PREFIX ~ 'edit', { 'id': entity.id }) %}
+            {% endif %}
+        {% else %}
+            {% set editlink = path('user_self_edit') %}
+        {% endif %}
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}User{% endtrans %}</th>
+                <th>{% trans %}Full Name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}Admin{% endtrans %}</th>
+                <th>{% trans %}Autoreply{% endtrans %}</th>
+            </tr>
+            <tr>
+                {#}<td><a href="{{ editlink }}">{{ entity.name }}</a></td>#}
+                <td><a title="{% trans %}Edit{% endtrans %}" href="#" data-toggle="modal" data-target="#{{ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
+                <td>{{ entity.fullName }}</td>
+                <td>{{ entity.isActive ? '√' : '--' }}</td>
+                <td>{{ entity.isAdmin ? '√' : '--' }}</td>
+            <td>{% if entity.reply %}√{% else %}<a href="{{ path('user_autoreply_new', { id: entity.id }) }}">Crear{% endif %}</a></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+          {% if is_granted('ROLE_MANAGER') %}
+            <a href="{{ path(PREFIX ~ 'index') }}">{% trans %}Back to the list{% endtrans %}</a>
+          {% else %}
+              <a href="{{ path('user_self_edit') }}">{% trans %}Back{% endtrans %}</a>
+          {% endif %}
+        </li>
+    </ul>
+{% endblock %}

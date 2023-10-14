@@ -1,0 +1,88 @@
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
+
+{{ form_start(user_form) }}
+<div class="modal-body">
+    <div class="row">
+      <div class="col-lg-4">
+        {{ form_label(user_form.name) }}
+      </div>
+      <div class="col-lg-1">
+      {% if user_form.domain is defined %}
+        {{ form_label(user_form.domain) }}
+        {% else %}
+        Dominio
+      {% endif %}
+      </div>
+      <div class="col-lg-7">
+        {{ form_label(user_form.fullname) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4">
+        {{ form_widget(user_form.name, {'attr': {'autocomplete': 'off'}} ) }}
+      </div>
+      <div class="col-lg-1">
+      {% if user_form.domain is defined %}
+          {{ form_widget(user_form.domain, {'attr': {'autocomplete': 'off'}} ) }}
+      {% else %}
+          @{{entity.name}}
+      {% endif %}
+      </div>
+      <div class="col-lg-7">
+        {{ form_widget(user_form.fullname, {'attr': {'autocomplete': 'off'}} ) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-2">
+        {{ form_row(user_form.quota) }}
+      </div>
+      <div class="col-lg-3">
+        {{ form_row(user_form.admin) }}
+      </div>
+      <div class="col-lg-3">
+        {{ form_row(user_form.active) }}
+      </div>
+      <div class="col-lg-4">
+        {{ form_row(user_form.sendEmail) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-5">
+        {{ form_widget(user_form.plainPassword) }}
+      </div>
+    </div>
+
+    {#}
+    {% if user_form.reply is not defined and user.id is defined %}
+      {% if user.reply|length == 0 %}
+        <p><a href="{{ path('user_autoreply_new', { id: user.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+      {% endif %}
+    {% else %}
+      {% if user.id is defined %}
+        <hr>
+        <h3>{% trans %}Autoreply{% endtrans %}</h3>
+        {{ form_widget(user_form.reply) }}
+        {% do user_form.reply.setRendered %}
+        <hr>
+      {% endif %}
+    {% endif %}
+    #}
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Closes')|trans }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
+    </div>
+    {{ form_end(user_form) }}
+
+{% if delete_user_form is defined %}
+    {{ include('_delete_form.html.twig') }}
+{% endif %}

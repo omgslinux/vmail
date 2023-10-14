@@ -1,0 +1,44 @@
+    <h2>{% trans %}Aliases in domain{% endtrans %} {{ entity.name }}</h2>
+    {% set modalId = 'aliases' %}
+    {% set modalTitle = 'Edit alias' %}
+    {% set modalSize, included = 'modal-lg', 'tabs/aliases/_form' %}
+
+    {% if aliases %}
+    {% set tagPrefix = 'edit' %}
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}List{% endtrans %}</th>
+                <th>{% trans %}Description{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+            </tr>
+            {% for alias in aliases %}{% set email = alias.name ~ '@' ~ alias.domain.name %}
+            <tr>
+                <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal"
+                {% if origin is defined %}
+                    data-url="{{ path('manage_alias_edit', { 'id': alias.id, 'origin': origin } ) }}">{{ email }}</a></td>
+                {% else %}
+                    data-url="{{ path('manage_alias_edit', { 'id': alias.id } ) }}">{{ email }}</a></td>
+                {% endif %}
+                <td>{{ alias.fullname }}</td>
+                <td>{{ alias.isActive ? '√' : '--' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        {{ include('_modal.html.twig', {
+          'nobutton': true,
+          'delete_form': true,
+        })
+        }}
+    {% else %}
+      <p>No hay alias definidos</p>
+    {% endif %}
+    {% set tagPrefix = 'create' %}
+    {% set modalTitle = 'Create a new alias' %}
+    {{ include('_modal.html.twig', {
+      'noajax': true,
+      })
+    }}
+<br>
