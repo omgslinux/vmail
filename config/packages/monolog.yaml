@@ -41,6 +41,11 @@ when@prod:
     monolog:
         handlers:
             main:
+                type: stream
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
+                level: debug
+                channels: ["!event"]
+            main2:
                 type: fingers_crossed
                 action_level: error
                 handler: nested
