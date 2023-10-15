@@ -1,3 +1,0 @@
-app:
-    resource: "@VmailBundle/Controller/"
-    type:     annotation

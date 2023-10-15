@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<style>
+.dashboard {
+    width: 500px;
+    height: 600px;
+    border-radius: 10px;
+    gap: 20px;
+}
+.item {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    justify-content: space-evenly;
+    width: inherit;
+    padding: 40px;
+}
+#roleadmin {
+    background-color: red;
+    border-radius: inherit;
+}
+#rolemanager {
+    background: green;
+    border-radius: inherit;
+}
+#roleuser {
+    background: orange;
+    border-radius: inherit;
+}
+</style>
+    <div class="dashboard d-flex flex-column">
+        {% if is_granted('ROLE_ADMIN') %}
+        <div id="roleadmin" class="item">
+            <li>
+                <a class="btn btn-primary" href="{{ path('admin_domain_index') }}">
+                {% trans %}Domain administration{% endtrans %}
+                </a>
+            </li>
+        </div>
+        {% endif %}
+        {% if is_granted('ROLE_MANAGER') %}
+        <div id="rolemanager" class="item">
+            <li>
+                <a class="btn btn-primary" href="{{ path('manage_user_index') }}">
+                {% trans %}Users in domain{% endtrans %}
+                </a>
+            </li>
+        </div>
+        {% endif %}
+        {% if is_granted('ROLE_USER') %}
+            {% set tagPrefix = 'pass' %}
+            {% set modalId = 'userpass' %}
+            {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+            {% set modalTitle = 'Change password' %}
+            <div id="roleuser" class="item">
+                <li>
+                    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    </a>
+                </li>
+                {% set modalSize, included = 'modal-md', 'user/_pass' %}
+                {{ include('_modal.html.twig', {
+                  'nobutton': true,
+                  'form': passform,
+                  'noajax': true,
+                  })
+                }}
+
+                {% set tagPrefix = 'reply' %}
+                {% set modalId = 'userreply' %}
+                {% set modalSize, included = 'modal-lg', 'reply/_form' %}
+                {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+                {% set modalTitle = 'Autoreply' %}
+                <li>
+                    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    </a>
+                </li>
+            {{ include('_modal.html.twig', {
+              'nobutton': true,
+              'form': replyform,
+              'noajax': true,
+              })
+            }}
+
+            </div>
+            <hr>
+        {% endif %}
+    </div>
+{% endblock %}

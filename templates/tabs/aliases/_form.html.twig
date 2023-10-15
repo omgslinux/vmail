@@ -1,0 +1,64 @@
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
+{{ form_start(alias_form) }}
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_label(alias_form.name) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(alias_form.fullname) }}
+            </div>
+            <div class="col-md-1">
+                {{ form_label(alias_form.active) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_widget(alias_form.name) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_widget(alias_form.fullname) }}
+            </div>
+            <div class="col-md-1">
+                {{ form_widget(alias_form.active) }}
+            </div>
+        </div>
+    </div>
+        {% if alias_form.aliasnames is defined and domain is defined %}
+          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
+          <table id="aliasnames-container" class="table table-bordered"
+            data-prototype="{{ form_widget(alias_form.aliasnames.vars.prototype)|e('html_attr') }}">
+            <thead>
+              <tr>
+                  <th>{% trans %}Email{% endtrans %}</th>
+                  <th>{% trans %}Active{% endtrans %}</th>
+                  <th>{% trans %}Delete?{% endtrans %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for address in alias_form.aliasnames %}
+                {{ form_widget(address) }}
+              {% endfor %}
+              {% do alias_form.aliasnames.setRendered %}
+            </tbody>
+          </table>
+        {% endif %}
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
+    </div>
+{{ form_end(alias_form) }}
+
+{% if delete_alias_form is defined %}
+    {{ include('_delete_form.html.twig') }}
+{% endif %}

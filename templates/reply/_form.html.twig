@@ -1,0 +1,22 @@
+{{ form_start(form) }}
+<div class="modal-body">
+    <p>
+    {{ form_row(form.message) }}
+    </p>
+    <div class="row">
+        <div class="col-6">
+            {{ form_row(form.startdate) }}
+        </div>
+        <div class="col-6">
+            {{ form_row(form.enddate) }}
+        </div>
+    </div>
+    <p>
+    {{ form_widget(form.active) }}
+    </p>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+    <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
+</div>
+{{ form_end(form) }}

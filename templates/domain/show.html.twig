@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
+    {% set modalSize, included = VARS.modalSize, VARS.included %}
+
+        {% set tagPrefix = 'Edit' %}
+        {% set modalId, modalTitle = 'domains', 'Edit domain' %}
+        {{ include('_modal.html.twig', {
+          'nobutton': true,
+          'delete_form': true,
+          })
+        }}
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+            </tr>
+            <tr>
+                {#}<td><a title="{% trans %}Edit{% endtrans %}" href="{{ path(PREFIX ~ 'edit', { 'id': entity.id }) }}">{{ entity.name }}</a></td>#}
+                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal">{{ entity.name }}</a></td>
+                <td>{{ entity.active ? '√' : '--' }}</td>
+            </tr>
+        </tbody>
+    </table>
+    {# Para la vuelta de las peticiones es origin #}
+    {{ include('_tabs.html.twig', {
+            'tdir': 'tabs',
+            'origin': entity.name,
+            }) }}
+
+    <script src="{{ assetjs|default("/custom/js/user-aliasnames.js") }}"></script>
+
+{% endblock %}

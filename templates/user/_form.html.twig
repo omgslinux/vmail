@@ -1,0 +1,76 @@
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
+{{ form_start(form) }}
+    <div class="modal-body">
+    {% if entity.id is defined %}
+    <h1>{% trans %}User edit{% endtrans %} {{ entity.email }}</h1>
+    {% else %}
+    <h1>{% trans %}User creation{% endtrans %} @{{ parent }}</h1>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-md-2">
+        {{ form_row(form.name) }}
+      </div>
+      {% if form.domain is defined %}
+      <div class="col-md-2">
+        {{ form_row(form.domain) }}
+      </div>
+      {% endif %}
+      <div class="col-md-8">
+        {{ form_row(form.fullname) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        {{ form_row(form.quota) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(form.admin) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(form.active) }}
+      </div>
+      <div class="col-md-3">
+        {{ form_widget(form.sendEmail) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(form.plainPassword) }}
+      </div>
+    </div>
+
+    {#}
+    {% if form.reply is not defined and entity.id is defined %}
+        {% if entity.reply|length == 0 %}
+            <p><a href="{{ path('user_autoreply_new', { id: entity.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
+        {% endif %}
+    {% else %}
+        {% if entity.id is defined %}
+            <hr>
+            <h3>{% trans %}Autoreply{% endtrans %}</h3>
+            {{ form_widget(form.reply) }}
+            {% do form.reply.setRendered %}
+            <hr>
+        {% endif %}
+    {% endif %}
+    #}
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
+        <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')}}</button>
+    </div>
+{{ form_end(form) }}
+
+    {% if delete_form is defined %}
+        {{ include('_delete_form.html.twig') }}
+    {% endif %}

@@ -1,0 +1,16 @@
+# Este fichero contiene solo la parte de gestion de dominios virtuales gestionados por vmail.
+# Debe añadirse al final de main.cf
+
+receive_override_options =
+alias_maps = hash:/etc/aliases, mysql:/etc/postfix/vmail/mysql-alias_maps.cf
+mailbox_size_limit = 0
+
+
+transport_maps = mysql:/etc/postfix/vmail/mysql-virtual_transport.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_transport.cf
+virtual_alias_domains =
+virtual_alias_maps = proxy:mysql:/etc/postfix/vmail/mysql-virtual_autoreply_mailboxes.cf, proxy:mysql:/etc/postfix/vmail/mysql-virtual_alias_maps.cf
+virtual_gid_maps = static:{{ GID }}
+virtual_mailbox_base = {{ virtual_mailbox_base }}
+virtual_mailbox_domains = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_domains.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_domains.cf
+virtual_mailbox_maps = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_maps.cf
+virtual_uid_maps = static:{{ UID }}
