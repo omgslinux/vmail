@@ -34,6 +34,10 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 {
     private $pe;
     private $config;
+    private $deliver;
+    private $dr;
+    private $RS;
+
     public function __construct(
         ManagerRegistry $registry,
         RS $RS,

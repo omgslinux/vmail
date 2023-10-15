@@ -13,12 +13,13 @@ use App\Repository\ConfigRepository as CR;
 //use App\Entity\Config;
 use Twig\Environment as TW;
 
+#[AsCommand(
+    name: 'vmail:conffiles:postfix',
+    description: 'Writes postfix config files from database parameters',
+)]
 class PostfixConfCommand extends Command
 {
     protected $body;
-
-    protected static $defaultName = 'vmail:conffiles:postfix';
-    protected static $defaultDescription = 'Writes postfix config files from database parameters';
 
     private $CR;
     private $TW;
@@ -65,7 +66,7 @@ class PostfixConfCommand extends Command
         $dbpass=$this->CR->param('password');
         $dbport=$this->CR->param('port');
 
-        $output->writeln("Source: ${source}, destination: ${destination}");
+        $output->writeln("Source: {$source}, destination: {$destination}");
         $sourcefiles = array_slice(scandir($source), 2);
 
         foreach ($sourcefiles as $sourcefile) {
