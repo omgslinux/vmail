@@ -14,10 +14,10 @@ use App\Entity\Config;
 use Twig\Environment as TW;
 
 #[AsCommand(
-    name: 'vmail:conffiles:courier',
-    description: 'Writes courier config files from database parameters',
+    name: 'vmail:conffiles:dovecot',
+    description: 'Writes dovecot config files from database parameters',
 )]
-class CourierConfCommand extends Command
+class DovecotConfCommand extends Command
 {
     protected $body;
 
@@ -39,9 +39,9 @@ class CourierConfCommand extends Command
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'Source directory',
-                'templates/conffiles/courier/'
+                'templates/conffiles/dovecot/'
             )
-            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, 'Destination directory', '/etc/courier/')
+            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, 'Destination directory', '/etc/dovecot/')
         ;
     }
 
