@@ -40,11 +40,6 @@ when@test:
 when@prod:
     monolog:
         handlers:
-#            maindev:
-#                type: stream
-#                path: "%kernel.logs_dir%/%kernel.environment%.log"
-#                level: error
-#                channels: ["!event"]
             main:
                 type: fingers_crossed
                 action_level: debug

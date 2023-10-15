@@ -18,11 +18,12 @@ use App\Repository\DomainRepository as DR;
 use App\Repository\UserRepository as UR;
 use Doctrine\ORM\EntityManagerInterface as EM;
 
+#[AsCommand(
+    name: 'vmail:setup',
+    description: 'Initializes default values',
+)]
 class SetupCommand extends Command
 {
-    protected static $defaultName = 'vmail:setup';
-    protected static $defaultDescription = 'Initializes default values';
-
     protected $body;
     private $CR;
     private $DR;
