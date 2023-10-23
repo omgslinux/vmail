@@ -12,6 +12,7 @@ use App\Repository\ConfigRepository as CR;
 use Doctrine\ORM\EntityManagerInterface as EM;
 use App\Entity\Config;
 use Twig\Environment as TW;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(
     name: 'vmail:conffiles:dovecot',

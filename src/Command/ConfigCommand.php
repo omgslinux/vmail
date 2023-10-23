@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Entity\Config;
 use App\Repository\ConfigRepository as CR;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(
     name: 'vmail:config',
