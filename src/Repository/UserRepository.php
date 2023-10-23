@@ -65,6 +65,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         $user=$a[0];
         $domain=$a[1];
         return $this->createQueryBuilder('u')
+            ->addSelect('d')
             ->leftJoin('u.domain', 'd')
             ->where('u.name = :user AND d.name = :domain')
             ->setParameter('user', $user)
