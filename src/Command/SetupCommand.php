@@ -17,6 +17,7 @@ use App\Repository\ConfigRepository as CR;
 use App\Repository\DomainRepository as DR;
 use App\Repository\UserRepository as UR;
 use Doctrine\ORM\EntityManagerInterface as EM;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(
     name: 'vmail:setup',
