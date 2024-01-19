@@ -100,7 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         //$this->reply=new ArrayCollection();
         $this->aliasnames=new ArrayCollection();
-        $this->addresses=new ArrayCollection();
+        $this->addressnames=new ArrayCollection();
     }
 
     /**
