@@ -13,9 +13,8 @@ use App\Repository\UserRepository as REPO;
 
 /**
  * Alias controller.
- *
- * @Route("/manage/alias", name="manage_alias_")
  */
+#[Route(path: '/manage/alias', name: 'manage_alias_')]
 class AliasController extends AbstractController
 {
     const PREFIX = 'manage_alias_';
@@ -28,9 +27,8 @@ class AliasController extends AbstractController
 
     /**
      * Lists all alias entities.
-     *
-     * @Route("/index/{id}", name="index", methods={"GET"})
      */
+    #[Route(path: '/index/{id}', name: 'index', methods: ['GET'])]
     public function indexAction(Domain $domain)
     {
         if (!($this->isGranted('ROLE_ADMIN')) && $domain->getId()===0) {
@@ -55,9 +53,8 @@ class AliasController extends AbstractController
 
     /**
      * Lists all alias entities.
-     *
-     * @Route("/index/{id}", name="domain_index", methods={"GET"})
      */
+    #[Route(path: '/index/{id}', name: 'domain_index', methods: ['GET'])]
     public function domainIndexAction(Domain $domain)
     {
         if ($domain->getId==0) {
@@ -77,9 +74,8 @@ class AliasController extends AbstractController
 
     /**
      * Creates a new alias entity.
-     *
-     * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
+    #[Route(path: '/new/{id}', name: 'new', methods: ['GET', 'POST'])]
     public function newAction(Request $request, Domain $domain)
     {
         if (!($this->isGranted('ROLE_ADMIN')) && $domain->getId()===0) {
@@ -127,9 +123,8 @@ class AliasController extends AbstractController
 
     /**
      * Creates a new alias entity.
-     *
-     * @Route("/new/{id}", name="domain_new", methods={"GET", "POST"})
      */
+    #[Route(path: '/new/{id}', name: 'domain_new', methods: ['GET', 'POST'])]
     public function domainNewAction(Request $request, Domain $domain)
     {
         if ($domain->getId()===0) {
@@ -172,9 +167,8 @@ class AliasController extends AbstractController
 
     /**
      * Finds and displays a alias entity.
-     *
-     * @Route("/show/{id}", name="show", methods={"GET"})
      */
+    #[Route(path: '/show/{id}', name: 'show', methods: ['GET'])]
     public function showAction(User $alias)
     {
 
@@ -185,9 +179,8 @@ class AliasController extends AbstractController
 
     /**
      * Displays a form to edit an existing alias entity.
-     *
-     * @Route("/{id}/edit/{origin}", name="edit", methods={"GET", "POST"})
      */
+    #[Route(path: '/{id}/edit/{origin}', name: 'edit', methods: ['GET', 'POST'])]
     public function editAction(Request $request, User $alias, $origin = null)
     {
         $ORIGIN = 'aliasedit';
@@ -232,9 +225,7 @@ class AliasController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/delete", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, User $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {

@@ -4,7 +4,6 @@ namespace App\Utils;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Entity\Config;
 use App\Entity\Autoreply;

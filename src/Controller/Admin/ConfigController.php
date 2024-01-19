@@ -10,16 +10,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Config controller.
- *
- * @Route("/admin/config", name="config_")
  */
+#[Route(path: '/admin/config', name: 'config_')]
 class ConfigController extends AbstractController
 {
     /**
      * Lists all config entities.
-     *
-     * @Route("/", name="index", methods={"GET"})
      */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
@@ -33,9 +31,8 @@ class ConfigController extends AbstractController
 
     /**
      * Creates a new config entity.
-     *
-     * @Route("/new", name="new", methods={"GET", "POST"})
      */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function newAction(Request $request)
     {
         $config = new Config();
@@ -58,9 +55,8 @@ class ConfigController extends AbstractController
 
     /**
      * Finds and displays a config entity.
-     *
-     * @Route("/{id}", name="show", methods={"GET"})
      */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function showAction(Config $config)
     {
         $deleteForm = $this->createDeleteForm($config);
@@ -73,9 +69,8 @@ class ConfigController extends AbstractController
 
     /**
      * Displays a form to edit an existing config entity.
-     *
-     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
      */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function editAction(Request $request, Config $config)
     {
         $deleteForm = $this->createDeleteForm($config);
@@ -97,9 +92,8 @@ class ConfigController extends AbstractController
 
     /**
      * Deletes a config entity.
-     *
-     * @Route("/{id}", name="delete", methods={"DELETE"})
      */
+    #[Route(path: '/{id}', name: 'delete', methods: ['DELETE'])]
     public function deleteAction(Request $request, Config $config)
     {
         $form = $this->createDeleteForm($config);

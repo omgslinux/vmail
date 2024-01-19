@@ -11,56 +11,49 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Autoreply
- *
- * @ORM\Table(name="autoreply")
- * @ORM\Entity(repositoryClass="App\Repository\AutoreplyRepository")
  */
+#[ORM\Table(name: 'autoreply')]
+#[ORM\Entity(repositoryClass: 'App\Repository\AutoreplyRepository')]
 class Autoreply
 {
     use ActivableEntityTrait;
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var user
-     *
-     * @ORM\OneToOne(targetEntity="User", inversedBy="reply")
      */
+    #[ORM\OneToOne(targetEntity: 'User', inversedBy: 'reply')]
     private $user;
 
     /**
      * @var message
-     *
-     * @Assert\NotBlank
-     * @ORM\Column(name="message", type="text")
      */
+    #[Assert\NotBlank]
+    #[ORM\Column(name: 'message', type: 'text')]
     private $message;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(type="datetime")
      */
+    #[ORM\Column(type: 'datetime')]
     private $startdate;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(type="datetime")
      */
+    #[ORM\Column(type: 'datetime')]
     private $enddate;
 
     /**
      * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="AutoreplyCache", mappedBy="reply")
      */
+    #[ORM\OneToMany(targetEntity: 'AutoreplyCache', mappedBy: 'reply')]
     private $replys;
 
 

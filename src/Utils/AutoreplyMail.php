@@ -4,7 +4,6 @@ namespace App\Utils;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use App\Entity\AutoreplyCache;
 use App\Entity\Autoreply;
 use App\Entity\User;

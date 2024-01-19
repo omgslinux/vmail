@@ -7,47 +7,41 @@ use App\Entity\Autoreply;
 
 /**
  * AutoreplyCache
- *
- * @ORM\Table(name="autoreply_cache")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'autoreply_cache')]
+#[ORM\Entity]
 class AutoreplyCache
 {
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var Autoreply
-     *
-     * @ORM\ManyToOne(targetEntity="Autoreply", inversedBy="replys")
      */
+    #[ORM\ManyToOne(targetEntity: 'Autoreply', inversedBy: 'replys')]
     private $reply;
 
     /**
      * @var sender
-     *
-     * @ORM\Column(type="string", length=64)
      */
+    #[ORM\Column(type: 'string', length: 64)]
     private $sender;
 
     /**
      * @var sender
-     *
-     * @ORM\Column(type="string", length=64)
      */
+    #[ORM\Column(type: 'string', length: 64)]
     private $recipient;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(type="datetime")
      */
+    #[ORM\Column(type: 'datetime')]
     private $datesent;
 
     /**
