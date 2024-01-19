@@ -6,40 +6,35 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Config
- *
- * @ORM\Table(name="config")
- * @ORM\Entity(repositoryClass="App\Repository\ConfigRepository")
  */
+#[ORM\Table(name: 'config')]
+#[ORM\Entity(repositoryClass: 'App\Repository\ConfigRepository')]
 class Config
 {
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255, unique: true)]
     private $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="value", type="string", length=255, nullable=true)
      */
+    #[ORM\Column(name: 'value', type: 'string', length: 255, nullable: true)]
     private $value;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
 

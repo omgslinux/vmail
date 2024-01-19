@@ -11,35 +11,32 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Domain
- *
- * @ORM\Entity(repositoryClass="App\Repository\DomainRepository")
- * @ORM\Table(name="domain", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"name"})})
- * @UniqueEntity(fields="name", message="El nombre ya está en uso")
  */
+#[ORM\Table(name: 'domain')]
+#[UniqueConstraint(name: 'name_unique', columns: ['name'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\DomainRepository')]
+#[UniqueEntity(fields: 'name', message: 'El nombre ya está en uso')]
 class Domain
 {
     use ActivableEntityTrait;
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255, unique: true)]
     private $name;
 
     /**
      * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="User", mappedBy="domain")
      */
+    #[ORM\OneToMany(targetEntity: 'User', mappedBy: 'domain')]
     private $users;
 
 

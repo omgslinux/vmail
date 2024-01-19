@@ -17,9 +17,8 @@ use App\Repository\UserRepository as UR;
 
 /**
  * User controller.
- *
- * @Route("/user/self", name="user_self_")
  */
+#[Route(path: '/user/self', name: 'user_self_')]
 class SelfController extends AbstractController
 {
     const VARS = [
@@ -32,9 +31,8 @@ class SelfController extends AbstractController
 
     /**
      * Lists pass and reply
-     *
-     * @Route("/", name="index", methods={"GET", "POST"})
      */
+    #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
     public function index(Request $request, UR $ur): Response
     {
         $entity = $this->getUser();
@@ -75,9 +73,8 @@ class SelfController extends AbstractController
 
     /**
      * Finds and displays a user entity.
-     *
-     * @Route("/show", name="show", methods={"GET"})
      */
+    #[Route(path: '/show', name: 'show', methods: ['GET'])]
     public function showAction()
     {
         $user=$this->getUser();
@@ -90,9 +87,8 @@ class SelfController extends AbstractController
 
     /**
      * Displays a form to change the password.
-     *
-     * @Route("/pass", name="pass", methods={"GET", "POST"})
      */
+    #[Route(path: '/pass', name: 'pass', methods: ['GET', 'POST'])]
     public function password(Request $request, UR $ur)
     {
         $user=$this->getUser();
@@ -120,9 +116,8 @@ class SelfController extends AbstractController
 
     /**
      * Displays a form to edit an existing user entity.
-     *
-     * @Route("/reply", name="reply", methods={"GET", "POST"})
      */
+    #[Route(path: '/reply', name: 'reply', methods: ['GET', 'POST'])]
     public function reply(Request $request, UR $ur)
     {
         $user=($this->getUser())

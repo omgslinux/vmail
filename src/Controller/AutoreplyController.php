@@ -12,18 +12,16 @@ use App\Form\AutoreplyType;
 
 /**
  * Autoreply controller.
- *
- * @Route("/user/autoreply", name="user_autoreply_")
  */
+#[Route(path: '/user/autoreply', name: 'user_autoreply_')]
 class AutoreplyController extends AbstractController
 {
     const PREFIX = 'user_autoreply_';
 
     /**
      * Creates a new Domain entity.
-     *
-     * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
+    #[Route(path: '/new/{id}', name: 'new', methods: ['GET', 'POST'])]
     public function newAction(Request $request, User $user = null)
     {
         if (is_null($user)) {
@@ -56,9 +54,8 @@ class AutoreplyController extends AbstractController
 
     /**
      * Finds and displays a user entity.
-     *
-     * @Route("/show/{id}", name="show", methods={"GET"})
      */
+    #[Route(path: '/show/{id}', name: 'show', methods: ['GET'])]
     public function showAction(User $user = null)
     {
         if (is_null($user)) {
@@ -73,9 +70,8 @@ class AutoreplyController extends AbstractController
 
     /**
      * Displays a form to edit an existing user entity.
-     *
-     * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
+    #[Route(path: '/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function editAction(Request $request)
     {
         $user=$this->getUser();

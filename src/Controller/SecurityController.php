@@ -8,9 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SecurityController extends AbstractController
 {
-    /**
-     * @Route("/login", name="login")
-     */
+    #[Route(path: '/login', name: 'login')]
     public function loginAction(AuthenticationUtils $authenticationUtils)
     {
 
@@ -26,9 +24,7 @@ class SecurityController extends AbstractController
         ));
     }
 
-    /**
-     * @Route("/logout", name="logout")
-     */
+    #[Route(path: '/logout', name: 'logout')]
     public function logoutAction(Request $request)
     {
         $this->get('security.context')->setToken(null);

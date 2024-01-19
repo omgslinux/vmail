@@ -20,9 +20,8 @@ trait UserInterfaceEntityTrait
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="password", type="string", length=255)
      */
+    #[ORM\Column(name: 'password', type: 'string', length: 255)]
     private $password;
 
     /**
@@ -56,7 +55,7 @@ trait UserInterfaceEntityTrait
      *
      * @return users
      */
-    public function setPlainPassword($password)
+    public function setPlainPassword($password): self
     {
         $this->plainPassword = $password;
 
@@ -96,7 +95,7 @@ trait UserInterfaceEntityTrait
         }
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
 
     }
