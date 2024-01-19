@@ -17,7 +17,7 @@ use App\Utils\AutoreplyMail;
 class AutoreplyCommand extends Command
 {
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('sender', InputArgument::OPTIONAL, 'Postfix sender')
@@ -26,7 +26,7 @@ class AutoreplyCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sender = $input->getArgument('sender');
         $recipient= $input->getArgument('recipient');
