@@ -19,3 +19,7 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 /migrations
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
