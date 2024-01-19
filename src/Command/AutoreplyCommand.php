@@ -2,13 +2,13 @@
 
 namespace App\Command;
 
-#use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Utils\AutoreplyMail;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(
     name: 'vmail:autoreply',
@@ -17,7 +17,7 @@ use App\Utils\AutoreplyMail;
 class AutoreplyCommand extends Command
 {
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('sender', InputArgument::OPTIONAL, 'Postfix sender')
@@ -26,7 +26,7 @@ class AutoreplyCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sender = $input->getArgument('sender');
         $recipient= $input->getArgument('recipient');

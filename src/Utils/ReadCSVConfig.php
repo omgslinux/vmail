@@ -9,17 +9,15 @@ use App\Entity\Config;
 
 /**
  * Securities controller.
- *
- * @Route("/utils/readcsv/config")
  */
+#[Route(path: '/utils/readcsv/config')]
 class ReadCSVConfig extends Controller
 {
 
     /**
      * Loads the contents of a csv file into Securities from a FundBanks entity
-     *
-     * @Route("/load", name="readcsv_config_load", methods={"GET", "POST"})
      */
+    #[Route(path: '/load', name: 'readcsv_config_load', methods: ['GET', 'POST'])]
     public function loadAction(Request $request, Config $config)
     {
         $filename = urldecode($request->get('filename'));

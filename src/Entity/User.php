@@ -16,91 +16,77 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * User
- *
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ORM\Table(name="user", uniqueConstraints={@UniqueConstraint(name="name_unique", columns={"domain_id", "user"})})
- * @UniqueEntity(
- *       fields={"name", "domain"},
- *       message="Ya existe ese usuario",
- *       errorPath="name"
- * )
  */
+#[ORM\Table(name: 'user')]
+#[UniqueConstraint(name: 'name_unique', columns: ['domain_id', 'user'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
+#[UniqueEntity(fields: ['name', 'domain'], message: 'Ya existe ese usuario', errorPath: 'name')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use ActivableEntityTrait, UserInterfaceEntityTrait;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="user", type="string", length=32)
      */
+    #[ORM\Column(name: 'user', type: 'string', length: 32)]
     private $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=64, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 64, nullable: true)]
     private $fullName;
 
     /**
      * @var domain
-     *
-     * @ORM\ManyToOne(targetEntity="Domain", inversedBy="users")
      */
+    #[ORM\ManyToOne(targetEntity: 'Domain', inversedBy: 'users')]
     private $domain;
 
     private $domainName;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(type="bigint")
      */
+    #[ORM\Column(type: 'bigint')]
     private $quota=0;
 
     /**
      * @var boolean
-     *
-     * @ORM\Column(name="is_admin", type="boolean")
      */
+    #[ORM\Column(name: 'is_admin', type: 'boolean')]
     private $admin=false;
 
     /**
      * @var boolean
-     *
-     * @ORM\Column(name="is_list", type="boolean")
      */
+    #[ORM\Column(name: 'is_list', type: 'boolean')]
     private $list=false;
 
     /**
      * @var Autoreply
-     *
-     * @ORM\OneToOne(targetEntity="Autoreply", mappedBy="user", cascade={"persist", "remove"})
      */
+    #[ORM\OneToOne(targetEntity: 'Autoreply', mappedBy: 'user', cascade: ['persist', 'remove'])]
     private $reply;
 
     /**
      * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="Alias", mappedBy="aliasname", cascade={"persist", "remove"}, orphanRemoval=true)
      */
+    #[ORM\OneToMany(targetEntity: 'Alias', mappedBy: 'aliasname', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private $aliasnames;
 
     /**
      * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="Alias", mappedBy="addressname", cascade={"persist", "remove"}, orphanRemoval=true)
      */
+    #[ORM\OneToMany(targetEntity: 'Alias', mappedBy: 'addressname', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private $addressnames;
 
     /**

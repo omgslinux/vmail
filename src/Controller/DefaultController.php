@@ -8,9 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends AbstractController
 {
-    /**
-     * @Route("/", name="homepage")
-     */
+    #[Route(path: '/', name: 'homepage')]
     public function indexAction(Request $request)
     {
         if (null==$this->getUser()) {

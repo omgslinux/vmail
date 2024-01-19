@@ -18,9 +18,8 @@ use App\Repository\UserRepository as UR;
 
 /**
  * Domain controller.
- *
- * @Route("/admin/domain", name="admin_domain_")
  */
+#[Route(path: '/admin/domain', name: 'admin_domain_')]
 class DomainController extends AbstractController
 {
 
@@ -52,9 +51,8 @@ class DomainController extends AbstractController
 
     /**
      * Lists all domain entities.
-     *
-     * @Route("/", name="index", methods={"GET", "POST"})
      */
+    #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
     public function index(Request $request, ReadConfig $config): Response
     {
         $entity = new Domain();
@@ -81,9 +79,8 @@ class DomainController extends AbstractController
 
     /**
      * Edit a domain entity.
-     *
-     * @Route("/{id}/edit/", name="edit", methods={"GET", "POST"})
      */
+    #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Domain $entity, ReadConfig $config): Response
     {
         $form = $this->createForm(DomainType::class, $entity);
@@ -109,9 +106,7 @@ class DomainController extends AbstractController
     }
 
 
-    /**
-     * @Route("/{id}/delete", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Domain $entity, REPO $repo, ReadConfig $config): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
@@ -127,9 +122,8 @@ class DomainController extends AbstractController
 
     /**
      * Creates a form to show a FundBanks entity.
-     *
-     * @Route("/show/byname/{name}", name="showbyname", methods={"GET", "POST"})
      */
+    #[Route(path: '/show/byname/{name}', name: 'showbyname', methods: ['GET', 'POST'])]
     public function showByName(Request $request, FFI $ff, $name, UR $ur, ReadConfig $config)
     {
         $activetab = 'users';
@@ -252,9 +246,8 @@ class DomainController extends AbstractController
 
     /**
      * Creates a form to show a entity.
-     *
-     * @Route("/show/byid/{id}", name="show", methods={"GET", "POST"})
      */
+    #[Route(path: '/show/byid/{id}', name: 'show', methods: ['GET', 'POST'])]
     public function showAction(Request $request, Domain $domain)
     {
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'showbyname', ['name' => $domain->getName()]);

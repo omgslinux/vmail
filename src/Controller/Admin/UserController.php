@@ -15,9 +15,8 @@ use App\Repository\DomainRepository;
 
 /**
  * User controller.
- *
- * @Route("/manage/user", name="manage_user_")
  */
+#[Route(path: '/manage/user', name: 'manage_user_')]
 class UserController extends AbstractController
 {
     const TABS = [
@@ -48,9 +47,8 @@ class UserController extends AbstractController
 
     /**
      * Lists all user entities.
-     *
-     * @Route("/", name="index", methods={"GET", "POST"})
      */
+    #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
     public function index(Request $request, FormFactoryInterface $ff, $activetab = null)
     {
         $parent=$this->getUser()->getDomain();
@@ -142,9 +140,8 @@ class UserController extends AbstractController
 
     /**
      * Finds and displays a user entity.
-     *
-     * @Route("/show/byemail/{email}", name="show_byemail", methods={"GET", "POST"})
      */
+    #[Route(path: '/show/byemail/{email}', name: 'show_byemail', methods: ['GET', 'POST'])]
     public function showByEmailAction(Request $request, DomainRepository $DR, $email)
     {
         $t=explode('@', $email);
@@ -187,9 +184,8 @@ class UserController extends AbstractController
 
     /**
      * Finds and displays a user entity.
-     *
-     * @Route("/show/byid/{id}", name="show", methods={"GET"})
      */
+    #[Route(path: '/show/byid/{id}', name: 'show', methods: ['GET'])]
     public function show(User $user)
     {
 
@@ -201,9 +197,8 @@ class UserController extends AbstractController
 
     /**
      * Displays a form to edit an existing user entity.
-     *
-     * @Route("/{id}/edit/{origin}", name="edit", methods={"GET", "POST"})
      */
+    #[Route(path: '/{id}/edit/{origin}', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $entity, $origin = null)
     {
         $user_form = $this->createForm(
@@ -246,9 +241,7 @@ class UserController extends AbstractController
         ));
     }
 
-    /**
-     * @Route("/{id}/delete", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, User $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {

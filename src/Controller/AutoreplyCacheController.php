@@ -15,18 +15,16 @@ use App\Form\AutoreplyType;
 
 /**
  * AutoreplyCache controller.
- *
- * @Route("/user/autoreplycache", name="user_autoreplycache_")
  */
+#[Route(path: '/user/autoreplycache', name: 'user_autoreplycache_')]
 class AutoreplyCacheController extends AbstractController
 {
     const PREFIX = 'user_autoreplycache_';
 
     /**
      * Creates a new Domain entity.
-     *
-     * @Route("/new/{id}", name="new", methods={"GET", "POST"})
      */
+    #[Route(path: '/new/{id}', name: 'new', methods: ['GET', 'POST'])]
     public function newAction(Request $request, DeliverMail $deliver, ReadConfig $config, $sender, $recipient, $body)
     {
         //$body=file_get_contents('php://STDIN');
@@ -84,9 +82,8 @@ class AutoreplyCacheController extends AbstractController
 
     /**
      * Finds and displays a user entity.
-     *
-     * @Route("/show", name="show", methods={"GET"})
      */
+    #[Route(path: '/show', name: 'show', methods: ['GET'])]
     public function showAction(AutoreplyCache $cache)
     {
         $user=$this->getUser();
@@ -100,9 +97,8 @@ class AutoreplyCacheController extends AbstractController
 
     /**
      * Displays a form to edit an existing user entity.
-     *
-     * @Route("/edit", name="edit", methods={"GET", "POST"})
      */
+    #[Route(path: '/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function editAction(Request $request, AutoreplyCache $cache)
     {
         $editForm = $this->createForm(AutoreplyType::class, $cache);
