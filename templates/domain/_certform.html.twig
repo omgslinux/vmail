@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% set tagPrefix = 'create' %}
+    <h1>{{ title|trans }}</h1>
+
+{% if ajax is defined %}
+    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+    <div class="modal-header btn-primary">
+        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
+{{ form_start(form) }}
+<div class="modal-body">
+  <div class="row">
+    <div class="col-2">{{ form_label(form.countryName)}}</div>
+    <div class="col-4">{{ form_widget(form.countryName)}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2">{{ form_label(form.stateOrProvinceName)}}</div>
+    <div class="col-4">{{ form_widget(form.stateOrProvinceName)}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2">{{ form_label(form.localityName)}}</div>
+    <div class="col-4">{{ form_widget(form.localityName)}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2">{{ form_label(form.organizationName)}}</div>
+    <div class="col-4">{{ form_widget(form.organizationName)}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2">{{ form_label(form.commonName)}}</div>
+    <div class="col-4">{{ form_widget(form.commonName)}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2">{{ form_label(form.notBefore)}}</div>
+    <div class="col-4">{{ form_widget(form.notBefore)}}</div>
+    <div class="col-2">{{ form_label(form.notAfter)}}</div>
+    <div class="col-4">{{ form_widget(form.notAfter)}}</div>
+  </div>
+  <div class="row">
+    <div class="col-2">{{ form_label(form.interval)}}</div>
+    <div class="col-4">{{ form_widget(form.interval)}}</div>
+  </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+    <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
+</div>
+{{ form_end(form) }}
+
+{% if delete_form is defined %}
+    {{ include('_delete_form.html.twig') }}
+{% endif %}
+
+
+{% endblock %}
