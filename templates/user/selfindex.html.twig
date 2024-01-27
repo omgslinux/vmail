@@ -37,6 +37,11 @@
                 {% trans %}Domain administration{% endtrans %}
                 </a>
             </li>
+            <li>
+                <a class="btn btn-primary" href="{{ path('admin_certificate_index') }}">
+                {% trans %}Certificate administration{% endtrans %}
+                </a>
+            </li>
         </div>
         {% endif %}
         {% if is_granted('ROLE_MANAGER') %}
