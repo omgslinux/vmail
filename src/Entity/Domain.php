@@ -39,6 +39,9 @@ class Domain
     #[ORM\OneToMany(targetEntity: 'User', mappedBy: 'domain')]
     private $users;
 
+    #[ORM\Column(nullable: true)]
+    private ?array $certData = null;
+
 
     public function __construct()
     {
@@ -121,5 +124,17 @@ class Domain
     public function __toString()
     {
         return $this->getName();
+    }
+
+    public function getCertData(): ?array
+    {
+        return $this->certData;
+    }
+
+    public function setCertData(?array $certData): static
+    {
+        $this->certData = $certData;
+
+        return $this;
     }
 }
