@@ -196,28 +196,43 @@ class CertificateController extends AbstractController
         $entities = [];
         foreach ($domain->getServerCertificates() as $certificate) {
             if (null!=$certData=$domain->getCertData()) {
-                dump($certData);
+                //dump($certData);
                 $certout = $certData['certdata']['cert'];
                 $cert = openssl_x509_parse($certout, false);
                 $data = [
                     'description' => $certificate->getDescription(),
                     'domain' => $certificate->getDomain(),
                     'interval' => $certData['interval'],
-                    'cert' => $cert,
+                    'entity' => $certificate,
                 ];
                 $entities[] = $data;
             }
         }
-        dump($entities);
+        //dump($entities);
 
         return $this->render('certificates/server_show.html.twig',
           [
               'title' => 'Show server certificate',
-              'entity' => $domain,
+              'domain' => $domain,
               'entities' => $entities,
               'VARS' => self::VARS,
       ]
         );
+    }
+
+    #[Route(path: '/{id}/server/download/{dtype}', name: 'server_download', methods: ['GET', 'POST'])]
+    public function serverDownload(Request $request, ServerCertificate $certificate, $dtype): Response
+    {
+        if (($dtype == 'chain') || ($dtype == 'certkey')) {
+            $this->addFlash('success', 'Se creo el certificado');
+            return $this->util
+            //->setDomain($domain)
+            ->certDownload('server', [$certificate, $dtype]);
+
+        } else {
+            $this->addFlash('error', "Opción incorrecta $dtype");
+        }
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
     }
 
 }

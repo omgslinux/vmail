@@ -10,20 +10,25 @@
                 <th>{% trans %}NotBefore{% endtrans %}</th>
                 <th>{% trans %}NotAfter{% endtrans %}</th>
                 <th>{% trans %}Download cert and key{% endtrans %}</th>
-                <th>{% trans %}Download cert chain{% endtrans %}</th>
+                <th>{% trans %}Download full chain{% endtrans %}</th>
             </tr>
             {% for entity in entities %}
             <tr>
                 <td>{{ entity.description }}</a></td>
                 <td>{{ entity.interval.notBefore.date|date('d-m-Y') }}</td>
                 <td>{{ entity.interval.notAfter.date|date('d/m/Y') }}</td>
-                <td></td>
-                <td></td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'certkey'}) }}">Download</a></td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'chain'}) }}">Download</a></td>
             </tr>
             {% endfor %}
             <tr>
                 <td>
-                    <a href="{{ path(VARS.PREFIX ~ 'server_new', {'id': entity.id }) }}">{% trans %}Create a new server certificate{% endtrans %}</a>
+                    <a href="{{ path(VARS.PREFIX ~ 'server_new', {'id': domain.id }) }}">{% trans %}Create a new server certificate{% endtrans %}</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="{{ path(VARS.PREFIX ~ 'index') }}">{% trans %}Back to cert menu{% endtrans %}</a>
                 </td>
             </tr>
         </tbody>

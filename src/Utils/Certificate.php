@@ -4,6 +4,9 @@ namespace App\Utils;
 
 use App\Entity\Domain;
 use App\Entity\User;
+use Symfony\Component\HttpFoundation\Response;
+//use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /*
   Clase para gestionar los certificados x509
@@ -158,13 +161,6 @@ class Certificate
         return $csr;
     }
 
-    private function genCsrConfig($customOptions): array
-    {
-        //$csrOptions = array_merge($customOptions, self::pkeyConfigArgs);
-
-        return $csrOptions;
-    }
-
     public function createCACert($form): array
     {
         $data = $this->extractFormData($form);
@@ -195,34 +191,6 @@ class Certificate
         dump("privKey: " . $privKey, $this->decryptKey($cryptedKey, $plainPassword));
         dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
 
-        return $data;
-    }
-
-    public function createCACertOLD($form): array
-    {
-        $data = $this->extractFormData($form);
-        $privKey = $this->new_private_key($data['plainPassword']);
-
-        $csr = openssl_csr_new($data['common'], $privKey);
-
-        $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], self::CAConfigArgs);
-        openssl_x509_export($signcert, $certout);
-        //openssl_pkey_export($privkey, $pkeyout, "mypassword")
-        $factor = rand(16,30);
-        $strpw = $data['plainPassword'];
-        for ($i=1;$i<=$factor;$i++) {
-            $strpw = base64_encode($strpw);
-        }
-        $strfactor = substr($certout, 20 + $factor, 10);
-        for ($i=1;$i<=$factor-9;$i++) {
-            $strfactor = base64_encode($strfactor);
-        }
-        $data['certdata'] = [
-            'privKey' => $privKey,
-            'cert' => $certout,
-            'strfactor' => substr($strfactor, 0, 8) . dechex($factor) . substr($strfactor, 8),
-            'strpw' => $strpw,
-        ];
         return $data;
     }
 
@@ -363,9 +331,67 @@ class Certificate
         return bin2hex(random_bytes(20));
     }
 
-    public function setDomain(Domain $domain)
+    public function setDomain(Domain $domain): self
     {
         $this->domain = $domain;
+
+        return $this;
+    }
+
+    public function certDownload(string $category, array $params)
+    {
+        $stream = "";
+        if ($category=='server') {
+            list($certificate, $dtype) = $params;
+            $certData = $certificate->getCertData()['certdata'];
+            //dump($certData);
+            $filename = $certificate->getDescription() . '.' . $certificate->getDomain()->getName();
+            $filename .= '-' . $dtype . '.pem';
+            if ($dtype=='chain') {
+                $caCertData = $this->extractCAData($certificate->getDomain());
+                $stream .= $caCertData['cert'];
+                $stream .= $certData['cert'];
+            } else {
+                $plainPassword = $this->decryptPass($certData['strfactor'], $certData['strdata']);
+                $privKey = $this->decryptKey($certData['privKey'], $plainPassword);
+                $stream .= $certData['cert'];
+                $stream .= $privKey;
+            }
+            $message = [
+                'succes' => 'OK',
+                'message' => 'El certificado se ha descargado correctamente',
+            ];
+        } elseif ($category=='client') {
+
+        } elseif ($category=='ca') {
+
+        } else {
+            return [
+                'error' => 'Error',
+                'message' => 'Categoría incorrecta',
+            ];
+        }
+
+        return $this->streamDownload($stream, $filename);
+
+        return $message;
+    }
+
+    public function streamDownload($output, $filename): Response
+    {
+            $response = new Response($output);
+//dd($output, $filename);
+            // Create the disposition of the file
+            $disposition = $response->headers->makeDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $filename
+            );
+
+            // Set the content disposition
+            $response->headers->set('Content-Disposition', $disposition);
+
+            return $response;
+
     }
 
 }
