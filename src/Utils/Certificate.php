@@ -15,10 +15,18 @@ class Certificate
     private $user;
     private $certData = [];
 
+    const confFile = '../public/custom/openssl.cnf';
+
     const pkeyConfigArgs = [
         "digest_alg" => "sha512",
         "private_key_bits" => 4096,
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
+    ];
+    const basicCertConfg = [
+        "digest_alg" => "sha256",
+        "private_key_bits" => 4096,
+        "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        'config' => 'file://' . self::confFile,
     ];
     const CAConfigArgs = [
         "x509_extensions" => [
@@ -35,35 +43,28 @@ class Certificate
             'basicConstraints'=> 'critical,CA:FALSE',
         ]
     ];
-    const ServerConfigArgs = [
-        "x509_extensions" => [
-            'nsCertType' => 'server',
-            'subjectAltName' => 'DNS:CN <Update with CN when creating certificate>',
-            'extendedKeyUsage' => 'serverAuth',
-            'keyUsage' => 'digitalSignature, nonRepudiation, keyEncipherment, keyAgreement',
-            'basicConstraints'=> 'critical,CA:FALSE',
-        ]
+    const ServerExtensionsArgs0 = [
+        'nsCertType' => 'server',
+        'subjectAltName' => 'DNS:CN <Update with CN when creating certificate>',
+        'extendedKeyUsage' => 'serverAuth',
+        'keyUsage' => 'digitalSignature, nonRepudiation, keyEncipherment, keyAgreement',
+        'basicConstraints'=> 'critical,CA:FALSE',
+    ];
+    const ServerExtensionsArgs = [
+        'nsCertType' => 'server',
+        'extendedKeyUsage' => 'serverAuth',
+        'keyUsage' => 'digitalSignature, nonRepudiation, keyEncipherment, keyAgreement',
+        'basicConstraints'=> 'critical,CA:FALSE',
     ];
 
-    public function new_private_key($pass)
+    public function new_private_key(): string
     {
-        // # generate aes encrypted private key
-        // openssl genrsa -aes256 -out $CANAME.key 4096
         //$pkey = openssl_pkey_new($pass);
         //$spkac = openssl_spki_new($pkey, $this->commonData['CN']);
-
-
-
-        // Create the private and public key
-        $config =
         $res = openssl_pkey_new(self::pkeyConfigArgs);
 
         // Extract the private key from $res to $privKey
         openssl_pkey_export($res, $privKey);
-
-        // Extract the public key from $res to $pubKey
-        $pubKey = openssl_pkey_get_details($res);
-        $pubKey = $pubKey["key"];
 
         return $privKey;
 
@@ -90,13 +91,13 @@ class Certificate
     {
         /*
         openssl_pkcs12_export(
-   $cert,
-   $pfx_contenido,
-   $private_key,
-   $pfx_password,
-   [ 'extracerts' => $extracerts]
-);
-openssl_pkcs12_read($pfx_contenido, $certs, $pfx_password)
+           $cert,
+           $pfx_contenido,
+           $private_key,
+           $pfx_password,
+           [ 'extracerts' => $extracerts]
+        );
+        openssl_pkcs12_read($pfx_contenido, $certs, $pfx_password)
 
         */
     }
@@ -141,56 +142,67 @@ openssl_pkcs12_read($pfx_contenido, $certs, $pfx_password)
         $data = [
             'common' => $commonData,
             'interval' => $intervalData,
-            'plainPassword' => ($form['plainPassword']??null)
         ];
 
         return $data;
     }
 
+    private function genCsr($dn,  $privKey)
+    {
+        $csr = openssl_csr_new($dn, $privKey);
+
+        openssl_csr_export($csr, $csrout);
+
+        dump($csrout, $creqOptions, $csrOptions);
+
+        return $csr;
+    }
+
+    private function genCsrConfig($customOptions): array
+    {
+        //$csrOptions = array_merge($customOptions, self::pkeyConfigArgs);
+
+        return $csrOptions;
+    }
+
     public function createCACert($form): array
     {
         $data = $this->extractFormData($form);
-        $privKey = $this->new_private_key($data['plainPassword']);
-        //openssl req -new -x509 -config $CACONF -days 3650 -key $CAKEYFILE -$CASIGALG -nodes -out $CAPEM -outform PEM
-        /*
-        $SSLcnf = array('config' => '/usr/local/nessy2/share/ssl/openssl.cnf',
-        'encrypt_key' => true,
-        'private_key_type' => OPENSSL_KEYTYPE_RSA,
-        'digest_alg' => 'sha1',
-        'x509_extensions' => 'v3_ca',
-        'private_key_bits' => $someVariable // ---> bad
-        'private_key_bits' => (int)$someVariable // ---> good
-        'private_key_bits' => 512 // ---> obviously good
+        $privKey = $this->new_private_key();
+
+        $csr = openssl_csr_new($data['common'], $privKey);
+
+        $creqOptions = self::CAConfigArgs;
+        $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], $creqOptions);
+        openssl_x509_export($signcert, $certout);
+
+        // Generamos una contraseña
+        $plainPassword = $this->genPass();
+        $cryptedPass = $this->cryptPass($plainPassword, $certout);
+        $cryptedKey = $this->cryptKey($privKey, $plainPassword);
+
+        $data['certdata'] = array_merge(
+            [
+                'privKey' => $cryptedKey,
+                'cert' => $certout,
+                'config' => $creqOptions,
+            ],
+            $cryptedPass
         );
 
+        dump($data, "plainPassword: " . $plainPassword);
 
+        dump("privKey: " . $privKey, $this->decryptKey($cryptedKey, $plainPassword));
+        dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
 
-        To set the "basicConstraints" to  "critical,CA:TRUE", you have to define configargs, but in the openssl_csr_sign() function !
+        return $data;
+    }
 
-That's my example of code to sign a "child" certificate :
+    public function createCACertOLD($form): array
+    {
+        $data = $this->extractFormData($form);
+        $privKey = $this->new_private_key($data['plainPassword']);
 
-$CAcrt = "file://ca.crt";
-$CAkey = array("file://ca.key", "myPassWord");
-
-$clientKeys = openssl_pkey_new();
-$dn = array(
-    "countryName" => "FR",
-    "stateOrProvinceName" => "Finistere",
-    "localityName" => "Plouzane",
-    "organizationName" => "Ecole Nationale d'Ingenieurs de Brest",
-    "organizationalUnitName" => "Enib Students",
-    "commonName" => "www.enib.fr",
-    "emailAddress" => "ilovessl@php.net"
-);
-$csr = openssl_csr_new($dn, $clientPrivKey);
-
-$configArgs = array("x509_extensions" => "v3_req");
-$cert = openssl_csr_sign($csr, $CAcrt, $CAkey, 100, $configArgs);
-
-openssl_x509_export_to_file($cert, "childCert.crt");
-
-Then if you want to add some more options, you can edit the "/etc/ssl/openssl.cnf" ssl config' file (debian path), and add these after the [ v3_req ] tag.
-        */
         $csr = openssl_csr_new($data['common'], $privKey);
 
         $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], self::CAConfigArgs);
@@ -208,7 +220,7 @@ Then if you want to add some more options, you can edit the "/etc/ssl/openssl.cn
         $data['certdata'] = [
             'privKey' => $privKey,
             'cert' => $certout,
-            'factor' => substr($strfactor, 0, 8) . dechex($factor) . substr($strfactor, 8),
+            'strfactor' => substr($strfactor, 0, 8) . dechex($factor) . substr($strfactor, 8),
             'strpw' => $strpw,
         ];
         return $data;
@@ -216,15 +228,144 @@ Then if you want to add some more options, you can edit the "/etc/ssl/openssl.cn
 
     public function createClientCert($form)
     {
-        $data = $this->extractFormData($form);
-        dd($data);
+        $data = $this->extractFormData($form, 'client');
     }
 
     public function createServerCert($form)
     {
-        $data = $this->extractFormData($form);
-        dd($data);
+        return $this->createSignedCert($form, 'server');
     }
 
+    private function createSignedCert($form, $type): array
+    {
+        // Obtenemos el certificado y la clave sin cifrar
+        $caCertData = $this->extractCAData($this->domain);
+        $data = $this->extractFormData($form);
+        if ($type=='server') {
+            $extensions = 'v3_req';
+            $data['common']['commonName'] .= '.' . $this->domain->getName();
+        } elseif ($type=='client') {
+            $extensions = 'ext_client';
+            $data['common']['emailAddress'] .= '@' . $this->domain->getName();
+        }
+
+        $privKey = $this->new_private_key();
+        $csr = openssl_csr_new($data['common'], $privKey);
+
+        $creqOptions = [];
+        $creqOptions['x509_extensions'] = $extensions;
+        //dump($caCertData, $creqOptions);
+        $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions);
+        openssl_x509_export($signcert, $certout);
+
+        // Creamos una contraseña para cifrar la clave privada
+        $plainPassword=$this->genPass();
+        // Ciframos la contraseña
+        $cryptedPass = $this->cryptPass($plainPassword, $certout);
+        $cryptedKey = $this->cryptKey($privKey, $plainPassword);
+        $data['certdata'] = array_merge(
+            [
+                'privKey' => $cryptedKey,
+                'cert' => $certout,
+                'config' => $creqOptions,
+            ],
+            $cryptedPass
+        );
+        //dump($data);
+
+        //dump($privKey, $this->decryptKey($cryptedKey, $plainPassword));
+        //dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
+
+        return $data;
+
+    }
+
+    private function cryptKey($privKey, $key, $cipher="aes-128-gcm"): array
+    {
+        //$plaintext = "message to be encrypted";
+        $original_plaintext="";
+        if (in_array($cipher, openssl_get_cipher_methods()))
+        {
+            $ivlen = openssl_cipher_iv_length($cipher);
+            $iv = openssl_random_pseudo_bytes($ivlen);
+            $cryptKey = openssl_encrypt($privKey, $cipher, $key, $options=0, $iv, $tag);
+            //store $cipher, $iv, and $tag for decryption later
+        } else {
+            dd(openssl_get_cipher_methods());
+        }
+
+        return [
+            'cipher' => $cipher,
+            'iv' => bin2hex($iv),
+            'tag' => bin2hex($tag),
+            'cryptKey' => $cryptKey,
+        ];
+    }
+
+    private function decryptKey(array $cipherdata, $key): string
+    {
+        //dump($cipherdata, $key);
+        $cipher = $cipherdata['cipher'];
+        $tag = $cipherdata['tag'];
+        $cryptKey = $cipherdata['cryptKey'];
+        $iv = $cipherdata['iv'];
+        //$privKey = openssl_decrypt($cryptKey, $cipher, $key, $options=0, $iv, hex2bin($tag));
+        $privKey = openssl_decrypt($cipherdata['cryptKey'], $cipherdata['cipher'], $key, $options=0, hex2bin($cipherdata['iv']), hex2bin($cipherdata['tag']));
+
+        //dump("decrypted Key: ". $privKey);
+        return $privKey;
+    }
+
+    private function cryptPass($plainData, $stream): array
+    {
+        $factor = rand(16,30);
+        $strdata = $plainData;
+        for ($i=1;$i<=$factor;$i++) {
+            $strdata = base64_encode($strdata);
+        }
+        $strfactor = substr($stream, 20 + $factor, 10);
+        for ($i=1;$i<=$factor-9;$i++) {
+            $strfactor = base64_encode($strfactor);
+        }
+        return [
+            'strfactor' => substr($strfactor, 0, 8) . dechex($factor) . substr($strfactor, 8),
+            'strdata' => $strdata,
+        ];
+    }
+
+    private function decryptPass($strfactor, $strdata): string
+    {
+        $factor = hexdec(substr($strfactor, 8, 2));
+
+        for ($i=1;$i<=$factor;$i++) {
+            $strdata = base64_decode($strdata);
+        }
+
+        return $strdata;
+    }
+
+    private function extractCAData(Domain $domain): array
+    {
+        $caCertData = $domain->getCertData();
+        //$caKey = $caCertData['certdata']['privKey'];
+        $key = $this->decryptPass($caCertData['certdata']['strfactor'], $caCertData['certdata']['strdata']);
+        $caKey = $this->decryptKey($caCertData['certdata']['privKey'], $key);
+        //dump($caCertData, $key, $caKey);
+
+        return [
+            'cert' => $caCertData['certdata']['cert'],
+            'privKey' => $caKey,
+        ];
+    }
+
+    public function genPass(): string
+    {
+        return bin2hex(random_bytes(20));
+    }
+
+    public function setDomain(Domain $domain)
+    {
+        $this->domain = $domain;
+    }
 
 }

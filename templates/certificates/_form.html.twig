@@ -2,7 +2,7 @@
 
 {% block body %}
     {% set tagPrefix = 'create' %}
-    <h1>{{ title|trans }}</h1>
+    <h1>{{ title|trans }}{% if entity is defined %} ({{ entity.name }}){% endif %}</h1>
 
 {% if ajax is defined %}
     {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
@@ -44,7 +44,7 @@
      {% if form.common.emailAddress is defined %}
       <div class="row">
         <div class="col-2">{{ form_label(form.common.emailAddress)}}</div>
-        <div class="col-4">{{ form_widget(form.common.emailAddress)}}</div>
+        <div class="col-4">{{ form_widget(form.common.emailAddress)}}@{{ entity }}</div>
       </div>
     {% endif %}
 {% endif %}

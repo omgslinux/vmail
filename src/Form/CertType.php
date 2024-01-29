@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -24,6 +25,13 @@ class CertType extends AbstractType
         $notAfter = new \DateTime();
         $notAfter->add(\DateInterval::createFromDateString($options['duration']));
         $builder
+        ->add(
+            'domain',
+            HiddenType::class,
+            [
+                'data' => $options['domain']
+            ]
+        )
         ->add('common',
             CertCommonType::class,
             [
@@ -43,7 +51,7 @@ class CertType extends AbstractType
         ;
 
         if ($options['certtype'] != 'server') {
-
+            /*
             $builder->add(
                 'plainPassword',
                 RepeatedType::class,
@@ -67,6 +75,7 @@ class CertType extends AbstractType
                 ]
             )
             ;
+            */
         }
     }
 

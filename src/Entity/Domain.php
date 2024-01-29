@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\User;
@@ -42,10 +43,14 @@ class Domain
     #[ORM\Column(nullable: true)]
     private ?array $certData = null;
 
+    #[ORM\OneToMany(mappedBy: 'domain', cascade: ['persist', 'remove'], orphanRemoval: true, targetEntity: ServerCertificate::class)]
+    private Collection $serverCertificates;
+
 
     public function __construct()
     {
         $this->users=new ArrayCollection();
+        $this->serverCertificates = new ArrayCollection();
     }
 
     /**
@@ -134,6 +139,36 @@ class Domain
     public function setCertData(?array $certData): static
     {
         $this->certData = $certData;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ServerCertificate>
+     */
+    public function getServerCertificates(): Collection
+    {
+        return $this->serverCertificates;
+    }
+
+    public function addServerCertificate(ServerCertificate $serverCertificate): static
+    {
+        if (!$this->serverCertificates->contains($serverCertificate)) {
+            $this->serverCertificates->add($serverCertificate);
+            $serverCertificate->setDomain($this);
+        }
+
+        return $this;
+    }
+
+    public function removeServerCertificate(ServerCertificate $serverCertificate): static
+    {
+        if ($this->serverCertificates->removeElement($serverCertificate)) {
+            // set the owning side to null (unless already changed)
+            if ($serverCertificate->getDomain() === $this) {
+                $serverCertificate->setDomain(null);
+            }
+        }
 
         return $this;
     }

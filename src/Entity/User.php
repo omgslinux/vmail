@@ -95,6 +95,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $sendEmail = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?array $certdata = null;
+
 
     public function __construct()
     {
@@ -422,5 +425,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         } else {
             return $this->getEmail();
         }
+    }
+
+    public function getCertdata(): ?array
+    {
+        return $this->certdata;
+    }
+
+    public function setCertdata(?array $certdata): static
+    {
+        $this->certdata = $certdata;
+
+        return $this;
     }
 }

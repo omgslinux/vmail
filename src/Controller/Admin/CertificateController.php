@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Domain;
+use App\Entity\ServerCertificate;
 use App\Entity\User;
 use App\Form\CertType;
 //use App\Form\CertCommonType;
@@ -65,10 +66,10 @@ class CertificateController extends AbstractController
         $form = $this->createForm(CertType::class, null, ['duration' => '10 years']);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        /*if ($form->isSubmitted() && $form->isValid()) {
 
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-        }
+        }*/
 
         return $this->render('certificates/index.html.twig',
             [
@@ -96,9 +97,11 @@ class CertificateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
-            dump($form);
+            //dump($form);
             $formData = $form->getData();
             $certData = $this->util->createCACert($formData);
+            dump($certData);
+            dump(openssl_x509_parse($certData['certdata']['cert']));
             $domain->setCertData($certData);
             $this->repo->add($domain, true);
             $this->addFlash('success', 'Se creo el certificado');
@@ -109,7 +112,7 @@ class CertificateController extends AbstractController
           [
               'title' => 'Create CA certificate',
               'form' => $form->createView(),
-              'emtity' => $domain,
+              'entity' => $domain,
           ]
         );
     }
@@ -117,12 +120,20 @@ class CertificateController extends AbstractController
     #[Route(path: '/{id}/client', name: 'client', methods: ['GET', 'POST'])]
     public function client(Request $request, REPO $domainRepo, Domain $domain): Response
     {
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'duration' => '5 years']);
+        $certSubject = null;
+        if (null!=$certData=$domain->getCertData()) {
+            $certout = $certData['certdata']['cert'];
+            $cert = openssl_x509_parse($certout, false);
+            $certSubject = $cert['subject'];
+        }
+
+        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'client', 'duration' => '5 years']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
             $formData = $form->getData();
+            $this->util->setDomain($domain);
             dump($formData['common']);
             $certData = $this->util->createClientCert($formData);
             dd($certData);
@@ -133,7 +144,7 @@ class CertificateController extends AbstractController
           [
               'title' => 'Create client certificate',
               'form' => $form->createView(),
-              'emtity' => $domain,
+              'entity' => $domain,
           ]
         );
     }
@@ -141,15 +152,32 @@ class CertificateController extends AbstractController
     #[Route(path: '/{id}/server', name: 'server', methods: ['GET', 'POST'])]
     public function server(Request $request, REPO $domainRepo, Domain $domain): Response
     {
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'certtype' => 'server', 'duration' => '5 years']);
+        $certSubject = null;
+        if (null!=$certData=$domain->getCertData()) {
+            $certout = $certData['certdata']['cert'];
+            $cert = openssl_x509_parse($certout, false);
+            $certSubject = $cert['subject'];
+        }
+
+        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'server', 'duration' => '5 years']);
         $form->handleRequest($request);
 
-        dump($form);
+        //dump($form);
         if ($form->isSubmitted() && $form->isValid()) {
+            //dump($request);
             //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
             $formData = $form->getData();
+            $this->util->setDomain($domain);
             $certData = $this->util->createServerCert($formData);
-            dd($certData);
+            //dump($formData, $certData);
+            //dump(openssl_x509_parse($certData['certdata']['cert']));
+            $serverCertificate = new ServerCertificate();
+            $serverCertificate->setDomain($domain)
+            ->setDescription($formData['common']['commonName'])
+            ->setCertData($certData);
+            $domain->addServerCertificate($serverCertificate);
+            $this->repo->add($domain, true);
+            $this->addFlash('success', 'Se creo el certificado');
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
@@ -157,7 +185,8 @@ class CertificateController extends AbstractController
           [
               'title' => 'Create server certificate',
               'form' => $form->createView(),
-          ]
+              'entity' => $domain,
+      ]
         );
     }
 

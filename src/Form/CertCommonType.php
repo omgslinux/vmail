@@ -86,7 +86,7 @@ class CertCommonType extends AbstractType
             ]
         )
         ;
-        if (null==$options['certtype']) {
+        if ($options['certtype']=='client') {
           $builder->add(
             'emailAddress',
             TextType::class,
@@ -94,7 +94,8 @@ class CertCommonType extends AbstractType
                 'label' => 'emailAddress',
                 'required' => true,
                 'attr' => [
-                    'autocomplete' => 'new-password'
+                    'autocomplete' => 'new-password',
+                    'placeholder' => 'mailbox without domain',
                 ]
             ]
           );
