@@ -149,8 +149,8 @@ class CertificateController extends AbstractController
         );
     }
 
-    #[Route(path: '/{id}/server', name: 'server', methods: ['GET', 'POST'])]
-    public function server(Request $request, REPO $domainRepo, Domain $domain): Response
+    #[Route(path: '/{id}/server/new', name: 'server_new', methods: ['GET', 'POST'])]
+    public function serverNew(Request $request, REPO $domainRepo, Domain $domain): Response
     {
         $certSubject = null;
         if (null!=$certData=$domain->getCertData()) {
@@ -190,5 +190,34 @@ class CertificateController extends AbstractController
         );
     }
 
+    #[Route(path: '/{id}/server/show', name: 'server_show', methods: ['GET', 'POST'])]
+    public function serverShow(Request $request, Domain $domain): Response
+    {
+        $entities = [];
+        foreach ($domain->getServerCertificates() as $certificate) {
+            if (null!=$certData=$domain->getCertData()) {
+                dump($certData);
+                $certout = $certData['certdata']['cert'];
+                $cert = openssl_x509_parse($certout, false);
+                $data = [
+                    'description' => $certificate->getDescription(),
+                    'domain' => $certificate->getDomain(),
+                    'interval' => $certData['interval'],
+                    'cert' => $cert,
+                ];
+                $entities[] = $data;
+            }
+        }
+        dump($entities);
+
+        return $this->render('certificates/server_show.html.twig',
+          [
+              'title' => 'Show server certificate',
+              'entity' => $domain,
+              'entities' => $entities,
+              'VARS' => self::VARS,
+      ]
+        );
+    }
 
 }

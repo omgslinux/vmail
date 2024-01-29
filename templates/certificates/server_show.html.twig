@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Server certificates{% endtrans %}</h1>
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}NotBefore{% endtrans %}</th>
+                <th>{% trans %}NotAfter{% endtrans %}</th>
+                <th>{% trans %}Download cert and key{% endtrans %}</th>
+                <th>{% trans %}Download cert chain{% endtrans %}</th>
+            </tr>
+            {% for entity in entities %}
+            <tr>
+                <td>{{ entity.description }}</a></td>
+                <td>{{ entity.interval.notBefore.date|date('d-m-Y') }}</td>
+                <td>{{ entity.interval.notAfter.date|date('d/m/Y') }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                    <a href="{{ path(VARS.PREFIX ~ 'server_new', {'id': entity.id }) }}">{% trans %}Create a new server certificate{% endtrans %}</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock %}

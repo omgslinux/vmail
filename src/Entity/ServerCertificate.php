@@ -5,8 +5,12 @@ namespace App\Entity;
 use App\Repository\ServerCertificateRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+#[UniqueConstraint(name: 'cert_description_unique', columns: ['domain_id', 'description'])]
 #[ORM\Entity(repositoryClass: ServerCertificateRepository::class)]
+#[UniqueEntity(fields: ['domain', 'description'], message: 'Ya existe ese para ese dominio', errorPath: 'description')]
 class ServerCertificate
 {
     #[ORM\Id]
