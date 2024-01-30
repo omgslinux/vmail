@@ -186,10 +186,10 @@ class Certificate
             $cryptedPass
         );
 
-        dump($data, "plainPassword: " . $plainPassword);
+        //dump($data, "plainPassword: " . $plainPassword);
 
-        dump("privKey: " . $privKey, $this->decryptKey($cryptedKey, $plainPassword));
-        dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
+        //dump("privKey: " . $privKey, $this->decryptKey($cryptedKey, $plainPassword));
+        //dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
 
         return $data;
     }
@@ -221,6 +221,7 @@ class Certificate
         $csr = openssl_csr_new($data['common'], $privKey);
 
         $creqOptions = [];
+        //$creqOptions = self::basicCertConfg;
         $creqOptions['x509_extensions'] = $extensions;
         //dump($caCertData, $creqOptions);
         $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions);
@@ -380,7 +381,7 @@ class Certificate
     public function streamDownload($output, $filename): Response
     {
             $response = new Response($output);
-//dd($output, $filename);
+            //dd($output, $filename);
             // Create the disposition of the file
             $disposition = $response->headers->makeDisposition(
                 ResponseHeaderBag::DISPOSITION_ATTACHMENT,

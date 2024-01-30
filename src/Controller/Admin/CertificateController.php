@@ -164,7 +164,7 @@ class CertificateController extends AbstractController
 
         //dump($form);
         if ($form->isSubmitted() && $form->isValid()) {
-            //dump($request);
+            //dd($request);
             //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
             $formData = $form->getData();
             $this->util->setDomain($domain);
