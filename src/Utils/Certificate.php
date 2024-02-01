@@ -29,7 +29,7 @@ class Certificate
         "digest_alg" => "sha256",
         "private_key_bits" => 4096,
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
-        'config' => 'file://' . self::confFile,
+        //'config' => $_SERVER['DOCUMENT_R00T'] . self::confFile,
     ];
     const CAConfigArgs = [
         "x509_extensions" => [
@@ -37,27 +37,6 @@ class Certificate
             'keyUsage' => 'keyCertSign,cRLSign',
             'basicConstraints'=> 'critical,CA:TRUE',
         ]
-    ];
-    const ClientConfigArgs = [
-        "x509_extensions" => [
-            'nsCertType' => 'client, email',
-            'extendedKeyUsage' => 'clientAuth',
-            'keyUsage' => 'digitalSignature, keyEncipherment, dataEncipherment, keyAgreement',
-            'basicConstraints'=> 'critical,CA:FALSE',
-        ]
-    ];
-    const ServerExtensionsArgs0 = [
-        'nsCertType' => 'server',
-        'subjectAltName' => 'DNS:CN <Update with CN when creating certificate>',
-        'extendedKeyUsage' => 'serverAuth',
-        'keyUsage' => 'digitalSignature, nonRepudiation, keyEncipherment, keyAgreement',
-        'basicConstraints'=> 'critical,CA:FALSE',
-    ];
-    const ServerExtensionsArgs = [
-        'nsCertType' => 'server',
-        'extendedKeyUsage' => 'serverAuth',
-        'keyUsage' => 'digitalSignature, nonRepudiation, keyEncipherment, keyAgreement',
-        'basicConstraints'=> 'critical,CA:FALSE',
     ];
 
     public function new_private_key(): string
@@ -196,7 +175,7 @@ class Certificate
 
     public function createClientCert($form)
     {
-        $data = $this->extractFormData($form, 'client');
+        return $this->createSignedCert($form, 'client');
     }
 
     public function createServerCert($form)
@@ -204,34 +183,44 @@ class Certificate
         return $this->createSignedCert($form, 'server');
     }
 
-    private function createSignedCert($form, $type): array
+    private function createSignedCert($formData, $type): array
     {
         // Obtenemos el certificado y la clave sin cifrar
         $caCertData = $this->extractCAData($this->domain);
-        $data = $this->extractFormData($form);
+        $data = $this->extractFormData($formData);
         if ($type=='server') {
-            $extensions = 'v3_req';
+            $extensions = 'server_ext';
             $data['common']['commonName'] .= '.' . $this->domain->getName();
         } elseif ($type=='client') {
-            $extensions = 'ext_client';
-            $data['common']['emailAddress'] .= '@' . $this->domain->getName();
+            $eUser = $data['common']['emailAddress'];
+            $data['common']['commonName'] = $eUser->getFullName();
+            $data['common']['emailAddress'] = $eUser->getEmail();
+            //dd($data);
+            $extensions = 'client_ext';
         }
-
-        $privKey = $this->new_private_key();
-        $csr = openssl_csr_new($data['common'], $privKey);
-
-        $creqOptions = [];
-        //$creqOptions = self::basicCertConfg;
-        $creqOptions['x509_extensions'] = $extensions;
-        //dump($caCertData, $creqOptions);
-        $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions);
-        openssl_x509_export($signcert, $certout);
 
         // Creamos una contraseña para cifrar la clave privada
         $plainPassword=$this->genPass();
+
+        $privKey = $this->new_private_key();
+        $csr = openssl_csr_new($data['common'], $privKey);
+        //openssl_pkey_export($caCertData['privKey'], $cryptedCAKey, $plainPassword);
+        //dump($csr, $cryptedCAKey);
+        $creqOptions = array_merge(
+            self::basicCertConfg,
+            ['config' => self::confFile],
+            ['x509_extensions' => $extensions]
+        );
+        //dump(file_get_contents($creqOptions['config']));
+        //$signcert = openssl_csr_sign($csr, $caCertData['cert'], [$cryptedCAKey, $plainPassword], $data['interval']['duration'], $creqOptions);
+        $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions);
+        openssl_x509_export($signcert, $certout);
+        //dump($creqOptions, $signcert, openssl_x509_parse($certout));
+
         // Ciframos la contraseña
         $cryptedPass = $this->cryptPass($plainPassword, $certout);
         $cryptedKey = $this->cryptKey($privKey, $plainPassword);
+        unset($creqOptions['config']);
         $data['certdata'] = array_merge(
             [
                 'privKey' => $cryptedKey,

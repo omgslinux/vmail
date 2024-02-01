@@ -92,7 +92,7 @@ class CertificateController extends AbstractController
             dump($certData, $cert);
             dump($cert['subject']);
         }
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'CA', 'duration' => '10 years']);
+        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'duration' => '10 years']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -117,8 +117,8 @@ class CertificateController extends AbstractController
         );
     }
 
-    #[Route(path: '/{id}/client', name: 'client', methods: ['GET', 'POST'])]
-    public function client(Request $request, REPO $domainRepo, Domain $domain): Response
+    #[Route(path: '/{id}/client/new', name: 'client_new', methods: ['GET', 'POST'])]
+    public function clientNew(Request $request, UR $userRepo, Domain $domain): Response
     {
         $certSubject = null;
         if (null!=$certData=$domain->getCertData()) {
@@ -127,16 +127,18 @@ class CertificateController extends AbstractController
             $certSubject = $cert['subject'];
         }
 
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'client', 'duration' => '5 years']);
+        $form = $this->createForm(CertType::class, null, ['domain' => $domain->getId(), 'subject' => $certSubject, 'certtype' => 'client', 'duration' => '5 years']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
             $formData = $form->getData();
             $this->util->setDomain($domain);
             dump($formData['common']);
+            $user = $formData['common']['emailAddress'];
             $certData = $this->util->createClientCert($formData);
-            dd($certData);
+            //dd($certData);
+            $user->setCertData($certData);
+            $userRepo->add($user, true);
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
@@ -150,7 +152,7 @@ class CertificateController extends AbstractController
     }
 
     #[Route(path: '/{id}/server/new', name: 'server_new', methods: ['GET', 'POST'])]
-    public function serverNew(Request $request, REPO $domainRepo, Domain $domain): Response
+    public function serverNew(Request $request, Domain $domain): Response
     {
         $certSubject = null;
         if (null!=$certData=$domain->getCertData()) {

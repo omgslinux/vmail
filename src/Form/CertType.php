@@ -38,6 +38,7 @@ class CertType extends AbstractType
                 'label' => false,
                 'certtype' => $options['certtype'],
                 'subject' => $options['subject'],
+                'domain' => $options['domain'],
             ]
         )
         ->add(
@@ -50,8 +51,8 @@ class CertType extends AbstractType
         )
         ;
 
-        if ($options['certtype'] != 'server') {
-            /*
+        if ($options['certtype'] == 'export') {
+
             $builder->add(
                 'plainPassword',
                 RepeatedType::class,
@@ -75,7 +76,7 @@ class CertType extends AbstractType
                 ]
             )
             ;
-            */
+
         }
     }
 

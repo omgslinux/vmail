@@ -37,14 +37,16 @@
     <div class="col-2">{{ form_label(form.common.organizationalUnitName)}}</div>
     <div class="col-4">{{ form_widget(form.common.organizationalUnitName)}}</div>
   </div>
+  {% if form.common.commonName is defined %}
   <div class="row">
     <div class="col-2">{{ form_label(form.common.commonName)}}</div>
     <div class="col-4">{{ form_widget(form.common.commonName)}}</div>
   </div>
+    {% endif %}
      {% if form.common.emailAddress is defined %}
       <div class="row">
         <div class="col-2">{{ form_label(form.common.emailAddress)}}</div>
-        <div class="col-4">{{ form_widget(form.common.emailAddress)}}@{{ entity }}</div>
+        <div class="col-4">{{ form_widget(form.common.emailAddress)}}</div>
       </div>
     {% endif %}
 {% endif %}

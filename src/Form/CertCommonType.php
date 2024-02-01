@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Domain;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\CallbackTransformer;
+use Doctrine\ORM\EntityRepository;
 
 class CertCommonType extends AbstractType
 {
@@ -21,6 +24,7 @@ class CertCommonType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $domain = $options['domain'];
         $notAfter = new \DateTime();
         $notAfter->add(\DateInterval::createFromDateString($options['duration']));
         $builder
@@ -80,9 +84,10 @@ class CertCommonType extends AbstractType
                     'autocomplete' => 'new-password',
                     'readonly' => null!=$options['subject'],
                 ]
-          ]
-        )
-        ->add('commonName',
+            ]
+        );
+        if ($options['certtype']!='client') {
+            $builder->add('commonName',
             TextType::class,
             [
                 'label' => 'commonName',
@@ -92,19 +97,29 @@ class CertCommonType extends AbstractType
                     'autocomplete' => 'new-password'
                 ]
             ]
-        )
-        ;
+            )
+            ;
+        }
         if ($options['certtype']=='client') {
           $builder->add(
             'emailAddress',
-            TextType::class,
+            EntityType::class,
             [
+                'class' => User::class,
                 'label' => 'emailAddress',
-                'required' => true,
-                'attr' => [
-                    'autocomplete' => 'new-password',
-                    'placeholder' => 'mailbox without domain',
-                ]
+                'query_builder' => function (EntityRepository $er) use ($domain) {
+                    $qb = $er->createQueryBuilder('u');
+                    $qb
+                    ->where('u.list = 0');
+                    if ($domain!=0) {
+                        $qb
+                          ->andWhere('u.domain = :domain')
+                          ->andWhere('u.certdata IS NULL')
+                          ->setParameter('domain', $domain)
+                        ;
+                    }
+                    return $qb;
+                },
             ]
           );
         }
