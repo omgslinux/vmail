@@ -11,6 +11,7 @@
                 <th>{% trans %}Full Name{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
                 <th>{% trans %}Admin{% endtrans %}</th>
+                <th>{% trans %}Certificate{% endtrans %}</th>
             </tr>
             {% for user in users %}{% set email = user.name ~ '@' ~ entity.name %}
             <tr>
@@ -23,7 +24,8 @@
                 <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
-            </tr>
+                <td>{{ user.certdata ? '√' : '--' }}</td>
+        </tr>
             {% endfor %}
         </tbody>
     </table>
