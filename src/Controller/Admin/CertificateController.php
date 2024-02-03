@@ -89,8 +89,8 @@ class CertificateController extends AbstractController
             $certout = $certData['certdata']['cert'];
             $cert = openssl_x509_parse($certout, false);
             $certSubject = $cert['subject'];
-            dump($certData, $cert);
-            dump($cert['subject']);
+            //dump($certData, $cert);
+            //dump($cert['subject']);
         }
         $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'duration' => '10 years']);
         $form->handleRequest($request);
@@ -100,8 +100,8 @@ class CertificateController extends AbstractController
             //dump($form);
             $formData = $form->getData();
             $certData = $this->util->createCACert($formData);
-            dump($certData);
-            dump(openssl_x509_parse($certData['certdata']['cert']));
+            //dump($certData);
+            //dump(openssl_x509_parse($certData['certdata']['cert']));
             $domain->setCertData($certData);
             $this->repo->add($domain, true);
             $this->addFlash('success', 'Se creo el certificado');
@@ -133,7 +133,7 @@ class CertificateController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
             $this->util->setDomain($domain);
-            dump($formData['common']);
+            //dump($formData['common']);
             $user = $formData['common']['emailAddress'];
             $certData = $this->util->createClientCert($formData);
             //dd($certData);
@@ -149,6 +149,21 @@ class CertificateController extends AbstractController
               'entity' => $domain,
           ]
         );
+    }
+
+    #[Route(path: '/{id}/client/download/{dtype}', name: 'client_download', methods: ['GET', 'POST'])]
+    public function clientDownload(Request $request, User $user, $dtype='pcks12'): Response
+    {
+        if (($dtype == 'pkcs12') || ($dtype == 'certkey')) {
+            $this->addFlash('success', 'Se creo el certificado');
+            return $this->util
+            //->setDomain($domain)
+            ->certDownload('client', [$user, $dtype]);
+
+        } else {
+            $this->addFlash('error', "Opción incorrecta $dtype");
+        }
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
     }
 
     #[Route(path: '/{id}/server/new', name: 'server_new', methods: ['GET', 'POST'])]

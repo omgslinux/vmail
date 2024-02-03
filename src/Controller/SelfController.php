@@ -12,8 +12,10 @@ use App\Entity\Domain;
 use App\Entity\Autoreply;
 use App\Form\UserType;
 use App\Form\AutoreplyType;
+use App\Form\CertDownloadType;
 use App\Form\ManagePasswordType;
 use App\Repository\UserRepository as UR;
+use App\Utils\Certificate;
 
 /**
  * User controller.
@@ -33,7 +35,7 @@ class SelfController extends AbstractController
      * Lists pass and reply
      */
     #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
-    public function index(Request $request, UR $ur): Response
+    public function index(Request $request, UR $ur, Certificate $cUtil): Response
     {
         $entity = $this->getUser();
 
@@ -63,10 +65,29 @@ class SelfController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
+        $certificateform = $this->createForm(certDownloadType::class, null, ['certtype' => 'client', 'entity' => $entity]);
+        $certificateform->handleRequest($request);
+
+        if ($certificateform->isSubmitted() && $certificateform->isValid()) {
+            $formData = $certificateform->getData();
+            dump($certificateform, $formData);
+            //dd($certificateform->getClickedButton()->getName());
+            return $cUtil->certDownload(
+                'client',
+                [
+                    'format' => $certificateform->getClickedButton()->getName(),
+                    'setkey' => $formData['setkey']
+                ]
+            );
+
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+        }
+
         return $this->render(self::VARS['BASEDIR'] . '/selfindex.html.twig', array(
             'user' => $entity,
             'passform' => $passform->createView(),
             'replyform' => $replyform->createView(),
+            'certificateform' => $certificateform->createView(),
             'VARS' => self::VARS,
         ));
     }

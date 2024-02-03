@@ -69,9 +69,16 @@ class Certificate
        return $pem;
     }
 
-    public function exportPKCS12()
+    public function exportPKCS12(array $params)
     {
         /*
+         openssl_pkcs12_export(
+            mixed $x509,
+            string &$out,
+            mixed $priv_key,
+            string $pass,
+            array $args = ?
+        ): bool
         openssl_pkcs12_export(
            $cert,
            $pfx_contenido,
@@ -81,7 +88,45 @@ class Certificate
         );
         openssl_pkcs12_read($pfx_contenido, $certs, $pfx_password)
 
+         openssl_pkcs12_export_to_file(
+    mixed $x509,
+    string $filename,
+    mixed $priv_key,
+    string $pass,
+    array $args = ?
+): bool
         */
+        dump($params);
+        $f = $params['filename'];
+        unset($params['filename']);
+        if (!empty($params['filename'])) {
+            openssl_pkcs12_export_to_file(
+                $params['certdata']['cert'],
+                $params['filename'],
+                $params['certdata']['privKey'],
+                $params['plainpassword'],
+                //[ 'extracerts' => $params['cacertdata']['cert']]
+            );
+            openssl_pkcs12_read(file_get_contents($params['filename']), $pfxout, $params['plainpassword']);
+
+
+        } else {
+
+            openssl_pkcs12_export(
+                $params['certdata']['cert'],
+                $pfx,
+                $params['certdata']['privKey'],
+                $params['plainpassword'],
+                // AÑADIR CA PROVOCA ERROR DESCONOCIDO AL IMPORTAR
+                //[ 'extracerts' => $params['cacertdata']['cert']]
+            );
+            openssl_pkcs12_read($pfx, $pfxout, $params['plainpassword']);
+            //file_put_contents($f, $pfx);
+        }
+        //dd($pfxout);
+
+        return $pfx;
+
     }
 
     private function extractFormCommonData($commonData): array
@@ -304,6 +349,11 @@ class Certificate
 
     private function extractCAData(Domain $domain): array
     {
+        return $this->extractCertData($domain->getCertData());
+    }
+
+    private function extractCADataOLD(Domain $domain): array
+    {
         $caCertData = $domain->getCertData();
         //$caKey = $caCertData['certdata']['privKey'];
         $key = $this->decryptPass($caCertData['certdata']['strfactor'], $caCertData['certdata']['strdata']);
@@ -313,6 +363,19 @@ class Certificate
         return [
             'cert' => $caCertData['certdata']['cert'],
             'privKey' => $caKey,
+        ];
+    }
+
+    private function extractCertData($certData): array
+    {
+        //$caKey = $caCertData['certdata']['privKey'];
+        $key = $this->decryptPass($certData['certdata']['strfactor'], $certData['certdata']['strdata']);
+        $privKey = $this->decryptKey($certData['certdata']['privKey'], $key);
+        //dump($caCertData, $key, $caKey);
+
+        return [
+            'cert' => $certData['certdata']['cert'],
+            'privKey' => $privKey,
         ];
     }
 
@@ -331,9 +394,16 @@ class Certificate
     public function certDownload(string $category, array $params)
     {
         $stream = "";
+        dump($params);
+        // Mensaje común predeterminado
+        $message = [
+            'succes' => 'OK',
+            'message' => 'El certificado se ha descargado correctamente',
+        ];
         if ($category=='server') {
             list($certificate, $dtype) = $params;
-            $certData = $certificate->getCertData()['certdata'];
+            //$certData = $certificate->getCertData()['certdata'];
+            $certData = $this->extractCertData($certificate->getCertData()['certdata']);
             //dump($certData);
             $filename = $certificate->getDescription() . '.' . $certificate->getDomain()->getName();
             $filename .= '-' . $dtype . '.pem';
@@ -341,18 +411,49 @@ class Certificate
                 $caCertData = $this->extractCAData($certificate->getDomain());
                 $stream .= $caCertData['cert'];
                 $stream .= $certData['cert'];
+                $stream .= $castream;
             } else {
                 $plainPassword = $this->decryptPass($certData['strfactor'], $certData['strdata']);
-                $privKey = $this->decryptKey($certData['privKey'], $plainPassword);
-                $stream .= $certData['cert'];
-                $stream .= $privKey;
+                //$privKey = $this->decryptKey($certData['privKey'], $plainPassword);
+                $stream .= $certData['cert'] . $certData['privKey'];
             }
-            $message = [
-                'succes' => 'OK',
-                'message' => 'El certificado se ha descargado correctamente',
-            ];
         } elseif ($category=='client') {
-
+                /*'client',
+                [
+                    'format' => $certificateform->getClickedButton()->getName(),
+                    'setkey' => $formData
+                ]*/
+            $format = strtolower($params['format']);
+            //list($format, $userdata) = $params;
+            $user = $params['setkey'];
+            $filename = $user->getEmail() . '.' . ($format=='pkcs12'?'pfx':'pem');
+            $plainPassword = $user->getPlainPassword();
+            //dump("format: " . $format, $user, $plainPassword, "filename: " . $filename);
+            $certData = $this->extractCertData($user->getCertData());
+            $caCertData = $this->extractCAData($user->getDomain());
+            if ($format=='pem') {
+                $stream = $certData['cert'] . $certData['privKey'];
+            } else {
+                openssl_pkcs12_export(
+                    $certData['cert'],
+                    $stream,
+                    $certData['privKey'],
+                    $plainPassword,
+                    // AÑADIR CA PROVOCA ERROR DESCONOCIDO AL IMPORTAR
+                    //[ 'extracerts' => $caCertData['cert']]
+                );
+                //$stream = $pfx;
+                /*
+                $stream = $this->exportPKCS12(
+                    [
+                        'certdata' => $certData,
+                        'cacertdata' => $caCertData,
+                        'plainpassword' => $plainPassword,
+                        'filename' => $filename
+                    ]
+                );*/
+            }
+            //dd($caCertData, $certData, ($format=='pem'?$stream:''));
         } elseif ($category=='ca') {
 
         } else {

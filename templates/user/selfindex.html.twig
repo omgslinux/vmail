@@ -3,8 +3,8 @@
 {% block body %}
 <style>
 .dashboard {
-    width: 500px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
     border-radius: 10px;
     gap: 20px;
 }
@@ -26,6 +26,10 @@
 }
 #roleuser {
     background: orange;
+    border-radius: inherit;
+}
+#usercertificate {
+    background: darkcyan;
     border-radius: inherit;
 }
 </style>
@@ -86,7 +90,26 @@
               'noajax': true,
               })
             }}
-
+        </div>
+            {% if user.certData %}
+                {% set tagPrefix = 'certificate' %}
+                {% set modalId = 'usercertificate' %}
+                {% set modalSize, included = 'modal-lg', 'certificates/_download' %}
+                {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+            <h1>Descarga de certificados</h1>
+            <div id="usercertificate" class="item">
+                {% set modalTitle = 'User certificate download' %}
+                <li>
+                    <a class="btn btn-primary item" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    </a>
+                </li>
+            {{ include('_modal.html.twig', {
+              'nobutton': true,
+              'form': certificateform,
+              'noajax': true,
+              })
+            }}
+            {% endif %}
             </div>
             <hr>
         {% endif %}
