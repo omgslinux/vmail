@@ -44,16 +44,16 @@ localityName            = Locality Name (eg, city)
 localityName_default        = Madrid
 
 organizationName            = Organization Name (eg, company)
-organizationName_default    = 15M
+organizationName_default    = MyOrg
 
 organizationalUnitName  = Organizational Unit (eg, division)
-organizationalUnitName_default  = 15Hack
+organizationalUnitName_default  = My OU
 
 commonName          = Common Name (e.g. server FQDN or YOUR name)
-commonName_default      = *.tomalaplaza.net
+commonName_default      = My Common Name
 
 emailAddress            = Email Address
-emailAddress_default        = webmaster@15hack.tomalaplaza.net
+emailAddress_default        = webmaster@corp.org
 
 ####################################################################
 [ ca_extensions ]
