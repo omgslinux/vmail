@@ -84,19 +84,22 @@ class CertificateController extends AbstractController
     #[Route(path: '/{id}/ca', name: 'ca', methods: ['GET', 'POST'])]
     public function ca(Request $request, Domain $domain): Response
     {
-        $certSubject = null;
+        $certSubject = $certInterval = null;
         if (null!=$certData=$domain->getCertData()) {
             $certout = $certData['certdata']['cert'];
             $cert = openssl_x509_parse($certout, false);
             $certSubject = $cert['subject'];
-            //dump($certData, $cert);
+            $certInterval = [
+                'NotBefore' => $this->util::convertUTCTime2Date($cert['validFrom']),
+                'NotAfter'  => $this->util::convertUTCTime2Date($cert['validTo']),
+            ];
+            dump($certData, $cert, $certInterval);
             //dump($cert['subject']);
         }
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'duration' => '10 years']);
+        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'interval' => $certInterval, 'duration' => '10 years']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
             $files = $request->files->all();
             $csvfile = $csvcontents = null;
             foreach ($files as $file) {

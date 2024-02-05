@@ -94,8 +94,9 @@ class CertCommonType extends AbstractType
             [
                 'label' => 'commonName',
                 'required' => true,
+                'data' => $options['subject']['commonName']??null,
                 'attr' => [
-                    'readonly' => null!=$options['subject']&&$options['certtype']=='CA',
+                    'readonly' => null!=$options['subject']&&$options['certtype']=='ca',
                     'autocomplete' => 'new-password'
                 ]
             ]

@@ -16,8 +16,15 @@ class CertIntervalType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $notAfter = new \DateTime();
-        $notAfter->add(\DateInterval::createFromDateString($options['duration']));
+        if (null==$options['interval']) {
+            $notBefore = new \DateTime();
+            $notAfter = new \DateTime();
+            $notAfter->add(\DateInterval::createFromDateString($options['duration']));
+            //dump($options);
+        } else {
+            $notBefore = $options['interval']['NotBefore'];
+            $notAfter = $options['interval']['NotAfter'];
+        }
         $builder
         ->add(
             'notBefore',
@@ -25,7 +32,11 @@ class CertIntervalType extends AbstractType
             [
                 'widget' => 'single_text',
                 'label' => 'NotBefore',
-                'data'  => new \DateTime()
+                //'data' => \DateInterval::createFromDateString($options['interval']['NotBefore']),
+                //'data'  => new \DateTime()
+                //'data'  => $options['interval']['NotBefore']
+                //'data' => (null!=$options['interval']?$options['interval']['NotBefore']:null),
+                'data' => $notBefore
             ]
         )
         ->add(
@@ -34,6 +45,7 @@ class CertIntervalType extends AbstractType
             [
                 'widget' => 'single_text',
                 'label' => 'NotAfter',
+                //'data' => (null!=$options['interval']?$options['interval']['NotAfter']:null),
                 'data'  => $notAfter
           ]
 
@@ -43,7 +55,7 @@ class CertIntervalType extends AbstractType
             DateIntervalType::class,
             [
                 'label' => 'Interval',
-                'data' => \DateInterval::createFromDateString($options['duration']),
+                'data' => \DateInterval::createFromDateString($options['duration'])??null,
             ]
         );
     }
@@ -56,6 +68,7 @@ class CertIntervalType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => null,
             'duration' => '1 years',
+            'interval' => null,
         ));
     }
 }

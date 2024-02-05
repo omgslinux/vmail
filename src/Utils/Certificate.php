@@ -185,6 +185,35 @@ class Certificate
         return $csr;
     }
 
+    public static function convertUTCTime2Date($string) {
+        // Add a trailing 'Z' to indicate UTC
+        $string .= 'Z';
+
+        // Obtener los componentes de la cadena
+        $year = intval(substr($string, 0, 2));
+        $month = intval(substr($string, 2, 2));
+        $day = intval(substr($string, 4, 2));
+        $hour = intval(substr($string, 6, 2));
+        $minute = intval(substr($string, 8, 2));
+        $second = intval(substr($string, 10, 2));
+
+        // Adjust year if necessary (considering 50 years in the past and 50 in the future)
+        $year += ($year < 50) ? 2000 : 1900;
+
+        // Create a date string compatible with DateTime
+        $date_string = sprintf("%04d-%02d-%02d %02d:%02d:%02d", $year, $month, $day, $hour, $minute, $second);
+
+        // Create a DateTime object
+        $date = \DateTime::createFromFormat('Y-m-d H:i:s', $date_string);
+
+        // Return DateTime, or else, false
+        if ($date) {
+            return $date;
+        } else {
+            return false;
+        }
+    }
+
     public function createCACert($form, $contents): array
     {
         $data = $this->extractFormData($form);
@@ -193,7 +222,7 @@ class Certificate
             $plainPassword = $form['common']['plainPassword']['setkey']->getPlainPassword();
             $crypted = ' ENCRYPTED';
             if (!strpos($contents, $crypted)) {
-                $crypted ='';
+                $crypted =' RSA';
             }
             $begin = '-----BEGIN' . $crypted . ' PRIVATE KEY-----';
             $result = strpos($contents, $begin);

@@ -24,6 +24,7 @@ class CertType extends AbstractType
     {
         $notAfter = new \DateTime();
         $notAfter->add(\DateInterval::createFromDateString($options['duration']));
+        //dump($options);
         $builder
         ->add(
             'domain',
@@ -46,6 +47,7 @@ class CertType extends AbstractType
             CertIntervalType::class,
             [
                 'duration' => $options['duration'],
+                'interval' => $options['interval'],
                 'label' => false,
             ]
         )
@@ -89,6 +91,7 @@ class CertType extends AbstractType
             'data_class' => null,
             'domain' => null,
             'duration' => '1 years',
+            'interval' => null,
             'certtype' => null,
             'subject' => null,
         ));
