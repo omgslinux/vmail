@@ -97,14 +97,25 @@ class CertificateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
-            //dump($form);
+            $files = $request->files->all();
+            $csvfile = $csvcontents = null;
+            foreach ($files as $file) {
+                //dump($file);
+                $csvfile = $file['common']['customFile'];
+                $csvcontents = file_get_contents($csvfile);
+            }
             $formData = $form->getData();
-            $certData = $this->util->createCACert($formData);
-            //dump($certData);
-            //dump(openssl_x509_parse($certData['certdata']['cert']));
-            $domain->setCertData($certData);
-            $this->repo->add($domain, true);
-            $this->addFlash('success', 'Se creo el certificado');
+            //dump($form, $formData, $csvcontents);
+            $certData = $this->util->createCACert($formData, $csvcontents);
+            //dd($certData);
+            if (!empty($certData['error'])) {
+                $this->addFlash('error', $certData['error']);
+            } else {
+                //dump(openssl_x509_parse($certData['certdata']['cert']));
+                $domain->setCertData($certData);
+                $this->repo->add($domain, true);
+                $this->addFlash('success', 'Se creó el certificado');
+            }
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 

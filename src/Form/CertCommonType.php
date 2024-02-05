@@ -11,10 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Validator\Constraints\File;
 use Doctrine\ORM\EntityRepository;
 
 class CertCommonType extends AbstractType
@@ -99,6 +101,33 @@ class CertCommonType extends AbstractType
             ]
             )
             ;
+            if ($options['certtype']=='ca') {
+
+                $builder
+                ->add(
+                    'customFile',
+                    FileType::class,
+                    [
+                        'mapped' => false,
+                        'constraints' => [
+                            new File(
+                                [
+                                    'maxSize' => '150M'
+                                ]
+                            )
+                        ]
+                    ]
+                )
+                ->add(
+                    'plainPassword',
+                    CertDownloadType::class,
+                    [
+                        'label' => 'Private key password'
+                    ]
+
+                )
+                ;
+            }
         }
         if ($options['certtype']=='client') {
           $builder->add(

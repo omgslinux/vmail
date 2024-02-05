@@ -185,19 +185,72 @@ class Certificate
         return $csr;
     }
 
-    public function createCACert($form): array
+    public function createCACert($form, $contents): array
     {
         $data = $this->extractFormData($form);
-        $privKey = $this->new_private_key();
+        dump($contents);
+        if (null!=$contents) {
+            $plainPassword = $form['common']['plainPassword']['setkey']->getPlainPassword();
+            $crypted = ' ENCRYPTED';
+            if (!strpos($contents, $crypted)) {
+                $crypted ='';
+            }
+            $begin = '-----BEGIN' . $crypted . ' PRIVATE KEY-----';
+            $result = strpos($contents, $begin);
+            if (false===$result) {
+                dump($begin, $result);
+                return [
+                    'error' => 'No se ha podido encontrar la clave privada'
+                ];
+            }
+            $pem_data = substr($contents, strpos($contents, $begin)+strlen($begin));
+            $end = '-----END' . $crypted . ' PRIVATE KEY-----';
+            $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+            $privKey = $begin. $pem_data . $end;
+            if ($crypted) {
+                $privKeyObject = openssl_pkey_get_private($privKey,  $plainPassword);
+                //openssl_pkey_export($privKeyObject, $privKey, $plainPassword);
+                //openssl_x509_export(openssl_pkey_get_public($contents), $certout);
+                dump($crypted, $privKeyObject);
+                if (!$privKeyObject) {
+                    return [
+                        'error' => 'La contraseña no corresponde a la clave privada'
+                    ];
+                }
+            }
+            $begin = "-----BEGIN CERTIFICATE-----";
+            $end   = "-----END CERTIFICATE-----";
+            $pem_data = substr($contents, strpos($contents, $begin)+strlen($begin));
+            $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+            $certout = $begin. $pem_data . $end;
+            $certest = openssl_x509_parse($certout);
+            if (!$certest) {
+                return [
+                    'error' => 'No se pudo encontrar un certificado en el fichero'
+                ];
+            }
+            dump($privKey, $certout, openssl_x509_parse($certout));
+            $creqOptions = "Datos importados de fichero externo";
+            unset($data['common']);
+            unset($data['interval']);
+        }
 
-        $csr = openssl_csr_new($data['common'], $privKey);
+        if (!$certout) {
+            $privKey = $this->new_private_key();
 
-        $creqOptions = self::CAConfigArgs;
-        $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], $creqOptions);
-        openssl_x509_export($signcert, $certout);
+            $csr = openssl_csr_new($data['common'], $privKey);
 
-        // Generamos una contraseña
-        $plainPassword = $this->genPass();
+            $creqOptions = self::CAConfigArgs;
+            $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], $creqOptions);
+            openssl_x509_export($signcert, $certout);
+
+        }
+
+        if (!$plainPassword) {
+            // Generamos una contraseña
+            $plainPassword = $this->genPass();
+        }
+
         $cryptedPass = $this->cryptPass($plainPassword, $certout);
         $cryptedKey = $this->cryptKey($privKey, $plainPassword);
 
@@ -260,6 +313,7 @@ class Certificate
         //$signcert = openssl_csr_sign($csr, $caCertData['cert'], [$cryptedCAKey, $plainPassword], $data['interval']['duration'], $creqOptions);
         $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions);
         openssl_x509_export($signcert, $certout);
+        dd(openssl_x509_verify($signcert, $caCertData['cert']));
         //dump($creqOptions, $signcert, openssl_x509_parse($certout));
 
         // Ciframos la contraseña
