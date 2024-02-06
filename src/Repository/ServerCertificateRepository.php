@@ -2,7 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\ServerCertificate;
+use App\Entity\ServerCertificate as Entity;
+use App\Utils\Certificate;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,9 +17,18 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ServerCertificateRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $certUtil;
+
+    public function __construct(ManagerRegistry $registry, Certificate $certUtil)
     {
-        parent::__construct($registry, ServerCertificate::class);
+        parent::__construct($registry, Entity::class);
+
+        $this->$certUtil = $certUtil;
+    }
+
+    public function extractCertData(Entity $entity)
+    {
+        return $this->certUtil->extractX509Data($entity);
     }
 
 //    /**

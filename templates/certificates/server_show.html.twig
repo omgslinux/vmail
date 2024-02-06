@@ -14,8 +14,8 @@
             </tr>
             {% for entity in entities %}
             <tr>
-                <td>{{ entity.description }}</a></td>
-                <td>{{ entity.interval.notBefore.date|date('d-m-Y') }}</td>
+                <td>{{ entity.description }} ({{ entity.certdata.subject.commonName }})</a></td>
+                <td>{{ entity.interval.notBefore.date|date('d/m/Y') }}</td>
                 <td>{{ entity.interval.notAfter.date|date('d/m/Y') }}</td>
                 <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'certkey'}) }}">Download</a></td>
                 <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'chain'}) }}">Download</a></td>

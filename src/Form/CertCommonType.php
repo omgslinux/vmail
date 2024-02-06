@@ -102,7 +102,7 @@ class CertCommonType extends AbstractType
             ]
             )
             ;
-            if ($options['certtype']=='ca') {
+            if ($options['certtype']=='ca' && null==$options['subject']) {
 
                 $builder
                 ->add(
@@ -113,7 +113,7 @@ class CertCommonType extends AbstractType
                         'constraints' => [
                             new File(
                                 [
-                                    'maxSize' => '150M'
+                                    'maxSize' => '1M'
                                 ]
                             )
                         ]

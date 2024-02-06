@@ -30,8 +30,9 @@ class CertIntervalType extends AbstractType
             'notBefore',
             DateType::class,
             [
-                'widget' => 'single_text',
                 'label' => 'NotBefore',
+                'disabled' => null!=$options['interval'],
+                'widget' => 'single_text',
                 //'data' => \DateInterval::createFromDateString($options['interval']['NotBefore']),
                 //'data'  => new \DateTime()
                 //'data'  => $options['interval']['NotBefore']
@@ -43,8 +44,9 @@ class CertIntervalType extends AbstractType
             'notAfter',
             DateType::class,
             [
-                'widget' => 'single_text',
                 'label' => 'NotAfter',
+                'widget' => 'single_text',
+                'disabled' => null!=$options['interval'],
                 //'data' => (null!=$options['interval']?$options['interval']['NotAfter']:null),
                 'data'  => $notAfter
           ]
@@ -55,6 +57,7 @@ class CertIntervalType extends AbstractType
             DateIntervalType::class,
             [
                 'label' => 'Interval',
+                'disabled' => null!=$options['interval'],
                 'data' => \DateInterval::createFromDateString($options['duration'])??null,
             ]
         );

@@ -4,6 +4,7 @@ namespace App\Utils;
 
 use App\Entity\Domain;
 use App\Entity\User;
+use App\Entity\ServerCertificate;
 use Symfony\Component\HttpFoundation\Response;
 //use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -460,6 +461,13 @@ class Certificate
             'cert' => $certData['certdata']['cert'],
             'privKey' => $privKey,
         ];
+    }
+
+    public function extractX509Data(ServerCertificate $certificate): array
+    {
+        $certData = $certificate->getCertData();
+        $cer = $certData['certdata']['cert'];
+        return openssl_x509_parse($cer, false);
     }
 
     public function genPass(): string

@@ -93,7 +93,7 @@ class CertificateController extends AbstractController
                 'NotBefore' => $this->util::convertUTCTime2Date($cert['validFrom']),
                 'NotAfter'  => $this->util::convertUTCTime2Date($cert['validTo']),
             ];
-            dump($certData, $cert, $certInterval);
+            //dump($certData, $cert, $certInterval);
             //dump($cert['subject']);
         }
         $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'interval' => $certInterval, 'duration' => '10 years']);
@@ -101,9 +101,8 @@ class CertificateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $files = $request->files->all();
-            $csvfile = $csvcontents = null;
+            $csvcontents = null;
             foreach ($files as $file) {
-                //dump($file);
                 $csvfile = $file['common']['customFile'];
                 $csvcontents = file_get_contents($csvfile);
             }
@@ -114,7 +113,6 @@ class CertificateController extends AbstractController
             if (!empty($certData['error'])) {
                 $this->addFlash('error', $certData['error']);
             } else {
-                //dump(openssl_x509_parse($certData['certdata']['cert']));
                 $domain->setCertData($certData);
                 $this->repo->add($domain, true);
                 $this->addFlash('success', 'Se creó el certificado');
@@ -188,6 +186,9 @@ class CertificateController extends AbstractController
             $certout = $certData['certdata']['cert'];
             $cert = openssl_x509_parse($certout, false);
             $certSubject = $cert['subject'];
+            // Eliminamos el commonName
+            unset($certSubject['commonName']);
+            //dump($certSubject);
         }
 
         $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'server', 'duration' => '5 years']);
@@ -202,9 +203,10 @@ class CertificateController extends AbstractController
             $certData = $this->util->createServerCert($formData);
             //dump($formData, $certData);
             //dump(openssl_x509_parse($certData['certdata']['cert']));
+            $d = $formData['common']['commonName'];
             $serverCertificate = new ServerCertificate();
             $serverCertificate->setDomain($domain)
-            ->setDescription($formData['common']['commonName'])
+            ->setDescription($d!='*'?$d:'wildcard')
             ->setCertData($certData);
             $domain->addServerCertificate($serverCertificate);
             $this->repo->add($domain, true);
@@ -233,13 +235,14 @@ class CertificateController extends AbstractController
                 $data = [
                     'description' => $certificate->getDescription(),
                     'domain' => $certificate->getDomain(),
+                    'certdata' => $this->util->extractX509Data($certificate),
                     'interval' => $certData['interval'],
                     'entity' => $certificate,
                 ];
                 $entities[] = $data;
             }
         }
-        //dump($entities);
+        dump($entities);
 
         return $this->render('certificates/server_show.html.twig',
           [
