@@ -229,20 +229,24 @@ class CertificateController extends AbstractController
         $entities = [];
         foreach ($domain->getServerCertificates() as $certificate) {
             if (null!=$certData=$domain->getCertData()) {
-                //dump($certData);
                 $certout = $certData['certdata']['cert'];
                 $cert = openssl_x509_parse($certout, false);
+                $certInterval = [
+                    'notBefore' => $this->util::convertUTCTime2Date($cert['validFrom']),
+                    'notAfter'  => $this->util::convertUTCTime2Date($cert['validTo']),
+                ];
+                //dump($certData, $cert, $certInterval);
                 $data = [
                     'description' => $certificate->getDescription(),
                     'domain' => $certificate->getDomain(),
                     'certdata' => $this->util->extractX509Data($certificate),
-                    'interval' => $certData['interval'],
+                    'interval' => $certInterval,
                     'entity' => $certificate,
                 ];
                 $entities[] = $data;
             }
         }
-        dump($entities);
+        //dump($entities);
 
         return $this->render('certificates/server_show.html.twig',
           [
