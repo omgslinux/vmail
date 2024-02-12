@@ -316,6 +316,9 @@ class Certificate
         // Obtenemos el certificado y la clave sin cifrar
         $caCertData = $this->extractCAData($this->domain);
         $data = $this->extractFormData($formData);
+        if (null==$data['common']['organizationalUnitName']) {
+            unset($data['common']['organizationalUnitName']);
+        }
         if ($type=='server') {
             $extensions = 'server_ext';
             $data['common']['commonName'] .= '.' . $this->domain->getName();
@@ -323,9 +326,6 @@ class Certificate
             $eUser = $data['common']['emailAddress'];
             $data['common']['commonName'] = $eUser->getFullName();
             $data['common']['emailAddress'] = $eUser->getEmail();
-            if (null==$data['common']['organizationalUnitName']) {
-                unset($data['common']['organizationalUnitName']);
-            }
             //dd($data);
             $extensions = 'client_ext';
         }
