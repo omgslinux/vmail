@@ -323,6 +323,9 @@ class Certificate
             $eUser = $data['common']['emailAddress'];
             $data['common']['commonName'] = $eUser->getFullName();
             $data['common']['emailAddress'] = $eUser->getEmail();
+            if (null==$data['common']['organizationalUnitName']) {
+                unset($data['common']['organizationalUnitName']);
+            }
             //dd($data);
             $extensions = 'client_ext';
         }
@@ -331,6 +334,7 @@ class Certificate
         $plainPassword=$this->genPass();
 
         $privKey = $this->new_private_key();
+        //dump($data['common']);
         $csr = openssl_csr_new($data['common'], $privKey);
         //openssl_pkey_export($caCertData['privKey'], $cryptedCAKey, $plainPassword);
         //dump($csr, $cryptedCAKey);
@@ -343,7 +347,7 @@ class Certificate
         //$signcert = openssl_csr_sign($csr, $caCertData['cert'], [$cryptedCAKey, $plainPassword], $data['interval']['duration'], $creqOptions);
         $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions);
         openssl_x509_export($signcert, $certout);
-        dd(openssl_x509_verify($signcert, $caCertData['cert']));
+        //dd(openssl_x509_verify($signcert, $caCertData['cert']));
         //dump($creqOptions, $signcert, openssl_x509_parse($certout));
 
         // Ciframos la contraseña
