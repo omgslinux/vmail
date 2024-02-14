@@ -70,7 +70,7 @@ class SelfController extends AbstractController
 
         if ($certificateform->isSubmitted() && $certificateform->isValid()) {
             $formData = $certificateform->getData();
-            dump($certificateform, $formData);
+            dd($certificateform, $formData);
             //dd($certificateform->getClickedButton()->getName());
             return $cUtil->certDownload(
                 'client',

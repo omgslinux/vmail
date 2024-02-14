@@ -12,6 +12,7 @@ use App\Entity\Domain;
 use App\Form\UserType;
 use App\Repository\UserRepository as REPO;
 use App\Repository\DomainRepository;
+use App\Utils\Certificate;
 
 /**
  * User controller.
@@ -250,4 +251,23 @@ class UserController extends AbstractController
 
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route(path: '/ca/download/', name: 'ca_download', methods: ['GET', 'POST'])]
+    public function serverDownload(Request $request, Certificate $util): Response
+    {
+        $entity = $this->getUser();
+        $dtype = 'chain';
+        if (($dtype == 'chain')) {
+            //$this->addFlash('success', 'Se creo el certificado');
+            return $util
+            //->setDomain($domain)
+            ->certDownload('ca', [$entity, $dtype]);
+
+        } else {
+            $this->addFlash('error', "Opción incorrecta $dtype");
+        }
+        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+    }
+
+
 }

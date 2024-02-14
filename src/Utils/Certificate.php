@@ -440,20 +440,6 @@ class Certificate
         return $this->extractCertData($domain->getCertData());
     }
 
-    private function extractCADataOLD(Domain $domain): array
-    {
-        $caCertData = $domain->getCertData();
-        //$caKey = $caCertData['certdata']['privKey'];
-        $key = $this->decryptPass($caCertData['certdata']['strfactor'], $caCertData['certdata']['strdata']);
-        $caKey = $this->decryptKey($caCertData['certdata']['privKey'], $key);
-        //dump($caCertData, $key, $caKey);
-
-        return [
-            'cert' => $caCertData['certdata']['cert'],
-            'privKey' => $caKey,
-        ];
-    }
-
     private function extractCertData($certData): array
     {
         //$caKey = $caCertData['certdata']['privKey'];
@@ -498,18 +484,15 @@ class Certificate
         if ($category=='server') {
             list($certificate, $dtype) = $params;
             //$certData = $certificate->getCertData()['certdata'];
-            $certData = $this->extractCertData($certificate->getCertData()['certdata']);
-            //dump($certData);
+            $certData = $this->extractCertData($certificate->getCertData());
+            dump($certData);
             $filename = $certificate->getDescription() . '.' . $certificate->getDomain()->getName();
             $filename .= '-' . $dtype . '.pem';
             if ($dtype=='chain') {
                 $caCertData = $this->extractCAData($certificate->getDomain());
                 $stream .= $caCertData['cert'];
                 $stream .= $certData['cert'];
-                $stream .= $castream;
             } else {
-                $plainPassword = $this->decryptPass($certData['strfactor'], $certData['strdata']);
-                //$privKey = $this->decryptKey($certData['privKey'], $plainPassword);
                 $stream .= $certData['cert'] . $certData['privKey'];
             }
         } elseif ($category=='client') {
@@ -550,6 +533,14 @@ class Certificate
             }
             //dd($caCertData, $certData, ($format=='pem'?$stream:''));
         } elseif ($category=='ca') {
+            list($user, $dtype) = $params;
+            $filename = $user->getDomain()->getName();
+            $filename .= '-' . $dtype . '.pem';
+            $caCertData = $this->extractCAData($user->getDomain());
+            $stream .= $caCertData['cert'];
+            if ($dtype=='certkey') {
+                $stream .= $caCertData['privKey'];
+            }
 
         } else {
             return [
@@ -578,6 +569,11 @@ class Certificate
 
             return $response;
 
+    }
+
+    public function __toString()
+    {
+        return '';
     }
 
 }
