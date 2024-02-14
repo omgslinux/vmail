@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ServerCertificateRepository extends ServiceEntityRepository
 {
-    private $certUtil;
+    private Certificate $certUtil;
 
     public function __construct(ManagerRegistry $registry, Certificate $certUtil)
     {
