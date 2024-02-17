@@ -19,7 +19,7 @@
                 {#}<td><a href="{{ path(VARS.PREFIX ~ 'showbyname', { 'name': entity.name }) }}">{{ entity.name }}</td>#}
                 <td>{{ entity.name }}</td>
                 <td><a href="{{ path(VARS.PREFIX ~ 'ca', { 'id': entity.id }) }}">Manage CA</a></rd>
-                <td>{% if entity.certdata %}<a href="{{ path(VARS.PREFIX ~ 'client_new', { 'id': entity.id }) }}">Mangage Client Certificate</a>{% else %}--{% endif %}</td>
+                <td>{% if entity.certdata %}<a href="{{ path(VARS.PREFIX ~ 'client_new', { 'id': entity.id }) }}">Manage Client Certificate</a>{% else %}--{% endif %}</td>
                 <td>{% if entity.certdata %}<a href="{{ path(VARS.PREFIX ~ 'server_show', { 'id': entity.id }) }}">Manage server certificates</a>{% else %}--{% endif %}</td>
             </tr>
         {% endfor %}

@@ -110,6 +110,7 @@ class CertCommonType extends AbstractType
                     FileType::class,
                     [
                         'mapped' => false,
+                        'required' => false,
                         'constraints' => [
                             new File(
                                 [

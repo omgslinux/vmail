@@ -93,7 +93,7 @@ class CertificateController extends AbstractController
                 'NotBefore' => $this->util::convertUTCTime2Date($cert['validFrom']),
                 'NotAfter'  => $this->util::convertUTCTime2Date($cert['validTo']),
             ];
-            //dump($certData, $cert, $certInterval);
+            dump($certData, $cert, $certInterval);
             //dump($cert['subject']);
         }
         $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'interval' => $certInterval, 'duration' => '10 years']);
@@ -102,9 +102,12 @@ class CertificateController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $files = $request->files->all();
             $csvcontents = null;
+            //dump($files);
             foreach ($files as $file) {
                 $csvfile = $file['common']['customFile'];
-                $csvcontents = file_get_contents($csvfile);
+                if (null!=$csvfile) {
+                    $csvcontents = file_get_contents($csvfile);
+                }
             }
             $formData = $form->getData();
             //dump($form, $formData, $csvcontents);
@@ -148,9 +151,12 @@ class CertificateController extends AbstractController
             //dump($formData['common']);
             $user = $formData['common']['emailAddress'];
             $certData = $this->util->createClientCert($formData);
-            //dd($certData);
+            $indexData = $this->util->addToIndex($certData['certdata']['cert']);
+            //dd($certData, $indexData);
             $user->setCertData($certData);
             $userRepo->add($user, true);
+            $this->repo->updateCAIndex($domain, $indexData);
+            $this->addFlash('success', 'Se creo el certificado');
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
@@ -209,7 +215,10 @@ class CertificateController extends AbstractController
             ->setDescription($d!='*'?$d:'wildcard')
             ->setCertData($certData);
             $domain->addServerCertificate($serverCertificate);
-            $this->repo->add($domain, true);
+            $indexData = $this->util->addToIndex($certData['certdata']['cert']);
+            //dd($indexData);
+            //$this->repo->add($domain, true);
+            $this->repo->updateCAIndex($domain, $indexData);
             $this->addFlash('success', 'Se creo el certificado');
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
