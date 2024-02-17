@@ -17,13 +17,13 @@
                 <td>{{ entity.description }} ({{ entity.certdata.subject.commonName }})</a></td>
                 <td>{{ entity.interval.notBefore|date('d/m/Y') }}</td>
                 <td>{{ entity.interval.notAfter|date('d/m/Y') }}</td>
-                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'certkey'}) }}">Download</a></td>
-                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'chain'}) }}">Download</a></td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'certkey'}) }}">{% trans %}Download{% endtrans %}</a></td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'chain'}) }}">{% trans %}Download{% endtrans %}</a></td>
             </tr>
             {% endfor %}
             <tr>
                 <td>
-                    <a href="{{ path(VARS.PREFIX ~ 'server_new', {'id': domain.id }) }}">{% trans %}Create a new server certificate{% endtrans %}</a>
+                    <a href="{{ path(VARS.PREFIX ~ 'server_new', {'id': domain.id }) }}">{% trans %}Create certificate{% endtrans %}</a>
                 </td>
             </tr>
             <tr>
