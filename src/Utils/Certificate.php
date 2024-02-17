@@ -42,7 +42,7 @@ class Certificate
     public function addToIndex($certout): array
     {
         $cert = openssl_x509_parse($certout, false);
-        dump($cert);
+        //dump($cert);
         $key = $cert['subject']['commonName'] . '|' . $cert['serialNumber'] . '|' . $cert['hash'];
         return [$key => [
             'status' => 'V',
@@ -51,6 +51,37 @@ class Certificate
             'name' => $cert['name'],
             ]
         ];
+    }
+
+    private function dumpIndex(Domain $domain)
+    {
+        /*        The 6 fields are:
+
+        0) Entry type. May be "V" (valid), "R" (revoked) or "E" (expired).
+        Note that an expired may have the type "V" because the type has
+        not been updated. 'openssl ca updatedb' does such an update.
+        1) Expiration datetime.
+        2) Revokation datetime. This is set for any entry of the type "R".
+        3) Serial number.
+        4) File name of the certificate. This doesn't seem to be used,
+        ever, so it's always "unknown".
+        5) Certificate subject name.
+        */
+
+        $caCertData = $domain->getCertData();
+        $indexData = $caCertData['index'];
+        $crlData = "";
+        foreach ($indexData as $key => $value) {
+            $crlData .= "\t" . $value['status'] .
+                "\t" . $value['validTo'] .
+                "\t" . (!empty($value['revokeTime'])??"") .
+                "\t" . $value['serialNumber'] .
+                "\t" . "unknown" .
+                "\t" . $value['name']
+                ;
+        }
+        $filename = '../public/crl/' . $domain->getName() . '_index.txt';
+        file_put_contents($filename, $crlData);
     }
 
     public function new_private_key(): string
@@ -108,7 +139,7 @@ class Certificate
             array $args = ?
         ): bool
         */
-        dump($params);
+        //dump($params);
         $f = $params['filename'];
         unset($params['filename']);
         if (!empty($params['filename'])) {
@@ -151,7 +182,6 @@ class Certificate
         $intervalData = $form;
         $interval = $form['interval'];
         if ($interval->d != "0" || $interval->m!="0"|| $interval->y!="0") {
-            //dump("Hay que calcular la fecha de fin");
             $end = new \DateTime($form['notBefore']->format('Y-m-d'));
             $str="";
             if ($interval->d!="0") {
@@ -192,8 +222,6 @@ class Certificate
 
         openssl_csr_export($csr, $csrout);
 
-        //dump($csrout, $creqOptions, $csrOptions);
-
         return $csr;
     }
 
@@ -229,7 +257,6 @@ class Certificate
     public function createCACert($form, $contents): array
     {
         $data = $this->extractFormData($form);
-        dump($data, $contents);
         $certout="";
         if (null!=$contents) {
             $plainPassword = $form['common']['plainPassword']['setkey']->getPlainPassword();
@@ -240,7 +267,7 @@ class Certificate
             $begin = '-----BEGIN' . $crypted . ' PRIVATE KEY-----';
             $result = strpos($contents, $begin);
             if (false===$result) {
-                dump($begin, $result);
+                //dump($begin, $result);
                 return [
                     'error' => 'No se ha podido encontrar la clave privada'
                 ];
@@ -251,9 +278,7 @@ class Certificate
             $privKey = $begin. $pem_data . $end;
             if ($crypted) {
                 $privKeyObject = openssl_pkey_get_private($privKey,  $plainPassword);
-                //openssl_pkey_export($privKeyObject, $privKey, $plainPassword);
-                //openssl_x509_export(openssl_pkey_get_public($contents), $certout);
-                dump($crypted, $privKeyObject);
+                //dump($crypted, $privKeyObject);
                 if (!$privKeyObject) {
                     return [
                         'error' => 'La contraseña no corresponde a la clave privada'
@@ -271,7 +296,7 @@ class Certificate
                     'error' => 'No se pudo encontrar un certificado en el fichero'
                 ];
             }
-            dump($privKey, $certout, openssl_x509_parse($certout));
+            //dump($privKey, $certout, openssl_x509_parse($certout));
             $creqOptions = "Datos importados de fichero externo";
             unset($data['common']);
             unset($data['interval']);
@@ -281,7 +306,7 @@ class Certificate
             $privKey = $this->new_private_key();
             $u = $data['common']['plainPassword']['setkey'];
             $plainPassword = $u->getPlainPassword();
-            dump($data, $u, $plainPassword);
+            //dump($data, $u, $plainPassword);
             unset($data['common']['plainPassword']);
             $csr = openssl_csr_new($data['common'], $privKey);
 
@@ -311,9 +336,6 @@ class Certificate
 
         //dump($data, "plainPassword: " . $plainPassword);
 
-        //dump("privKey: " . $privKey, $this->decryptKey($cryptedKey, $plainPassword));
-        //dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
-
         return $data;
     }
 
@@ -342,7 +364,6 @@ class Certificate
             $eUser = $data['common']['emailAddress'];
             $data['common']['commonName'] = $eUser->getFullName();
             $data['common']['emailAddress'] = $eUser->getEmail();
-            //dd($data);
             $extensions = 'client_ext';
         }
 
@@ -353,22 +374,17 @@ class Certificate
         //dump($data['common']);
         $csr = openssl_csr_new($data['common'], $privKey);
         $serial = 100;
-        dump($this->domain->getCertData());
         if (!empty($this->domain->getCertData()['serial'])) {
             $serial = intval($this->domain->getCertData()['serial']);
         }
-        //openssl_pkey_export($caCertData['privKey'], $cryptedCAKey, $plainPassword);
-        dump($csr, $caCertData, $serial);
+        //dump($csr, $caCertData, $serial);
         $creqOptions = array_merge(
             self::basicCertConfg,
             ['config' => self::confFile],
             ['x509_extensions' => $extensions]
         );
-        //dump(file_get_contents($creqOptions['config']));
-        //$signcert = openssl_csr_sign($csr, $caCertData['cert'], [$cryptedCAKey, $plainPassword], $data['interval']['duration'], $creqOptions);
         $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions, $serial);
         openssl_x509_export($signcert, $certout);
-        //dd(openssl_x509_verify($signcert, $caCertData['cert']));
         //dump($creqOptions, $signcert, openssl_x509_parse($certout));
 
         // Ciframos la contraseña
@@ -385,9 +401,6 @@ class Certificate
             $cryptedPass
         );
         //dump($data);
-
-        //dump($privKey, $this->decryptKey($cryptedKey, $plainPassword));
-        //dd($plainPassword, $this->decryptPass($cryptedPass['strfactor'], $cryptedPass['strdata']));
 
         return $data;
 
@@ -417,12 +430,10 @@ class Certificate
 
     private function decryptKey(array $cipherdata, $key): string
     {
-        //dump($cipherdata, $key);
         $cipher = $cipherdata['cipher'];
         $tag = $cipherdata['tag'];
         $cryptKey = $cipherdata['cryptKey'];
         $iv = $cipherdata['iv'];
-        //$privKey = openssl_decrypt($cryptKey, $cipher, $key, $options=0, $iv, hex2bin($tag));
         $privKey = openssl_decrypt($cipherdata['cryptKey'], $cipherdata['cipher'], $key, $options=0, hex2bin($cipherdata['iv']), hex2bin($cipherdata['tag']));
 
         //dump("decrypted Key: ". $privKey);
@@ -466,7 +477,7 @@ class Certificate
     {
         $key = $this->decryptPass($certData['certdata']['strfactor'], $certData['certdata']['strdata']);
         $privKey = $this->decryptKey($certData['certdata']['privKey'], $key);
-        dump($certData, $key, $privKey);
+        //dump($certData, $key, $privKey);
 
         return [
             'cert' => $certData['certdata']['cert'],
@@ -496,7 +507,6 @@ class Certificate
     public function certDownload(string $category, array $params)
     {
         $stream = "";
-        dump($params);
         // Mensaje común predeterminado
         $message = [
             'succes' => 'OK',
@@ -521,7 +531,6 @@ class Certificate
             $user = $params['setkey'];
             $filename = $user->getEmail() . '.' . ($format=='pkcs12'?'pfx':'pem');
             $plainPassword = $user->getPlainPassword();
-            //dump("format: " . $format, $user, $plainPassword, "filename: " . $filename);
             $certData = $this->extractCertData($user->getCertData());
             $caCertData = $this->extractCAData($user->getDomain());
             if ($format=='pem') {

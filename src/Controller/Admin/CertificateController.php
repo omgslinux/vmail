@@ -93,8 +93,7 @@ class CertificateController extends AbstractController
                 'NotBefore' => $this->util::convertUTCTime2Date($cert['validFrom']),
                 'NotAfter'  => $this->util::convertUTCTime2Date($cert['validTo']),
             ];
-            dump($certData, $cert, $certInterval);
-            //dump($cert['subject']);
+            //dump($certData, $cert, $certInterval);
         }
         $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'interval' => $certInterval, 'duration' => '10 years']);
         $form->handleRequest($request);
@@ -102,7 +101,6 @@ class CertificateController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $files = $request->files->all();
             $csvcontents = null;
-            //dump($files);
             foreach ($files as $file) {
                 $csvfile = $file['common']['customFile'];
                 if (null!=$csvfile) {
@@ -110,7 +108,6 @@ class CertificateController extends AbstractController
                 }
             }
             $formData = $form->getData();
-            //dump($form, $formData, $csvcontents);
             $certData = $this->util->createCACert($formData, $csvcontents);
             //dd($certData);
             if (!empty($certData['error'])) {
@@ -148,7 +145,6 @@ class CertificateController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
             $this->util->setDomain($domain);
-            //dump($formData['common']);
             $user = $formData['common']['emailAddress'];
             $certData = $this->util->createClientCert($formData);
             $indexData = $this->util->addToIndex($certData['certdata']['cert']);
@@ -175,7 +171,6 @@ class CertificateController extends AbstractController
         if (($dtype == 'pkcs12') || ($dtype == 'certkey')) {
             $this->addFlash('success', 'Se creo el certificado');
             return $this->util
-            //->setDomain($domain)
             ->certDownload('client', [$user, $dtype]);
 
         } else {
@@ -194,21 +189,16 @@ class CertificateController extends AbstractController
             $certSubject = $cert['subject'];
             // Eliminamos el commonName
             unset($certSubject['commonName']);
-            //dump($certSubject);
         }
 
         $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'server', 'duration' => '5 years']);
         $form->handleRequest($request);
 
-        //dump($form);
         if ($form->isSubmitted() && $form->isValid()) {
-            //dd($request);
-            //system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
             $formData = $form->getData();
             $this->util->setDomain($domain);
             $certData = $this->util->createServerCert($formData);
             //dump($formData, $certData);
-            //dump(openssl_x509_parse($certData['certdata']['cert']));
             $d = $formData['common']['commonName'];
             $serverCertificate = new ServerCertificate();
             $serverCertificate->setDomain($domain)
@@ -273,7 +263,6 @@ class CertificateController extends AbstractController
         if (($dtype == 'chain') || ($dtype == 'certkey')) {
             $this->addFlash('success', 'Se creo el certificado');
             return $this->util
-            //->setDomain($domain)
             ->certDownload('server', [$certificate, $dtype]);
 
         } else {
