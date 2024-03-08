@@ -6,6 +6,7 @@ Overview
 ========
 
 Vmail tries to solve the problem about user management for virtual mail domains. You can manage lots of domains, and the users for each domain, along with specific domain users, password management and autoreply management for each user. Also, each user can login and change his/her password and manage an autoreply, specifying start datetime, end datetime, and the text to send as reply for the people who send mails while out of the office.
+In version 0.4.0, basic CA features are implemented.
 
 So, a first domain with id 0 (ideally called "default", is necessary). Then, you create a user and initially encode a chosen password, assigning 0 as domain_id for this user. Then, you can login with <code>user@default</code> and you get ROLE_ADMIN, with full privileges.
 
@@ -33,9 +34,9 @@ Prerequisites (as root):
 - Create <code>/var/lib/vmail/</code> directory, and set <code>vmail:vmail</code> as owner and 770 as permissions.
 
   <code># mkdir -p /var/lib/vmail</code>
-  
+
   <code># chown vmail:vmail /var/lib/vmail</code>
-  
+
   <code># chmod 770 /var/lib/vmail</code>
 - Install courier-imap-ssl (in /etc/courier) and setup everything but <code>authmysqlrc</code>. IMPORTANT: for SHA512 (the default), you may need to edit <code>/etc/courier/imapd</code> and add in the line IMAP_CAPABILITY an extra "AUTH=CRAM-SHA512" at the end of the line.
 - Install other mail related stuff like gamin, amavis, spamassassing and postfix.
