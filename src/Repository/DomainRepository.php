@@ -64,6 +64,18 @@ class DomainRepository extends ServiceEntityRepository
         }
     }
 
+    public function updateCAIndex(Entity $entity, $indexData): void
+    {
+        $caCertData = $entity->getCertData();
+        foreach ($indexData as $key => $value) {
+            $caCertData['index'][$key] = $value;
+        }
+        $caCertData['serial'] = ++$value['serialNumber'];
+        $entity->setCertData($caCertData);
+        //dd($entity, $indexData);
+        $this->add($entity, true);
+    }
+
 //    /**
 //     * @return Booking[] Returns an array of Booking objects
 //     */

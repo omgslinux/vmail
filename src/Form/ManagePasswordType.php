@@ -26,10 +26,16 @@ class ManagePasswordType extends AbstractType
                 'first_options' =>
                 [
                     'label' => 'Password',
+                    'attr' => [
+                        'autocomplete' => 'new-password'
+                    ]
                 ],
                 'second_options' =>
                 [
                     'label' => 'Confirm password',
+                    'attr' => [
+                        'autocomplete' => 'new-password'
+                    ]
                 ],
             ]
         );

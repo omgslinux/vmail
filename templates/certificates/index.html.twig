@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% set tagPrefix = 'create' %}
+    <h1>{{ title|trans }}</h1>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}CA{% endtrans %}</th>
+                <th>{% trans %}Client{% endtrans %}</th>
+                <th>{% trans %}Server{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                {#}<td><a href="{{ path(VARS.PREFIX ~ 'showbyname', { 'name': entity.name }) }}">{{ entity.name }}</td>#}
+                <td>{{ entity.name }}</td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'ca', { 'id': entity.id }) }}">{% trans %}Manage CA{% endtrans %}</a></rd>
+                <td>{% if entity.certdata %}<a href="{{ path(VARS.PREFIX ~ 'client_new', { 'id': entity.id }) }}">{% trans%}Manage client certificates{% endtrans %}</a>{% else %}--{% endif %}</td>
+                <td>{% if entity.certdata %}<a href="{{ path(VARS.PREFIX ~ 'server_show', { 'id': entity.id }) }}">{% trans %}Manage server certificates{% endtrans %}</a>{% else %}--{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if is_granted('ROLE_ADMIN') %}
+        {% set modalTitle = 'Create certificate' %}
+        {{ include('_modal.html.twig', {
+          'noajax': true
+          })
+        }}
+    {% endif %}
+
+{% endblock %}

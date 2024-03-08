@@ -26,7 +26,7 @@ class DomainController extends AbstractController
     const TABS = [
         [
           'n' => 'users',
-          't' => 'Usuarios',
+          't' => 'Users',
         ],
         [
           'n' => 'aliases',
