@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{% trans %}Server certificates{% endtrans %}</h1>
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}NotBefore{% endtrans %}</th>
+                <th>{% trans %}NotAfter{% endtrans %}</th>
+                <th>{% trans %}Download cert and key{% endtrans %}</th>
+                <th>{% trans %}Download full chain{% endtrans %}</th>
+            </tr>
+            {% for entity in entities %}
+            <tr>
+                <td>{{ entity.description }} ({{ entity.certdata.subject.commonName }})</a></td>
+                <td>{{ entity.interval.notBefore|date('d/m/Y') }}</td>
+                <td>{{ entity.interval.notAfter|date('d/m/Y') }}</td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'certkey'}) }}">{% trans %}Download{% endtrans %}</a></td>
+                <td><a href="{{ path(VARS.PREFIX ~ 'server_download', {'id': entity.entity.id, 'dtype': 'chain'}) }}">{% trans %}Download{% endtrans %}</a></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                    <a href="{{ path(VARS.PREFIX ~ 'server_new', {'id': domain.id }) }}">{% trans %}Create certificate{% endtrans %}</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="{{ path(VARS.PREFIX ~ 'index') }}">{% trans %}Back to cert menu{% endtrans %}</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock %}

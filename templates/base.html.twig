@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}VMAIL{% if title is defined %} - {{ title }}{% endif %}{% if is_granted('ROLE_USER') %} - ({{ app.user.username }}/{{ app.user.getRol }}/id:{{ app.user.id }}){% endif %}{% endblock %}</title>
+        {#}<title>{% block title %}VMAIL{% if title is defined %} - {{ title }}{% endif %}{% if is_granted('ROLE_USER') %} - ({{ app.user.username }}/{{ app.user.getRol }}/id:{{ app.user.id }}){% endif %}{% endblock %}</title>#}
         {% block stylesheets %}
           <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="{{ asset('components/css/bootstrap.css') }}" />

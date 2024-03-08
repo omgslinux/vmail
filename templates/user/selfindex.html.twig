@@ -3,8 +3,8 @@
 {% block body %}
 <style>
 .dashboard {
-    width: 500px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
     border-radius: 10px;
     gap: 20px;
 }
@@ -28,6 +28,10 @@
     background: orange;
     border-radius: inherit;
 }
+#usercertificate {
+    background: darkcyan;
+    border-radius: inherit;
+}
 </style>
     <div class="dashboard d-flex flex-column">
         {% if is_granted('ROLE_ADMIN') %}
@@ -35,6 +39,11 @@
             <li>
                 <a class="btn btn-primary" href="{{ path('admin_domain_index') }}">
                 {% trans %}Domain administration{% endtrans %}
+                </a>
+            </li>
+            <li>
+                <a class="btn btn-primary" href="{{ path('admin_certificate_index') }}">
+                {% trans %}Certificate administration{% endtrans %}
                 </a>
             </li>
         </div>
@@ -46,6 +55,13 @@
                 {% trans %}Users in domain{% endtrans %}
                 </a>
             </li>
+            {% if user.domain.certdata %}
+            <li>
+                <a class="btn btn-primary" href="{{ path('manage_user_ca_download') }}">
+                {% trans %}Download CA certificate{% endtrans %}
+                </a>
+            </li>
+            {% endif %}
         </div>
         {% endif %}
         {% if is_granted('ROLE_USER') %}
@@ -81,7 +97,26 @@
               'noajax': true,
               })
             }}
-
+        </div>
+            {% if user.certData %}
+                {% set tagPrefix = 'certificate' %}
+                {% set modalId = 'usercertificate' %}
+                {% set modalSize, included = 'modal-lg', 'certificates/_download' %}
+                {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+            <h1>Descarga de certificados</h1>
+            <div id="usercertificate" class="item">
+                {% set modalTitle = 'User certificate download' %}
+                <li>
+                    <a class="btn btn-primary item" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    </a>
+                </li>
+            {{ include('_modal.html.twig', {
+              'nobutton': true,
+              'form': certificateform,
+              'noajax': true,
+              })
+            }}
+            {% endif %}
             </div>
             <hr>
         {% endif %}
