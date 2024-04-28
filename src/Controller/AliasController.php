@@ -197,7 +197,7 @@ class AliasController extends AbstractController
         );
 
         $session = $request->getSession();
-        if ($origin) {
+        if (null!=$origin) {
             $session->remove($ORIGIN);
             $session->set($ORIGIN, $origin);
         }
@@ -205,6 +205,8 @@ class AliasController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $origin = $session->get($ORIGIN);
             $session->remove($ORIGIN);
+
+            $this->repo->add($alias, true);
 
             if (null==$origin) {
                 //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
