@@ -207,16 +207,6 @@ class DomainController extends AbstractController
         }
 
 
-        // Formulario de los alias
-        $aliasform->handleRequest($request);
-        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
-            $ur->add($alias, true);
-            $session->set('activetab', 'aliases');
-
-            $reload = true;
-        }
-
-
         if ($reload) {
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
         } else {
@@ -243,6 +233,7 @@ class DomainController extends AbstractController
             ]
         );
     }
+
 
     /**
      * Creates a form to show a entity.
