@@ -1,6 +1,41 @@
+const aliasready = (callback) => {
+    if (document.readyState != "loading") callback();
+    else document.addEventListener("DOMContentLoaded", callback);
+}
+
+aliasready(() => {
+  /* Do things after DOM has fully loaded */
+    const editaliasesModal = document.querySelector('#editaliasesModal');
+    // const editaliasesModal = document.querySelector('form');
+    editaliasesModal.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'add-aliasname') {
+            e.preventDefault();
+
+            const aliasesTable = editaliasesModal.querySelector('#aliasnames-container');
+            const collectionHolder = aliasesTable.querySelector('tbody');
+            collectionHolder.dataset.index = collectionHolder.querySelector('tr').length;
+            const index = parseInt(collectionHolder.dataset.index);
+            console.log(aliasesTable);
+            const prototype = aliasesTable.dataset.prototype;
+            const newForm = prototype.replace(/__name__/g, index);
+            collectionHolder.dataset.index = index + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = newForm;
+            collectionHolder.appendChild(newRow);
+            newRow.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('delete-aliasname')) {
+                    e.preventDefault();
+                    e.target.parentNode.parentNode.remove();
+                }
+            });
+        }
+    });
+});
+
+
+/*
 jQuery(document).ready(function() {
     var $aliasesModal = $('#editaliasesModal');
-    //var $addLink = $('#add-aliasname');
 
 
     $aliasesModal.on('click', '#add-aliasname', function(e) {
@@ -27,3 +62,4 @@ jQuery(document).ready(function() {
     });
 
 });
+*/
