@@ -22,12 +22,10 @@ aliasready(() => {
             const newRow = document.createElement('tr');
             newRow.innerHTML = newForm;
             collectionHolder.appendChild(newRow);
-            newRow.addEventListener('click', function(e) {
-                if (e.target && e.target.classList.contains('delete-aliasname')) {
-                    e.preventDefault();
-                    e.target.parentNode.parentNode.remove();
-                }
-            });
+        }
+        if (e.target && e.target.classList.contains('delete-aliasname')) {
+            e.preventDefault();
+            e.target.parentNode.parentNode.remove();
         }
     });
 });
