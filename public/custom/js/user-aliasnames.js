@@ -13,9 +13,14 @@ aliasready(() => {
 
             const aliasesTable = editaliasesModal.querySelector('#aliasnames-container');
             const collectionHolder = aliasesTable.querySelector('tbody');
-            collectionHolder.dataset.index = collectionHolder.querySelector('tr').length;
+            const collectionTableRow = collectionHolder.querySelector('tr');
+            if (collectionTableRow==null) {
+                collectionHolder.dataset.index = 0;
+            } else {
+                collectionHolder.dataset.index = collectionTableRow.length;
+            }
             const index = parseInt(collectionHolder.dataset.index);
-            console.log(aliasesTable);
+            //console.log(aliasesTable);
             const prototype = aliasesTable.dataset.prototype;
             const newForm = prototype.replace(/__name__/g, index);
             collectionHolder.dataset.index = index + 1;
