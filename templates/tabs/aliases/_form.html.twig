@@ -35,7 +35,7 @@
         </div>
     </div>
         {% if alias_form.aliasnames is defined and domain is defined %}
-          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-default"> + {% trans %}New{% endtrans %} </a></h3>
+          <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-info"> + {% trans %}New{% endtrans %} </a></h3>
           <table id="aliasnames-container" class="table table-bordered"
             data-prototype="{{ form_widget(alias_form.aliasnames.vars.prototype)|e('html_attr') }}">
             <thead>
