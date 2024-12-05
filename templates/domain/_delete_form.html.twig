@@ -1,4 +1,4 @@
-<form method="post" action="{{ path(PREFIX ~ 'delete', {'id': entity.id}) }}"
+<form method="post" id="domain-delete" action="{{ path(PREFIX ~ 'delete', {'id': entity.id}) }}"
     onsubmit="return confirm('¿Seguro que desea borrar este elemento?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ entity.id) }}">
     <button class="btn btn-danger col-2">Borrar</button>

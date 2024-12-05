@@ -45,6 +45,18 @@ class ConfigRepository extends ServiceEntityRepository
         }
     }
 
+    public function getValue(string $name): ?string
+    {
+        $entity = $this->createQueryBuilder('c')
+            ->andWhere('c.name = :val')
+            ->setParameter('val', $name)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        return (null!=$entity?$entity->getValue():null);
+    }
+
     public function rawsql($rawsql, bool $flush = false): void
     {
         $conn=$this->getEntityManager()->getConnection();
