@@ -199,7 +199,7 @@ class UserController extends AbstractController
     /**
      * Displays a form to edit an existing user entity.
      */
-    #[Route(path: '/{id}/edit/{origin}', name: 'edit', methods: ['GET', 'POST'])]
+    #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $entity, $origin = null)
     {
         $user_form = $this->createForm(
@@ -262,12 +262,9 @@ class UserController extends AbstractController
             return $util
             //->setDomain($domain)
             ->certDownload('ca', [$entity, $dtype]);
-
         } else {
             $this->addFlash('error', "Opción incorrecta $dtype");
         }
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
     }
-
-
 }
