@@ -1,0 +1,30 @@
+<div {{ attributes }}>
+
+    {% set modalId2 = this.id2 %}
+    {% if this.button %}<button class="btn btn-primary"
+    {% if liveAction is not null %}{{ live_action(liveAction) }}{% endif %}
+    data-bs-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</button>{% endif %}
+
+
+      <!-- Modal -->
+      <div class="modal fade" id="{{ modalId2 }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalId2 }}Label" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable {{ modalSize }}">
+              <div class="modal-content" id="{{ modalId2 }}-content">
+                    <div class="modal-header btn-primary">
+                        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ this.title|trans }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}"></button>
+                    </div>
+                    <div class="modal-body">
+                    {% block content %}
+                    {% endblock %}
+                    </div>
+                    <div class="modal-footer">
+                    {% block footer %}
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" {{ live_action('save') }}>Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close')}}</button>
+                    {% endblock %}
+                    </div>
+                </div>
+          </div>
+      </div>
+</div>

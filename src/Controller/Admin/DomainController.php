@@ -55,6 +55,19 @@ class DomainController extends AbstractController
     #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
     public function index(Request $request, ReadConfig $config): Response
     {
+
+        return $this->render(self::VARS['BASEDIR'] . '/index.html.twig',
+            [
+                'entities' => $this->repo->findAll(),
+                'tagPrefix' => 'admin',
+                'modalId' => 'domains',
+                'title' => 'Domain list',
+            ]
+        );
+    }
+
+    public function indexOLD(Request $request, ReadConfig $config): Response
+    {
         $entity = new Domain();
         $form = $this->createForm(DomainType::class, $entity);
         $form->handleRequest($request);
