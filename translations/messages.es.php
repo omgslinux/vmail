@@ -7,7 +7,7 @@ return array(
   'Addresses' => 'Direcciones',
   'Create a new alias' => 'Crear un alias',
   'Create a new user' => 'Crear un usuario',
-  'Create a new domain' => 'Crear un dominio',
+  'Create domain' => 'Crear un dominio',
   'Create a new config' => 'Crear una nueva configuración',
   'Create a new distribution list' => 'Crear una lista de distribución',
   'List' => 'Lista',
