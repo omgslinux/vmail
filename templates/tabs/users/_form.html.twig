@@ -78,7 +78,7 @@
     #}
     </div>
     <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
     {{ form_end(user_form) }}

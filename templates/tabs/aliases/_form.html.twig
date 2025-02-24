@@ -54,7 +54,7 @@
           </table>
         {% endif %}
     <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close') }}</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close') }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
 {{ form_end(alias_form) }}
