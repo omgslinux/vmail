@@ -19,19 +19,19 @@ class Certificate
     private $user;
     private $certData = [];
 
-    const confFile = '../public/custom/openssl.cnf';
+    const CONFFILE = '../public/custom/openssl.cnf';
 
-    const pkeyConfigArgs = [
+    const PKEYCONFIGARGS = [
         "digest_alg" => "sha512",
         "private_key_bits" => 4096,
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
     ];
-    const basicCertConfg = [
+    const BASICCERTCONFIG = [
         "digest_alg" => "sha256",
         "private_key_bits" => 4096,
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
     ];
-    const CAConfigArgs = [
+    const CACONFIGARGS = [
         "x509_extensions" => [
             'nsCertType' => 'sslCA, emailCA, objCA',
             'keyUsage' => 'keyCertSign,cRLSign',
@@ -84,32 +84,31 @@ class Certificate
         file_put_contents($filename, $crlData);
     }
 
-    public function new_private_key(): string
+    public function newPrivateKey(): string
     {
-        $res = openssl_pkey_new(self::pkeyConfigArgs);
+        $res = openssl_pkey_new(self::PKEYCONFIGARGS);
 
         // Extract the private key from $res to $privKey
         openssl_pkey_export($res, $privKey);
 
         return $privKey;
-
     }
 
     private function pem2der($pem_data)
     {
-       $begin = "CERTIFICATE-----";
-       $end   = "-----END";
-       $pem_data = substr($pem_data, strpos($pem_data, $begin)+strlen($begin));
-       $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
-       $der = base64_decode($pem_data);
-       return $der;
+        $begin = "CERTIFICATE-----";
+        $end   = "-----END";
+        $pem_data = substr($pem_data, strpos($pem_data, $begin)+strlen($begin));
+        $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+        $der = base64_decode($pem_data);
+        return $der;
     }
 
     private function der2pem($der_data): string
     {
-       $pem = chunk_split(base64_encode($der_data), 64, "\n");
-       $pem = "-----BEGIN CERTIFICATE-----\n".$pem."-----END CERTIFICATE-----\n";
-       return $pem;
+        $pem = chunk_split(base64_encode($der_data), 64, "\n");
+        $pem = "-----BEGIN CERTIFICATE-----\n".$pem."-----END CERTIFICATE-----\n";
+        return $pem;
     }
 
     public function exportPKCS12(array $params)
@@ -151,10 +150,7 @@ class Certificate
                 //[ 'extracerts' => $params['cacertdata']['cert']]
             );
             openssl_pkcs12_read(file_get_contents($params['filename']), $pfxout, $params['plainpassword']);
-
-
         } else {
-
             openssl_pkcs12_export(
                 $params['certdata']['cert'],
                 $pfx,
@@ -169,7 +165,6 @@ class Certificate
         //dd($pfxout);
 
         return $pfx;
-
     }
 
     private function extractFormCommonData($commonData): array
@@ -216,7 +211,7 @@ class Certificate
         return $data;
     }
 
-    private function genCsr($dn,  $privKey)
+    private function genCsr($dn, $privKey)
     {
         $csr = openssl_csr_new($dn, $privKey);
 
@@ -225,7 +220,8 @@ class Certificate
         return $csr;
     }
 
-    public static function convertUTCTime2Date($string) {
+    public static function convertUTCTime2Date($string)
+    {
         // Add a trailing 'Z' to indicate UTC
         $string .= 'Z';
 
@@ -277,7 +273,7 @@ class Certificate
             $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
             $privKey = $begin. $pem_data . $end;
             if ($crypted) {
-                $privKeyObject = openssl_pkey_get_private($privKey,  $plainPassword);
+                $privKeyObject = openssl_pkey_get_private($privKey, $plainPassword);
                 //dump($crypted, $privKeyObject);
                 if (!$privKeyObject) {
                     return [
@@ -303,17 +299,16 @@ class Certificate
         }
 
         if (!$certout) {
-            $privKey = $this->new_private_key();
+            $privKey = $this->newPrivateKey();
             $u = $data['common']['plainPassword']['setkey'];
             $plainPassword = $u->getPlainPassword();
             //dump($data, $u, $plainPassword);
             unset($data['common']['plainPassword']);
             $csr = openssl_csr_new($data['common'], $privKey);
 
-            $creqOptions = self::CAConfigArgs;
+            $creqOptions = self::CACONFIGARGS;
             $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], $creqOptions);
             openssl_x509_export($signcert, $certout);
-
         }
 
         if (!$plainPassword) {
@@ -370,7 +365,7 @@ class Certificate
         // Creamos una contraseña para cifrar la clave privada
         $plainPassword=$this->genPass();
 
-        $privKey = $this->new_private_key();
+        $privKey = $this->newPrivateKey();
         //dump($data['common']);
         $csr = openssl_csr_new($data['common'], $privKey);
         $serial = 100;
@@ -379,11 +374,18 @@ class Certificate
         }
         //dump($csr, $caCertData, $serial);
         $creqOptions = array_merge(
-            self::basicCertConfg,
-            ['config' => self::confFile],
+            self::BASICCERTCONFIG,
+            ['config' => self::CONFFILE],
             ['x509_extensions' => $extensions]
         );
-        $signcert = openssl_csr_sign($csr, $caCertData['cert'], $caCertData['privKey'], $data['interval']['duration'], $creqOptions, $serial);
+        $signcert = openssl_csr_sign(
+            $csr,
+            $caCertData['cert'],
+            $caCertData['privKey'],
+            $data['interval']['duration'],
+            $creqOptions,
+            $serial
+        );
         openssl_x509_export($signcert, $certout);
         //dump($creqOptions, $signcert, openssl_x509_parse($certout));
 
@@ -403,15 +405,12 @@ class Certificate
         //dump($data);
 
         return $data;
-
     }
 
-    private function cryptKey($privKey, $key, $cipher="aes-128-gcm"): array
+    private function cryptKey($privKey, $key, $cipher = "aes-128-gcm"): array
     {
-        //$plaintext = "message to be encrypted";
         $original_plaintext="";
-        if (in_array($cipher, openssl_get_cipher_methods()))
-        {
+        if (in_array($cipher, openssl_get_cipher_methods())) {
             $ivlen = openssl_cipher_iv_length($cipher);
             $iv = openssl_random_pseudo_bytes($ivlen);
             $cryptKey = openssl_encrypt($privKey, $cipher, $key, $options=0, $iv, $tag);
@@ -434,7 +433,14 @@ class Certificate
         $tag = $cipherdata['tag'];
         $cryptKey = $cipherdata['cryptKey'];
         $iv = $cipherdata['iv'];
-        $privKey = openssl_decrypt($cipherdata['cryptKey'], $cipherdata['cipher'], $key, $options=0, hex2bin($cipherdata['iv']), hex2bin($cipherdata['tag']));
+        $privKey = openssl_decrypt(
+            $cipherdata['cryptKey'],
+            $cipherdata['cipher'],
+            $key,
+            $options=0,
+            hex2bin($cipherdata['iv']),
+            hex2bin($cipherdata['tag'])
+        );
 
         //dump("decrypted Key: ". $privKey);
         return $privKey;
@@ -442,13 +448,13 @@ class Certificate
 
     private function cryptPass($plainData, $stream): array
     {
-        $factor = rand(16,30);
+        $factor = rand(16, 30);
         $strdata = $plainData;
-        for ($i=1;$i<=$factor;$i++) {
+        for ($i=1; $i<=$factor; $i++) {
             $strdata = base64_encode($strdata);
         }
         $strfactor = substr($stream, 20 + $factor, 10);
-        for ($i=1;$i<=$factor-9;$i++) {
+        for ($i=1; $i<=$factor-9; $i++) {
             $strfactor = base64_encode($strfactor);
         }
         return [
@@ -461,7 +467,7 @@ class Certificate
     {
         $factor = hexdec(substr($strfactor, 8, 2));
 
-        for ($i=1;$i<=$factor;$i++) {
+        for ($i=1; $i<=$factor; $i++) {
             $strdata = base64_decode($strdata);
         }
 
@@ -555,7 +561,6 @@ class Certificate
             if ($dtype=='certkey') {
                 $stream .= $caCertData['privKey'];
             }
-
         } else {
             return [
                 'error' => 'Error',
@@ -582,12 +587,10 @@ class Certificate
             $response->headers->set('Content-Disposition', $disposition);
 
             return $response;
-
     }
 
     public function __toString()
     {
         return '';
     }
-
 }
