@@ -24,9 +24,9 @@
                 ) }}
             {% else -%}
                 <script>
-                    const {{ modalId2}} = $('#{{ modalId2 }}');
+                    const {{ modalId2 }} = document.getElementById('{{ modalId2 }}');
 
-                    {{ modalId2 }}.on('show.bs.modal', function (e) {
+                    {{ modalId2 }}.addEventListener('show.bs.modal', function (e) {
                         console.log(e.relatedTarget);
                         fetch(e.relatedTarget.dataset.url)
                         .then( response => response.text())
