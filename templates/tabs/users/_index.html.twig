@@ -12,6 +12,7 @@
                 <th>{% trans %}Active{% endtrans %}</th>
                 <th>{% trans %}Admin{% endtrans %}</th>
                 <th>{% trans %}Certificate{% endtrans %}</th>
+                <th>{% trans %}Autoreply{% endtrans %}</th>
             </tr>
             {% for user in users %}{% set email = user.name ~ '@' ~ entity.name %}
             <tr>
@@ -25,6 +26,14 @@
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
                 <td>{{ user.certdata ? '√' : '--' }}</td>
+                <td><a
+                    {%- if user.reply -%}{% set replyActive = 'Edit' %}
+                    class="btn btn-secondary" data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}"
+                    {%- else -%}{% set replyActive = 'Create' %}
+                    class="btn btn-primary" data-url="{{ path('user_autoreply_new', { 'id': user.id } ) }}"
+                    {%- endif -%}
+                    href="#" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix }}replyModal">
+                {{ replyActive|trans }}</a></td>
         </tr>
             {% endfor %}
         </tbody>
@@ -33,6 +42,15 @@
     {{ include('_modal.html.twig', {
       'nobutton': true,
       'form': user_form,
+      'delete_form': true,
+      })
+    }}
+    {# Para autoreply #}
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'modalTitle': 'Edit autoreply',
+      'form': reply_form,
+      'modalId': 'reply',
       'delete_form': true,
       })
     }}
