@@ -7,19 +7,16 @@ use Doctrine\ORM\Mapping as ORM;
 trait ActivableEntityTrait
 {
 
-    /**
-     * @var bool
-     */
-    #[ORM\Column(name: 'is_active', type: 'boolean')]
-    private $active=false;
+    #[ORM\Column(name: 'is_active', type: 'boolean', nullable: true)]
+    private bool $active=true;
 
-    public function setActive($active)
+    public function setActive(bool $active): self
     {
         $this->active = $active;
         return $this;
     }
 
-    public function isActive()
+    public function isActive(): bool
     {
         return $this->active;
     }
