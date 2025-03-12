@@ -2,35 +2,35 @@
     {% set modalId = modalId|default(VARS.modalId) %}
     {% set modalSize = modalSize|default(VARS.modalSize) %}
 {% endif %}
-{% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+{% set modalConst = tagPrefix ~ modalId ~ "Modal" %}
 {% if nobutton is not defined %}
     <!-- Button trigger modal -->
-    <a class="btn btn-primary" role="button" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+    <a class="btn btn-primary" role="button" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalConst }}">{{ modalTitle|trans }}</a>
 {% endif %}
   <!-- Modal -->
-  <div class="modal fade" id="{{ modalId2 }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalId2 }}Label" aria-hidden="true">
+  <div class="modal fade" id="{{ modalConst }}" tabindex="-1" role="dialog" aria-labelledby="{{ modalConst }}Label" aria-hidden="true">
       <div class="modal-dialog {{ modalSize }}" role="document">
-          <div class="modal-content" id="{{ modalId2 }}-content">
+          <div class="modal-content" id="{{ modalConst }}-content">
                 <div class="modal-header btn-primary">
-                    <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+                    <h5 class="modal-title" id="{{ modalConst }}Label">{{ modalTitle|trans }}</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
             {% if noajax is defined %}
                 {{ include( included|default(VARS.included) ~ '.html.twig', {
-                    'modalId2': modalId2,
+                    'modalConst': modalConst,
                     }
                 ) }}
             {% else -%}
                 <script>
-                    const {{ modalId2 }} = document.getElementById('{{ modalId2 }}');
+                    const {{ modalConst }} = document.getElementById('{{ modalConst }}');
 
-                    {{ modalId2 }}.addEventListener('show.bs.modal', function (e) {
+                    {{ modalConst }}.addEventListener('show.bs.modal', function (e) {
                         console.log(e.relatedTarget);
                         fetch(e.relatedTarget.dataset.url)
                         .then( response => response.text())
-                        .then( body => document.getElementById('{{ modalId2 }}-content').innerHTML=body );
+                        .then( body => document.getElementById('{{ modalConst }}-content').innerHTML=body );
                     }
                 );
                 </script>
