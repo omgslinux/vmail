@@ -53,12 +53,13 @@ class DomainController extends AbstractController
      * Lists all domain entities.
      */
     #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
-    public function index(Request $request, ReadConfig $config): Response
+    public function index(Request $request): Response
     {
 
-        return $this->render(self::VARS['BASEDIR'] . '/index.html.twig',
+        return $this->render(
+            self::VARS['BASEDIR'] . '/index.html.twig',
             [
-                'entities' => $this->repo->findAll(),
+                //'entities' => $this->repo->findAll(),
                 'tagPrefix' => 'admin',
                 'modalId' => 'domains',
                 'title' => 'Domain list',
@@ -141,6 +142,9 @@ class DomainController extends AbstractController
     {
         $activetab = 'users';
         $session = $request->getSession();
+
+        $reload = false;
+
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -153,10 +157,21 @@ class DomainController extends AbstractController
                 $users[]=$user;
             }
         }
-        //$users=$ur->findBy(['domain' => $entity, 'list' => 0]);
-        //$lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
         $form = $this->createForm(DomainType::class, $entity);
         // Fin de definicion de la entidad
+
+        // Formulario de la entidad
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->add($entity, true);
+            $newName = $entity->getName();
+            if ($oldname!=$newName) {
+                $base=$config->findParameter('virtual_mailbox_base');
+                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
+            }
+
+            $reload = true;
+        }
 
         // Pestaña usuarios
         $user = (new User())
@@ -173,6 +188,15 @@ class DomainController extends AbstractController
         );
 
         // Fin pestaña usuarios
+
+        // Formulario de los usuarios
+        $userform->handleRequest($request);
+
+        if ($userform->isSubmitted() && $userform->isValid()) {
+            $ur->formSubmit($userform);
+
+            $reload = true;
+        }
 
         // Pestaña Alias
         $alias = (new User())
@@ -192,29 +216,10 @@ class DomainController extends AbstractController
         )
         ;
         // Fin pestaña aliases
+        $aliasform->handleRequest($request);
 
-        // Vamos a ver los POST de los distintos formularios. Sólo puede ser uno
-
-        $reload = false;
-
-        // Formulario de la entidad
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->add($entity, true);
-            $newName = $entity->getName();
-            if ($oldname!=$newName) {
-                $base=$config->findParameter('virtual_mailbox_base');
-                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
-            }
-
-            $reload = true;
-        }
-
-        // Formulario de los usuarios
-        $userform->handleRequest($request);
-
-        if ($userform->isSubmitted() && $userform->isValid()) {
-            $ur->formSubmit($userform);
+        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
+            $ur->formSubmit($aliasform);
 
             $reload = true;
         }
