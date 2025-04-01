@@ -97,7 +97,6 @@ trait UserInterfaceEntityTrait
 
     public function eraseCredentials(): void
     {
-
     }
 
     public function getSalt(): ?string

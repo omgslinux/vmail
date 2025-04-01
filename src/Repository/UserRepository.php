@@ -89,6 +89,16 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         }
     }
 
+    public function replySubmit($form)
+    {
+        $reply = $form->getData();
+        dump($form, $reply);
+        $user = $reply->getUser();
+        $user->setReply($reply);
+
+        $this->add($user, true);
+    }
+
     public function formSubmit($form)
     {
         $user = $form->getData();
@@ -130,6 +140,22 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
         $recipient=$user->getEmail();
         $sender='welcome@default';
         $this->deliver->sendMail($subject, $sender, $recipient, $body);
+    }
+
+    public function getIdFromEmail($email): User
+    {
+        list($username, $domainname) = explode('@', $email);
+        $domain = $this->dr->findOneBy(['name' => $domainname]);
+        $user = $ur->findOneBy(['name' => $username, 'domain' => $rDomain]);
+        if (null!=$rUser) {
+            $reply = $rUser->getReplys();
+        }
+        if (null==$reply) {
+            $reply = new Autoreply();
+            if (null!=$rUser) {
+                $reply->setUser($rUser);
+            }
+        }
     }
 
 //    /**

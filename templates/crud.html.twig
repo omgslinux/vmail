@@ -1,7 +1,7 @@
 {% extends ajax is defined and ajax ? "empty.html.twig" : "base.html.twig" %}
 
 {% block content -%}
-        <button type="button" class="close" data-dismiss="modal">
+        <button type="button" class="close" data-bs-dismiss="modal">
             <span aria-hidden="true">&times;</span>
             <span class="sr-only">Close</span>
         </button>
@@ -14,13 +14,13 @@
         {% if form.vars.errors is defined %}
             <div class="alert alert-danger alert-dismissable">
             {% for error in form.vars.errors %}
-                <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                <button aria-hidden="true" data-bs-dismiss="alert" class="close" type="button">×</button>
                 <h4><i class="icon-remove-sign"></i> Error</h4>{{ error.message|trans }}
             {% endfor %}
             </div>
         {% else %}
         <div class="alert alert-danger alert-dismissable">
-            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+            <button aria-hidden="true" data-bs-dismiss="alert" class="close" type="button">×</button>
             <h4><i class="icon-remove-sign"></i> Error</h4>
             Se han producido algunos errores y no se ha podido guardar la información.<br/>
             Revise los datos introducidos.

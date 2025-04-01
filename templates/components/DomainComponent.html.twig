@@ -1,0 +1,40 @@
+<div {{ attributes }}>
+    <div class="row border bg-secondary text-white p-2">
+        <div class="col-5">{% trans %}Name{% endtrans %}</div>
+        <div class="col-1">{% trans %}Active{% endtrans %}</div>
+        <div class="col-6 text-center">{% trans %}Actions{% endtrans %}</div>
+    </div>
+    {% for entity in this.all %}
+        <div class="row border">
+            <div class="col-5 border p-2">{{ entity.name }}</div>
+            <div class="col-1 border p-2">{{ entity.active ? '√' : '--' }}</div>
+            <div class="col-6 d-flex justify-content-around">
+                <div class="border p-2"><a class="btn btn-primary" href="{{ path('admin_domain_show', {'id': entity.id}) }}">{% trans %}Users and aliases{% endtrans %}</a></div>
+                <div class="border p-2"><a class="btn btn-primary" href="{{ path('admin_certificate_server_show', {'id': entity.id}) }}">{% trans %}Manage certificates{% endtrans %}</a></div>
+                <div class="border p-2"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix ~ modalId }}Modal" {{ live_action('edit', {'id': entity.id}) }}>{% trans %}Edit{% endtrans %}</button></div>
+                <div class="border p-2"><button class="btn btn-danger" {{ live_action('delete', {'id': entity.id} ) }}>{% trans %}Delete{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <p>Registros: {{ this.all|length }}</p>
+    {# Botón para crear un nuevo registro #}
+    <button class="px-4 py-2 text-white btn btn-primary rounded" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix ~ modalId }}Modal" {{ live_action("new") }}>{{ ('Create ' ~ itemName)|trans }}</button>
+
+    {{ form_start(form, {
+    attr: {
+    'data-action': 'live#action:prevent',
+    'data-live-action-param': 'save'
+    }
+    }) }}{% set modalTitle = id ? 'Edit ' : 'Create ' ~ itemName %}
+    <twig:ModalComponent modalId="{{ modalId }}" button="0" modalTitle="{{ modalTitle }}" modalSize="modal-lg" tagPrefix="{{ tagPrefix }}">
+            {{ form_row(form.name) }}
+            {{ form_row(form.active) }}
+
+        <twig:block name="footer">
+            {{ parent() }}
+        </twig:block>
+    </twig:ModalComponent>
+    {{ form_end(form) }}
+
+</div>

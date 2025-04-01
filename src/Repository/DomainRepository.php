@@ -8,7 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Booking>
+ * @extends ServiceEntityRepository<Domain>
  *
  * @method Domain|null find($id, $lockMode = null, $lockVersion = null)
  * @method Domain|null findOneBy(array $criteria, array $orderBy = null)
@@ -46,12 +46,21 @@ class DomainRepository extends ServiceEntityRepository
 
     public function makeMaildir(Entity $entity, bool $add = true)
     {
+        $oldEntity = $this->find($entity->getId());
         if ($add) {
             $this->add($entity, true);
         }
         $base=$this->config->findParameter('virtual_mailbox_base');
-        mkdir($base.'/'.$entity->getId());
-        system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
+        if (null!=$oldEntity) {
+            $oldname=$oldEntity->getName();
+            $newName = $entity->getName();
+            if ($oldname!=$newName) {
+                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
+            }
+        } else {
+            mkdir($base.'/'.$entity->getId());
+            system("cd $base;ln -sf " . $entity->getId() . " " . $entity->getName());
+        }
     }
 
     public function rawsql($rawsql, bool $flush = false): void
@@ -76,25 +85,43 @@ class DomainRepository extends ServiceEntityRepository
         $this->add($entity, true);
     }
 
+    public function certificateSubmit($form)
+    {
+        $user = $form->getData();
+        if (null==$user->getDomain() && $form->get('domain')) {
+            $domain = $this->dr->find($form->get('domain'));
+            $user->setDomain($domain);
+        }
+        $plainPassword = $user->getPlainpassword();
+        if (!empty($plainPassword)) {
+            $user->setPassword($this->encodePassword($plainPassword));
+            $this->RS->getSession()->getFlashBag()->add('success', 'Password successfully modified');
+        }
+        $this->add($user, true);
+        if ($user->getSendEmail()) {
+            $this->sendWelcomeMail($user);
+        }
+    }
+
 //    /**
-//     * @return Booking[] Returns an array of Booking objects
+//     * @return Domain[] Returns an array of Domain objects
 //     */
 //    public function findByExampleField($value): array
 //    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
+//        return $this->createQueryBuilder('d')
+//            ->andWhere('d.exampleField = :val')
 //            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
+//            ->orderBy('d.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Booking
+//    public function findOneBySomeField($value): ?Domain
 //    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
+//        return $this->createQueryBuilder('d')
+//            ->andWhere('d.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()

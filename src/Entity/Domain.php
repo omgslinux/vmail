@@ -14,7 +14,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * Domain
  */
 #[ORM\Table(name: 'domain')]
-#[UniqueConstraint(name: 'name_unique', columns: ['name'])]
 #[ORM\Entity(repositoryClass: 'App\Repository\DomainRepository')]
 #[UniqueEntity(fields: 'name', message: 'El nombre ya está en uso')]
 class Domain

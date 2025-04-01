@@ -19,7 +19,7 @@
             </tr>
             <tr>
                 {#}<td><a title="{% trans %}Edit{% endtrans %}" href="{{ path(PREFIX ~ 'edit', { 'id': entity.id }) }}">{{ entity.name }}</a></td>#}
-                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal">{{ entity.name }}</a></td>
+                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix ~ modalId }}Modal">{{ entity.name }}</a></td>
                 <td>{{ entity.active ? '√' : '--' }}</td>
             </tr>
         </tbody>
@@ -28,7 +28,8 @@
     {{ include('_tabs.html.twig', {
             'tdir': 'tabs',
             'origin': entity.name,
-            }) }}
+        })
+    }}
 
     <script src="{{ assetjs|default("/custom/js/user-aliasnames.js") }}"></script>
 

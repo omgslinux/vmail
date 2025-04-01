@@ -11,8 +11,10 @@ use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Entity\User;
 use App\Utils\ReadConfig;
+use App\Form\AutoreplyType;
 use App\Form\UserType;
 use App\Form\DomainType;
+use App\Repository\AutoreplyRepository as AUR;
 use App\Repository\DomainRepository as REPO;
 use App\Repository\UserRepository as UR;
 
@@ -52,8 +54,23 @@ class DomainController extends AbstractController
     /**
      * Lists all domain entities.
      */
+    #[Route(path: '/live', name: 'index_live', methods: ['GET', 'POST'])]
+    public function index(Request $request): Response
+    {
+
+        return $this->render(
+            self::VARS['BASEDIR'] . '/index_live.html.twig',
+            [
+                //'entities' => $this->repo->findAll(),
+                'tagPrefix' => 'admin',
+                'modalId' => 'domains',
+                'title' => 'Domain list',
+            ]
+        );
+    }
+
     #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
-    public function index(Request $request, ReadConfig $config): Response
+    public function indexOLD(Request $request, ReadConfig $config): Response
     {
         $entity = new Domain();
         $form = $this->createForm(DomainType::class, $entity);
@@ -120,14 +137,14 @@ class DomainController extends AbstractController
     }
 
 
-    /**
-     * Creates a form to show a FundBanks entity.
-     */
     #[Route(path: '/show/byname/{name}', name: 'showbyname', methods: ['GET', 'POST'])]
-    public function showByName(Request $request, FFI $ff, $name, UR $ur, ReadConfig $config)
+    public function showByName(Request $request, FFI $ff, $name, UR $ur, AUR $aur, ReadConfig $config)
     {
         $activetab = 'users';
         $session = $request->getSession();
+
+        $reload = false;
+
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -140,10 +157,16 @@ class DomainController extends AbstractController
                 $users[]=$user;
             }
         }
-        //$users=$ur->findBy(['domain' => $entity, 'list' => 0]);
-        //$lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
         $form = $this->createForm(DomainType::class, $entity);
         // Fin de definicion de la entidad
+
+        // Formulario de la entidad
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->makeMaildir($entity, true);
+
+            $reload = true;
+        }
 
         // Pestaña usuarios
         $user = (new User())
@@ -158,8 +181,16 @@ class DomainController extends AbstractController
                 'showAutoreply' => false,
             ]
         );
-
         // Fin pestaña usuarios
+
+        // Formulario de los usuarios
+        $userform->handleRequest($request);
+
+        if ($userform->isSubmitted() && $userform->isValid()) {
+            $ur->formSubmit($userform);
+
+            $reload = true;
+        }
 
         // Pestaña Alias
         $alias = (new User())
@@ -179,32 +210,29 @@ class DomainController extends AbstractController
         )
         ;
         // Fin pestaña aliases
+        $aliasform->handleRequest($request);
 
-        // Vamos a ver los POST de los distintos formularios. Sólo puede ser uno
-
-        $reload = false;
-
-        // Formulario de la entidad
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->add($entity, true);
-            $newName = $entity->getName();
-            if ($oldname!=$newName) {
-                $base=$config->findParameter('virtual_mailbox_base');
-                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
-            }
+        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
+            $ur->formSubmit($aliasform);
 
             $reload = true;
         }
 
-        // Formulario de los usuarios
-        $userform->handleRequest($request);
+dump($request->get('autoreply'));
+        $reply = $request->get('autoreply')?$aur->manageRequest($request->get('autoreply')):null;
+dump($reply);
+        $replyform = $this->createForm(
+            AutoreplyType::class,
+            $reply,
+        );
 
-        if ($userform->isSubmitted() && $userform->isValid()) {
-            $ur->formSubmit($userform);
-
+        if (null==$reply) {
+            $replyform->handleRequest($request);
+        } else {
+            $ur->replySubmit($replyform);
             $reload = true;
         }
+
 
 
         if ($reload) {
@@ -225,6 +253,7 @@ class DomainController extends AbstractController
                 'activetab' => $activetab,
                 'form' => $form->createView(),
                 'user_form' => $userform->createView(),
+                'reply_form' => $replyform->createView(),
                 'alias_form' => $aliasform->createView(),
                 'users' => $users,
                 'aliases' => $aliases,

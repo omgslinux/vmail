@@ -71,7 +71,7 @@
             {% set modalTitle = 'Change password' %}
             <div id="roleuser" class="item">
                 <li>
-                    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    <a class="btn btn-primary" role="button" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
                     </a>
                 </li>
                 {% set modalSize, included = 'modal-md', 'user/_pass' %}
@@ -88,7 +88,7 @@
                 {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
                 {% set modalTitle = 'Autoreply' %}
                 <li>
-                    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    <a class="btn btn-primary" role="button" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
                     </a>
                 </li>
             {{ include('_modal.html.twig', {
@@ -107,7 +107,7 @@
             <div id="usercertificate" class="item">
                 {% set modalTitle = 'User certificate download' %}
                 <li>
-                    <a class="btn btn-primary item" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
+                    <a class="btn btn-primary item" role="button" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
                     </a>
                 </li>
             {{ include('_modal.html.twig', {

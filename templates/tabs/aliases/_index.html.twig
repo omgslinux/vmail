@@ -15,7 +15,7 @@
             </tr>
             {% for alias in aliases %}{% set email = alias.name ~ '@' ~ alias.domain.name %}
             <tr>
-                <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal"
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix ~ modalId }}Modal"
                 {% if origin is defined %}
                     data-url="{{ path('manage_alias_edit', { 'id': alias.id, 'origin': origin } ) }}">{{ email }}</a></td>
                 {% else %}
