@@ -176,7 +176,7 @@ class Certificate
     {
         $intervalData = $form;
         $interval = $form['interval'];
-        if ($interval->d != "0" || $interval->m!="0"|| $interval->y!="0") {
+        if ($interval->d != "0" || $interval->m != "0" || $interval->y != "0") {
             $end = new \DateTime($form['notBefore']->format('Y-m-d'));
             $str="";
             if ($interval->d!="0") {
@@ -501,6 +501,21 @@ class Certificate
     public function genPass(): string
     {
         return bin2hex(random_bytes(20));
+    }
+
+    public function manageClientForm($form)
+    {
+        $formData = $form->getData();
+        $this->util->setDomain($formData['domain']);
+        $user = $formData['common']['emailAddress'];
+        $certData = $this->createClientCert($formData);
+        $indexData = $this->addToIndex($certData['certdata']['cert']);
+        //dd($certData, $indexData);
+        $user->setCertData($certData);
+        $userRepo->add($user, true);
+        $this->repo->updateCAIndex($domain, $indexData);
+        $this->addFlash('success', 'Se creo el certificado');
+
     }
 
     public function setDomain(Domain $domain): self

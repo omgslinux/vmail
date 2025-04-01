@@ -2,7 +2,7 @@
     {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
     <div class="modal-header btn-primary">
         <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')|trans}}">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')|trans}}">
         <span aria-hidden="true">&times;</span>
         </button>
     </div>
@@ -66,7 +66,7 @@
     #}
     </div>
     <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans}}</button>
     </div>
 {{ form_end(form) }}

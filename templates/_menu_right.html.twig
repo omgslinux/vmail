@@ -1,6 +1,6 @@
       {% if is_granted('ROLE_MANAGER') %}
         <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans %}Management{% endtrans %}<span class="caret"></span></a>
+        <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans %}Management{% endtrans %}<span class="caret"></span></a>
         <ul class="dropdown-menu">
             <li role="separator" class="divider"></li>
             <li><a href="{{ path('manage_user_index')}}">{% trans %}Domain users{% endtrans %}</a></li>
@@ -9,7 +9,7 @@
       {% endif %}
       {% if is_granted('ROLE_ADMIN') %}
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans %}Admin{% endtrans %}<span class="caret"></span></a>
+          <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans %}Admin{% endtrans %}<span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li role="separator" class="divider"></li>
             <li><a href="{{ path('admin_domain_index')}}">{% trans %}Domain administration{% endtrans %}</a></li>

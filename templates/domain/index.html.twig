@@ -1,8 +1,31 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    {% set tagPrefix = 'create' %}
     <h1>{{ title|trans }}</h1>
 
-   <twig:DomainComponent tagPrefix="{{ tagPrefix }}" modalId="{{ modalId }}" />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Active{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path(VARS.PREFIX ~ 'showbyname', { 'name': entity.name }) }}">{{ entity.name }}</td>
+                <td>{{ entity.active }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if is_granted('ROLE_ADMIN') %}
+        {% set modalTitle = 'Create domain' %}
+        {{ include('_modal.html.twig', {
+          'noajax': true
+          })
+        }}
+    {% endif %}
 
 {% endblock %}

@@ -24,7 +24,7 @@
                 ) }}
             {% else -%}
                 <script>
-                    const {{ modalConst }} = document.getElementById('{{ modalConst }}');
+                    var {{ modalConst }} = document.getElementById('{{ modalConst }}');
 
                     {{ modalConst }}.addEventListener('show.bs.modal', function (e) {
                         console.log(e.relatedTarget);

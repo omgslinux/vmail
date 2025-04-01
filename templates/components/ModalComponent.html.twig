@@ -1,9 +1,18 @@
 <div {{ attributes }}>
 
+    {# read and display all flash messages #}
+    {% for label, flashmessages in app.flashes %}
+        {% for flashmessage in flashmessages %}
+            <div class="alert alert-{{ label }}">
+                {{ flashmessage }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
     {% set modalId2 = this.id2 %}
     {% if this.button %}<button class="btn btn-primary"
     {% if liveAction is not null %}{{ live_action(liveAction) }}{% endif %}
-    data-bs-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</button>{% endif %}
+    data-bs-toggle="modal" data-bs-target="#{{ modalId2 }}">{{ modalTitle|trans }}</button>{% endif %}
 
 
       <!-- Modal -->

@@ -1,9 +1,9 @@
 <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
-
+<div data-turbo="false">
 {% set tagPrefix = 'edit' %}
 {% set modalId = 'users' %}
 {% set modalSize, included = 'modal-lg', 'tabs/users/_form' %}
-{% if users|length > 0 %}
+{% if users|length > 0 %}{% set certActive = 'Download' %}{% set replyActive = 'Edit' %}
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -25,12 +25,19 @@
                 <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
-                <td>{{ user.certdata ? '√' : '--' }}</td>
                 <td><a
-                    {%- if user.reply -%}{% set replyActive = 'Edit' %}
-                    class="btn btn-secondary" data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}"
+                    {%- if user.certdata -%}
+                    class="btn btn-secondary" data-url="{{ path('admin_certificate_client_download', { 'id': user.id } ) }}"
+                    {%- else -%}{% set certActive = 'Create' %}
+                    class="btn btn-primary" data-url="{{ path('admin_certificate_client_new', { 'id': user.id } ) }}"
+                    {%- endif -%}
+                    href="#" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix }}certModal">
+                {{ certActive|trans }}</a></td>
+                <td><a data-turbo="false"
+                    {%- if user.reply -%}
+                    class="btn btn-secondary" data-url="{{ path('user_autoreply_load', { 'id': user.id } ) }}"
                     {%- else -%}{% set replyActive = 'Create' %}
-                    class="btn btn-primary" data-url="{{ path('user_autoreply_new', { 'id': user.id } ) }}"
+                    class="btn btn-primary" data-url="{{ path('user_autoreply_load', { 'id': user.id } ) }}"
                     {%- endif -%}
                     href="#" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix }}replyModal">
                 {{ replyActive|trans }}</a></td>
@@ -45,10 +52,19 @@
       'delete_form': true,
       })
     }}
+    {# Para certificado #}
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'modalTitle': certActive ~ ' certificate',
+      'form': reply_form,
+      'modalId': 'cert',
+      'delete_form': true,
+      })
+    }}
     {# Para autoreply #}
     {{ include('_modal.html.twig', {
       'nobutton': true,
-      'modalTitle': 'Edit autoreply',
+      'modalTitle': replyActive ~ ' autoreply',
       'form': reply_form,
       'modalId': 'reply',
       'delete_form': true,
@@ -63,4 +79,4 @@
       'noajax': true,
       })
     }}
-<br>
+</div>

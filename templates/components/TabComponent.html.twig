@@ -1,0 +1,25 @@
+    <!-- Tabs navs -->
+  {% set tabname = "#{tabname ?? 'myTabList'}" %}{% set activetab = "#{activetab ?? 'default'}" %}
+    <ul class="nav nav-tabs md-tabs" id="{{tabname}}" role="tablist">
+        {% for tab in tabs %}
+            <li class="nav-item">
+                <a class="nav-link{{ tab.n == activetab ? ' active" aria-selected="true' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}"><strong>{{ tab.t|trans }}</strong></a>
+            </li>
+        {% endfor %}
+    </ul>
+    <!-- Tabs navs -->
+
+    <!-- Tabs content -->
+    <div class="tab-content border-right border-bottom border-left p-4" id="{{tabname}}-content">
+        {% for tab in tabs %}
+            <!-- Tab {{ tab.n }} -->
+            <div class="tab-pane fade{{ tab.n == activetab ? ' active show' }}" id="{{ tab.n }}" role="tabpanel" aria-labelledby="{{ tab.n }}-tab">
+            {% if tdir is not defined %}
+                {% if VARS.tdir is defined %}{% set tdir = VARS.tdir %}{% endif %}
+            {% endif %}
+            {{ include( tdir ~ '/' ~ tab.n ~ '/_index.html.twig') }}
+            </div>
+            <!-- Fin Tab {{ tab.n }} -->
+        {% endfor %}
+    </div>
+    <!-- Tabs content -->

@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Domain;
 use App\Entity\Autoreply;
 use App\Form\AutoreplyType;
+use App\Repository\AutoreplyRepository as REPO;
 
 /**
  * Autoreply controller.
@@ -17,6 +18,10 @@ use App\Form\AutoreplyType;
 class AutoreplyController extends AbstractController
 {
     const PREFIX = 'user_autoreply_';
+
+    public function __construct(private REPO $repo)
+    {
+    }
 
     /**
      * Creates a new Domain entity.
@@ -94,6 +99,37 @@ class AutoreplyController extends AbstractController
             'user' => $user,
             'form' => $editForm->createView(),
             'PREFIX' => self::PREFIX,
+        ));
+    }
+
+    // Para llamar de forma genérica desde otro controlador
+    #[Route(path: '/load/{id}/{form}', name: 'load', methods: ['GET', 'POST'])]
+    public function loadForm(Request $request, User $user, Symfony\Component\Form\FormView $form = null)
+    {
+        dump($user, $form);
+        if (null!=$form) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $reply = $form->getData();
+                dd($form, $reply);
+                $this->repo->add($reply, true);
+                if ($this->isGranted('ROLE_MANAGER')) {
+                    return $this->redirectToRoute('manage_user_edit', ['id' => $reply->getUser()->getId()]);
+                }
+            }
+            return $this->redirectToRoute('user_self_edit');
+        }
+
+        $reply = $user->getReply();
+        if (null==$reply) {
+            $reply = new Autoreply();
+        }
+        $reply->setUser($user);
+
+        $form = $this->createForm(AutoreplyType::class, $reply);
+dump($form);
+        return $this->render('reply/_form.html.twig', array(
+            'form' => $form->createView(),
         ));
     }
 }

@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{{ title|trans }}</h1>
+
+   <twig:DomainComponent tagPrefix="{{ tagPrefix }}" modalId="{{ modalId }}" />
+
+{% endblock %}

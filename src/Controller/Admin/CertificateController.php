@@ -46,14 +46,9 @@ class CertificateController extends AbstractController
         'modalId' => 'certs',
     ];
 
-    private $util;
 
-    private REPO $repo;
-
-    public function __construct(Certificate $util, REPO $repo)
+    public function __construct(private Certificate $util, private REPO $repo)
     {
-        $this->util = $util;
-        $this->repo = $repo;
     }
 
     /**
@@ -120,12 +115,16 @@ class CertificateController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        return $this->render('certificates/_form.html.twig',
-          [
-              'title' => 'Create CA certificate',
-              'form' => $form->createView(),
-              'entity' => $domain,
-          ]
+        return $this->render(
+            'certificates/_form.html.twig',
+            [
+                'ajax' => true,
+                'title' => 'Create CA certificate',
+                'modalTitle' => 'Create CA certificate',
+                'form' => $form->createView(),
+                'entity' => $domain,
+                'VARS' => self::VARS,
+            ]
         );
     }
 
