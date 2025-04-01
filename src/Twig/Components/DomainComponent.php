@@ -2,7 +2,7 @@
 
 namespace App\Twig\Components;
 
-use App\Entity\Domain;
+use App\Entity\Domain as Entity;
 use App\Form\DomainType;
 use App\Repository\DomainRepository as REPO;
 use App\Utils\ReadConfig;
@@ -22,13 +22,8 @@ class DomainComponent extends AbstractController
     use DefaultActionTrait;
     use ComponentWithFormTrait;
 
-    //public ?Question $initialFormData = null;
-
-    //#[LiveProp]
-    //public bool $isModalOpen = false;
-
     #[LiveProp]
-    public ?Domain $entity=null;
+    public ?Entity $id=null;
 
     #[LiveProp]
     public string $modalId;
@@ -40,33 +35,35 @@ class DomainComponent extends AbstractController
 
 
     public function __construct(private REPO $repo, private ReadConfig $config)
-    {}
+    {
+    }
 
     #[LiveAction]
     protected function instantiateForm(): FormInterface
     {
         // we can extend AbstractController to get the normal shortcuts
-        return $this->createForm(DomainType::class, $this->entity);
+        return $this->createForm(DomainType::class, $this->id);
     }
 
     #[LiveAction]
     public function new()
     {
-        $this->entity = new Domain();
+        $this->entity = new Entity();
         $this->resetForm();
     }
 
     #[LiveAction]
-    public function edit(#[LiveArg] Domain $id)
+    public function edit(#[LiveArg] Entity $id)
     {
-        $this->entity = $id;
+        $this->id = $id;
         $this->resetForm();
     }
 
-    #[LiveListener('deleteConfirmed')]
-    public function delete(#[LiveArg] Domain $id)
+    #[LiveAction]
+    public function delete(#[LiveArg] Entity $id)
     {
         $this->repo->remove($id, true);
+        $this->addFlash('success', $this->itemName .' deleted!');
     }
 
     public function getAll()
@@ -81,8 +78,9 @@ class DomainComponent extends AbstractController
         // and the component is automatically re-rendered with the errors
         $this->submitForm();
         //dump($this->form);
+        //$this->entity = $this->getForm()->getData();
 
-        $this->repo->add($this->entity, true);
+        $this->repo->add($this->id, true);
 
         $this->addFlash('success', $this->itemName . ' saved!');
 
