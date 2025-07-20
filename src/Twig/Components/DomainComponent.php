@@ -57,6 +57,8 @@ class DomainComponent extends AbstractController
     {
         $this->id = $id;
         $this->resetForm();
+        //$this->submitForm();
+        $this->addFlash('success', $this->itemName .' updated!');
     }
 
     #[LiveAction]
