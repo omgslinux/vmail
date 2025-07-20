@@ -2,26 +2,30 @@
     {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
     <div class="modal-header btn-primary">
         <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
-        <span aria-hidden="true">&times;</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
         </button>
     </div>
 {% endif %}
 
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'data-turbo': 'false'} }) }}
+{% if form_errors(form) is not empty %}
+    <div class="alert alert-danger">
+        {{ form_errors(form) }}
+    </div>
+{% endif %}
 <div class="modal-body">
     <p>
     {{ form_label(form.name) }}
     </p>
     <p>
-    {{ form_widget(form.name, {'attr': {'autocomplete': 'off'}} ) }}
+    {{ form_widget(form.name, {'attr': {'autocomplete': 'off'}} ) }}{{ form_errors(form.name) }}
     </p>
     <p>
     {{ form_widget(form.active) }}
     </p>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</button>
     <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
 </div>
 {{ form_end(form) }}

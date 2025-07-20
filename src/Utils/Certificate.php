@@ -302,9 +302,18 @@ class Certificate
             $privKey = $this->newPrivateKey();
             $u = $data['common']['plainPassword']['setkey'];
             $plainPassword = $u->getPlainPassword();
-            //dump($data, $u, $plainPassword);
             unset($data['common']['plainPassword']);
-            $csr = openssl_csr_new($data['common'], $privKey);
+            $common=[];
+            foreach ($data['common'] as $dk => $dv) {
+                if (null!=$dv) {
+                    $common[$dk] = $dv;
+                } else {
+                    $common[$dk] = ' ';
+                }
+            }
+            dump($data, $common, $u, $plainPassword);
+            //$csr = openssl_csr_new($data['common'], $privKey);
+            $csr = openssl_csr_new($common, $privKey);
 
             $creqOptions = self::CACONFIGARGS;
             $signcert = openssl_csr_sign($csr, null, $privKey, $data['interval']['duration'], $creqOptions);
@@ -366,7 +375,7 @@ class Certificate
         $plainPassword=$this->genPass();
 
         $privKey = $this->newPrivateKey();
-        //dump($data['common']);
+        dump($data['common']);
         $csr = openssl_csr_new($data['common'], $privKey);
         $serial = 100;
         if (!empty($this->domain->getCertData()['serial'])) {
@@ -544,7 +553,7 @@ class Certificate
                 $stream .= $caCertData['cert'];
                 $stream .= $certData['cert'];
             } else {
-                $stream .= $certData['cert'] . $certData['privKey'];
+                $stream .= $certData['cert'] . $certData['privKey'][0];
             }
         } elseif ($category=='client') {
             $format = strtolower($params['format']);
@@ -555,7 +564,8 @@ class Certificate
             $certData = $this->extractCertData($user->getCertData());
             $caCertData = $this->extractCAData($user->getDomain());
             if ($format=='pem') {
-                $stream = $certData['cert'] . $certData['privKey'];
+                //dump($certData);
+                $stream = $certData['cert'] . $certData['privKey'][0];
             } else {
                 openssl_pkcs12_export(
                     $certData['cert'],
@@ -568,10 +578,10 @@ class Certificate
             }
             //dd($caCertData, $certData, ($format=='pem'?$stream:''));
         } elseif ($category=='ca') {
-            list($user, $dtype) = $params;
-            $filename = $user->getDomain()->getName();
-            $filename .= '-' . $dtype . '.pem';
-            $caCertData = $this->extractCAData($user->getDomain());
+            list($domain, $dtype) = $params;
+            $filename = $domain->getName();
+            $filename .= '_CA-' . $dtype . '.pem';
+            $caCertData = $this->extractCAData($domain);
             $stream .= $caCertData['cert'];
             if ($dtype=='certkey') {
                 $stream .= $caCertData['privKey'];

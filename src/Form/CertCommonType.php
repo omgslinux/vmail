@@ -30,41 +30,46 @@ class CertCommonType extends AbstractType
         $notAfter = new \DateTime();
         $notAfter->add(\DateInterval::createFromDateString($options['duration']));
         $builder
-        ->add('countryName',
+        ->add(
+            'countryName',
             CountryType::class,
             [
                 'label' => 'countryName',
                 'data' => 'ES',
+                'required' => true,
                 'attr' => [
                     'readonly' => null!=$options['subject'],
                 ]
             ]
         )
-        ->add('stateOrProvinceName',
+        ->add(
+            'stateOrProvinceName',
             TextType::class,
             [
                 'label' => 'stateOrProvinceName',
                 'data' => $options['subject']['stateOrProvinceName']??null,
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'readonly' => null!=$options['subject'],
                     'autocomplete' => 'new-password'
                 ]
             ]
         )
-        ->add('localityName',
+        ->add(
+            'localityName',
             TextType::class,
             [
                 'label' => 'localityName',
                 'data' => $options['subject']['localityName']??null,
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'readonly' => null!=$options['subject'],
                     'autocomplete' => 'new-password'
                 ]
             ]
         )
-        ->add('organizationalUnitName',
+        ->add(
+            'organizationalUnitName',
             TextType::class,
             [
                 'label' => 'organizationalUnitName',
@@ -74,13 +79,14 @@ class CertCommonType extends AbstractType
                     'readonly' => null!=$options['subject'],
                     'autocomplete' => 'new-password'
                 ]
-          ]
+            ]
         )
-        ->add('organizationName',
+        ->add(
+            'organizationName',
             TextType::class,
             [
                 'label' => 'organizationName',
-                'required' => false,
+                'required' => true,
                 'data' => $options['subject']['organizationName']??null,
                 'attr' => [
                     'autocomplete' => 'new-password',
@@ -89,21 +95,22 @@ class CertCommonType extends AbstractType
             ]
         );
         if ($options['certtype']!='client') {
-            $builder->add('commonName',
-            TextType::class,
-            [
-                'label' => 'commonName',
-                'required' => true,
-                'data' => $options['subject']['commonName']??null,
-                'attr' => [
-                    'readonly' => null!=$options['subject']&&$options['certtype']=='ca',
-                    'autocomplete' => 'new-password'
+            $builder
+            ->add(
+                'commonName',
+                TextType::class,
+                [
+                    'label' => 'commonName',
+                    'required' => true,
+                    'data' => $options['subject']['commonName']??null,
+                    'attr' => [
+                        'readonly' => null!=$options['subject']&&$options['certtype']=='ca',
+                        'autocomplete' => 'new-password'
+                    ]
                 ]
-            ]
             )
             ;
             if ($options['certtype']=='ca' && null==$options['subject']) {
-
                 $builder
                 ->add(
                     'customFile',
@@ -126,33 +133,33 @@ class CertCommonType extends AbstractType
                     [
                         'label' => 'Private key password'
                     ]
-
                 )
                 ;
             }
         }
         if ($options['certtype']=='client') {
-          $builder->add(
-            'emailAddress',
-            EntityType::class,
-            [
-                'class' => User::class,
-                'label' => 'emailAddress',
-                'query_builder' => function (EntityRepository $er) use ($domain) {
-                    $qb = $er->createQueryBuilder('u');
-                    $qb
-                    ->where('u.list = 0');
-                    if ($domain!=0) {
+            $builder
+            ->add(
+                'emailAddress',
+                EntityType::class,
+                [
+                    'class' => User::class,
+                    'label' => 'emailAddress',
+                    'query_builder' => function (EntityRepository $er) use ($domain) {
+                        $qb = $er->createQueryBuilder('u');
                         $qb
-                          ->andWhere('u.domain = :domain')
-                          ->andWhere('u.certdata IS NULL')
-                          ->setParameter('domain', $domain)
-                        ;
-                    }
-                    return $qb;
-                },
-            ]
-          );
+                        ->where('u.list = 0');
+                        if ($domain!=0) {
+                            $qb
+                              ->andWhere('u.domain = :domain')
+                              ->andWhere('u.certdata IS NULL')
+                              ->setParameter('domain', $domain)
+                            ;
+                        }
+                        return $qb;
+                    },
+                ]
+            );
         }
     }
 

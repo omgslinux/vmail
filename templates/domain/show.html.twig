@@ -2,12 +2,16 @@
 
 {% block body %}
     <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
-    {% set modalSize, included = VARS.modalSize, VARS.included %}
+    {# set modalSize, included = VARS.modalSize, VARS.included #}
+    {% set modalTarget = targetPrefix ~ "Modal" %}
 
-        {% set tagPrefix = 'Edit' %}
         {% set modalId, modalTitle = 'domains', 'Edit domain' %}
         {{ include('_modal.html.twig', {
           'nobutton': true,
+          'targetPrefix': targetPrefix,
+          'VARS': VARS,
+          'modalSize': 'modal-md',
+          'modalTitle': modalTitle,
           'delete_form': true,
           })
         }}
@@ -19,18 +23,20 @@
             </tr>
             <tr>
                 {#}<td><a title="{% trans %}Edit{% endtrans %}" href="{{ path(PREFIX ~ 'edit', { 'id': entity.id }) }}">{{ entity.name }}</a></td>#}
-                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-bs-toggle="modal" data-bs-target="#{{ tagPrefix ~ modalId }}Modal">{{ entity.name }}</a></td>
+                <td><a title="{% trans %}Edit{% endtrans %}" data-url="{{ path(VARS.PREFIX ~ 'edit', { 'id': entity.id }) }}" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ entity.name }}</a></td>
                 <td>{{ entity.active ? '√' : '--' }}</td>
             </tr>
         </tbody>
     </table>
     {# Para la vuelta de las peticiones es origin #}
-    {{ include('_tabs.html.twig', {
+    {% set PREFIX = VARS.PREFIX %}
+        <twig:BootstrapTabsComponent :VARS="VARS" :entity="entity" :targetPrefix="targetPrefix" :PREFIX="PREFIX" :tabs="tabs" />
+    {# include('_tabs.html.twig', {
             'tdir': 'tabs',
             'origin': entity.name,
         })
-    }}
+    #}{# include( tdir ~ '/' ~ tab.n ~ '/_index.html.twig') #}
 
-    <script src="{{ assetjs|default("/custom/js/user-aliasnames.js") }}"></script>
+    {#<script src="{{ assetjs|default("/custom/js/user-aliasnames.js") }}"></script>#}
 
 {% endblock %}

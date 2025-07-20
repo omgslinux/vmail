@@ -39,6 +39,17 @@ class SelfController extends AbstractController
     {
         $entity = $this->getUser();
 
+        return $this->render(self::VARS['BASEDIR'] . '/selfindex.html.twig', array(
+            'user' => $entity,
+            'targetPrefix' => 'self',
+            'PREFIX' => self::VARS['PREFIX'],
+        ));
+    }
+
+    public function indexOLD(Request $request, UR $ur, Certificate $cUtil): Response
+    {
+        $entity = $this->getUser();
+
         $passform = $this->createForm(ManagePasswordType::class, $entity);
         $passform->handleRequest($request);
 
@@ -65,7 +76,7 @@ class SelfController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        $certificateform = $this->createForm(certDownloadType::class, null, ['certtype' => 'client', 'entity' => $entity]);
+        $certificateform = $this->createForm(CertDownloadType::class, null, ['certtype' => 'client', 'entity' => $entity]);
         $certificateform->handleRequest($request);
 
         if ($certificateform->isSubmitted() && $certificateform->isValid()) {
@@ -88,6 +99,7 @@ class SelfController extends AbstractController
             'passform' => $passform->createView(),
             'replyform' => $replyform->createView(),
             'certificateform' => $certificateform->createView(),
+            'targetPrefix' => 'self',
             'VARS' => self::VARS,
         ));
     }
@@ -105,6 +117,46 @@ class SelfController extends AbstractController
             'VARS' => self::VARS,
         ));
     }
+
+    #[Route(path: '/download/', name: 'download', methods: ['GET', 'POST'])]
+    public function clientDownload(Request $request, Certificate $util): Response
+    {
+        $user = $this->getUser();
+
+        $form = $this->createForm(
+            CertDownloadType::class,
+            null,
+            [
+                'certtype' => 'client',
+                'entity' => $user,
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'download')
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $formData = $form->getData();
+            return $util->certDownload(
+                'client',
+                [
+                    'format' => $form->getClickedButton()->getName(),
+                    'setkey' => $formData['setkey']
+                ]
+            );
+
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+        }
+
+        return $this->render(
+            'certificates/_download.html.twig',
+            [
+                'modalTitle' => 'Download certificate',
+                'form' => $form,
+            ]
+        );
+    }
+
 
     /**
      * Displays a form to change the password.

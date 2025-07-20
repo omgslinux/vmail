@@ -2,42 +2,28 @@
     {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
     <div class="modal-header btn-primary">
         <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
         <span aria-hidden="true">&times;</span>
         </button>
     </div>
 {% endif %}
 
-{{ form_start(alias_form) }}
+{{ form_start(form) }}
     <div class="modal-body">
 
-        <div class="row">
-            <div class="col-md-3">
-                {{ form_label(alias_form.name) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_label(alias_form.fullname) }}
-            </div>
-            <div class="col-md-1">
-                {{ form_label(alias_form.active) }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                {{ form_widget(alias_form.name) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_widget(alias_form.fullname) }}
-            </div>
-            <div class="col-md-1">
-                {{ form_widget(alias_form.active) }}
-            </div>
-        </div>
+    <div class="row">
+        <div class="col-4">{{ form_row(form.name)}}</div>
+        <div class="col-5">{{ form_row(form.fullname)}}</div>
+        <div class="col-1">{{ form_row(form.active)}}</div>
     </div>
-        {% if alias_form.aliasnames is defined and domain is defined %}
+    <div data-controller='form-collection'
+        data-form-collection-index-value="{{ form.aliasnames|length > 0 ? form.aliasnames|last.vars.name + 1 : 0 }}"
+        data-form-collection-prototype-value="{{ include('prototypes/alias_prototype.html.twig', { 'row': form.aliasnames.vars.prototype })|e('html_attr') }}"
+    >
+        {% if form.aliasnamesx is defined and domain is defined %}
           <h3>{% trans %}Addresses{% endtrans %} <a href="#" id="add-aliasname" class="btn btn-info"> + {% trans %}New{% endtrans %} </a></h3>
           <table id="aliasnames-container" class="table table-bordered"
-            data-prototype="{{ form_widget(alias_form.aliasnames.vars.prototype)|e('html_attr') }}">
+            data-prototype="{{ form_widget(form.aliasnames.vars.prototype)|e('html_attr') }}">
             <thead>
               <tr>
                   <th>{% trans %}Email{% endtrans %}</th>
@@ -46,19 +32,26 @@
               </tr>
             </thead>
             <tbody>
-              {% for address in alias_form.aliasnames %}
+              {% for address in form.aliasnames %}
                 {{ form_widget(address) }}
               {% endfor %}
-              {% do alias_form.aliasnames.setRendered %}
+              {% do form.aliasnames.setRendered %}
             </tbody>
           </table>
         {% endif %}
+    <h3>Addresses</h3>
+    <ul {{ stimulus_target('form-collection', 'collectionContainer') }}>
+        {% for address in form.aliasnames -%}
+            {{ include('prototypes/alias_prototype.html.twig', { 'row': address }) }}
+        {%- endfor %}
+    </ul>
+    <button type="button" class="btn btn-primary" data-action="form-collection#addCollectionElement">Add an alias</button>
+
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close') }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
-{{ form_end(alias_form) }}
-
-{% if delete_alias_form is defined %}
+    {{ form_end(form) }}
+{% if delete_form is defined %}
     {{ include('_delete_form.html.twig') }}
 {% endif %}

@@ -10,6 +10,7 @@ use App\Entity\Domain;
 use App\Entity\Autoreply;
 use App\Form\AutoreplyType;
 use App\Repository\AutoreplyRepository as REPO;
+use App\Repository\UserRepository as UR;
 
 /**
  * Autoreply controller.
@@ -23,47 +24,10 @@ class AutoreplyController extends AbstractController
     {
     }
 
-    /**
-     * Creates a new Domain entity.
-     */
-    #[Route(path: '/new/{id}', name: 'new', methods: ['GET', 'POST'])]
-    public function newAction(Request $request, User $user = null)
-    {
-        if (is_null($user)) {
-            $user=$this->getUser();
-        }
-        $reply=new Autoreply;
-        $reply->setUser($user);
-        $form = $this->createForm(AutoreplyType::class, $reply);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($reply);
-            $em->flush();
-            if ($this->isGranted('ROLE_MANAGER')) {
-                return $this->redirectToRoute('manage_user_edit', ['id' => $user->getId()]);
-            } else {
-                return $this->redirectToRoute('user_self_edit');
-            }
-        }
-
-        return $this->render('reply/new.html.twig', array(
-            //'item' => $reply,
-            'user' => $user,
-            'form' => $form->createView(),
-            'PREFIX' => self::PREFIX,
-        ));
-    }
-
-
-    /**
-     * Finds and displays a user entity.
-     */
     #[Route(path: '/show/{id}', name: 'show', methods: ['GET'])]
     public function showAction(User $user = null)
     {
-        if (is_null($user)) {
+        if (null==$user) {
             $user=$this->getUser();
         }
 
@@ -73,63 +37,51 @@ class AutoreplyController extends AbstractController
         ));
     }
 
-    /**
-     * Displays a form to edit an existing user entity.
-     */
-    #[Route(path: '/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function editAction(Request $request)
+    #[Route(path: '/edit/{id}', name: 'edit', methods: ['GET', 'POST'])]
+    public function editAction(Request $request, UR $ur, ?User $user = null)
     {
-        $user=$this->getUser();
-        $em = $this->getDoctrine()->getManager();
-        $reply=$em->getRepository(Autoreply::class)->findOneBy(['user' => $user]);
-        if (empty($reply)) {
-            return $this->redirectToRoute(self::PREFIX . 'new');
+        $origin = $request->request->get('origin', null) ?? $request->query->get('origin', null);
+        if (null == $user) {
+            $user=$this->getUser();
         }
-        $editForm = $this->createForm(AutoreplyType::class, $reply);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->persist($reply);
-            $em->flush();
-            return $this->redirectToRoute(self::PREFIX . 'show');
-        }
-
-        return $this->render('reply/edit.html.twig', array(
-            'item' => $reply,
-            'user' => $user,
-            'form' => $editForm->createView(),
-            'PREFIX' => self::PREFIX,
-        ));
-    }
-
-    // Para llamar de forma genérica desde otro controlador
-    #[Route(path: '/load/{id}/{form}', name: 'load', methods: ['GET', 'POST'])]
-    public function loadForm(Request $request, User $user, Symfony\Component\Form\FormView $form = null)
-    {
-        dump($user, $form);
-        if (null!=$form) {
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $reply = $form->getData();
-                dd($form, $reply);
-                $this->repo->add($reply, true);
-                if ($this->isGranted('ROLE_MANAGER')) {
-                    return $this->redirectToRoute('manage_user_edit', ['id' => $reply->getUser()->getId()]);
-                }
-            }
-            return $this->redirectToRoute('user_self_edit');
-        }
-
-        $reply = $user->getReply();
+        $reply=$user->getReply();
         if (null==$reply) {
             $reply = new Autoreply();
+            $reply->setUser($user);
         }
-        $reply->setUser($user);
+        $options = ['id' => $user->getId()];
+        if (null!=$origin) {
+            $options['origin'] = $origin;
+        }
+        $form = $this->createForm(
+            AutoreplyType::class,
+            $reply,
+            [
+                'action' => $this->generateUrl(self::PREFIX . 'edit', $options),
+            ]
+        );
+        $form->handleRequest($request);
 
-        $form = $this->createForm(AutoreplyType::class, $reply);
-dump($form);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setReply($reply);
+            $ur->add($user, true);
+            if (null==$origin) {
+                if ($this->isGranted('ROLE_ADMIN')) {
+                    return $this->redirectToRoute('admin_domain_showbyname', ['name' => $user->getDomain()->getName()]);
+                } elseif ($this->isGranted('ROLE_MANAGER')) {
+                    return $this->redirectToRoute('manage_user_index');
+                } else {
+                    return $this->redirectToRoute('user_self_index');
+                }
+            } else {
+                return $this->redirectToRoute($origin);
+            }
+        }
+
         return $this->render('reply/_form.html.twig', array(
-            'form' => $form->createView(),
+            'user' => $user,
+            'form' => $form,
+            'PREFIX' => self::PREFIX,
         ));
     }
 }

@@ -2,18 +2,17 @@
     {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
     <div class="modal-header btn-primary">
         <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')|trans}}">
-        <span aria-hidden="true">&times;</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')|trans}}">
         </button>
     </div>
 {% endif %}
 
 {{ form_start(form) }}
     <div class="modal-body">
-    {% if entity.id is defined %}
+    {% if entity.id %}
     <h1>{% trans %}User edit{% endtrans %} {{ entity.email }}</h1>
     {% else %}
-    <h1>{% trans %}User creation{% endtrans %} @{{ parent }}</h1>
+    <h1>{% trans %}User creation{% endtrans %} @{{ entity.domain }}</h1>
     {% endif %}
 
     <div class="row">
@@ -72,5 +71,10 @@
 {{ form_end(form) }}
 
     {% if delete_form is defined %}
-        {{ include('_delete_form.html.twig') }}
+        {{ include('/user/_delete_form.html.twig',
+        {
+        'PREFIX': VARS.PREFIX,
+        'VARS': VARS
+        }
+        ) }}
     {% endif %}

@@ -27,10 +27,6 @@ class AutoreplyType extends AbstractType
     {
         $builder
         ->add(
-            'user',
-            HiddenType::class
-        )
-        ->add(
             'message',
             TextareaType::class,
             [

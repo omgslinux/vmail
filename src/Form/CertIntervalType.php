@@ -49,8 +49,7 @@ class CertIntervalType extends AbstractType
                 'disabled' => null!=$options['interval'],
                 //'data' => (null!=$options['interval']?$options['interval']['NotAfter']:null),
                 'data'  => $notAfter
-          ]
-
+            ]
         )
         ->add(
             'interval',

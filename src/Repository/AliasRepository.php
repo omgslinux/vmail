@@ -22,7 +22,7 @@ class AliasRepository extends ServiceEntityRepository
         parent::__construct($registry, Entity::class);
     }
 
-    public function add(Entity $entity, bool $flush = false): void
+    public function save(Entity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 

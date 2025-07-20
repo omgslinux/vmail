@@ -10,6 +10,7 @@ use App\Entity\Domain;
 use App\Entity\ServerCertificate;
 use App\Entity\User;
 use App\Form\CertType;
+use App\Form\CertDownloadType;
 //use App\Form\CertCommonType;
 use App\Utils\Certificate;
 use App\Repository\DomainRepository as REPO;
@@ -18,24 +19,9 @@ use App\Repository\UserRepository as UR;
 /**
  * Domain controller.
  */
-#[Route(path: '/admin/certificate', name: 'admin_certificate_')]
+#[Route(path: '/manage/certificate', name: 'admin_certificate_')]
 class CertificateController extends AbstractController
 {
-
-    const TABS = [
-        [
-          'n' => 'ca',
-          't' => 'CA',
-        ],
-        [
-          'n' => 'client',
-          't' => 'Client',
-        ],
-        [
-          'n' => 'server',
-          't' => 'Server',
-        ],
-      ];
 
     const VARS = [
         'modalSize' => 'modal-md',
@@ -66,7 +52,8 @@ class CertificateController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }*/
 
-        return $this->render('certificates/index.html.twig',
+        return $this->render(
+            'certificates/index.html.twig',
             [
                 'title' => 'Certificates management',
                 'form' => $form->createView(),
@@ -90,29 +77,49 @@ class CertificateController extends AbstractController
             ];
             //dump($certData, $cert, $certInterval);
         }
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'ca', 'interval' => $certInterval, 'duration' => '10 years']);
+        $form = $this->createForm(
+            CertType::class,
+            null,
+            [
+                'domain' => $domain,
+                'subject' => $certSubject,
+                'certtype' => 'ca',
+                'interval' => $certInterval,
+                'duration' => '10 years',
+                'download' => null !=$certSubject,
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'ca', ['id' => $domain->getId()]),
+
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $files = $request->files->all();
-            $csvcontents = null;
-            foreach ($files as $file) {
-                $csvfile = $file['common']['customFile'];
-                if (null!=$csvfile) {
-                    $csvcontents = file_get_contents($csvfile);
+            if (null==$certSubject) {
+                $files = $request->files->all();
+                $csvcontents = null;
+                foreach ($files as $file) {
+                    $csvfile = $file['common']['customFile'];
+                    if (null!=$csvfile) {
+                        $csvcontents = file_get_contents($csvfile);
+                    }
                 }
-            }
-            $formData = $form->getData();
-            $certData = $this->util->createCACert($formData, $csvcontents);
-            //dd($certData);
-            if (!empty($certData['error'])) {
-                $this->addFlash('error', $certData['error']);
+                $formData = $form->getData();
+                $certData = $this->util->createCACert($formData, $csvcontents);
+                //dd($certData);
+                if (!empty($certData['error'])) {
+                    $this->addFlash('error', $certData['error']);
+                } else {
+                    $domain->setCertData($certData);
+                    $this->repo->save($domain, true);
+                    $this->addFlash('success', 'Se creó el certificado');
+                }
+
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
             } else {
-                $domain->setCertData($certData);
-                $this->repo->add($domain, true);
-                $this->addFlash('success', 'Se creó el certificado');
+                return $this->util
+                ->certDownload('ca', [$domain, 'pem']);
             }
-            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
         return $this->render(
@@ -129,8 +136,9 @@ class CertificateController extends AbstractController
     }
 
     #[Route(path: '/{id}/client/new', name: 'client_new', methods: ['GET', 'POST'])]
-    public function clientNew(Request $request, UR $userRepo, Domain $domain): Response
+    public function clientNew(Request $request, UR $userRepo, User $user): Response
     {
+        $domain = $user->getDomain();
         $certSubject = null;
         if (null!=$certData=$domain->getCertData()) {
             $certout = $certData['certdata']['cert'];
@@ -138,7 +146,17 @@ class CertificateController extends AbstractController
             $certSubject = $cert['subject'];
         }
 
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain->getId(), 'subject' => $certSubject, 'certtype' => 'client', 'duration' => '5 years']);
+        $form = $this->createForm(
+            CertType::class,
+            null,
+            [
+                'domain' => $domain->getId(),
+                'subject' => $certSubject,
+                'certtype' => 'client',
+                'duration' => '5 years',
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'client_new', ['id' => $user->getId()]),
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -152,30 +170,58 @@ class CertificateController extends AbstractController
             $userRepo->add($user, true);
             $this->repo->updateCAIndex($domain, $indexData);
             $this->addFlash('success', 'Se creo el certificado');
-            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+            }
+
+            return $this->redirectToRoute('manage_user_index');
         }
 
-        return $this->render('certificates/_form.html.twig',
-          [
+        return $this->render(
+            'certificates/_form.html.twig',
+            [
               'title' => 'Create client certificate',
               'form' => $form->createView(),
               'entity' => $domain,
-          ]
+            ]
         );
     }
 
-    #[Route(path: '/{id}/client/download/{dtype}', name: 'client_download', methods: ['GET', 'POST'])]
-    public function clientDownload(Request $request, User $user, $dtype='pcks12'): Response
+    #[Route(path: '/{id}/client/download/', name: 'client_download', methods: ['GET', 'POST'])]
+    public function clientDownload(Request $request, User $user): Response
     {
-        if (($dtype == 'pkcs12') || ($dtype == 'certkey')) {
-            $this->addFlash('success', 'Se creo el certificado');
-            return $this->util
-            ->certDownload('client', [$user, $dtype]);
+        $form = $this->createForm(
+            CertDownloadType::class,
+            null,
+            [
+                'certtype' => 'client',
+                'entity' => $user,
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'client_download', ['id' => $user->getId()])
+            ]
+        );
 
-        } else {
-            $this->addFlash('error', "Opción incorrecta $dtype");
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $formData = $form->getData();
+            return $this->util->certDownload(
+                'client',
+                [
+                    'format' => $form->getClickedButton()->getName(),
+                    'setkey' => $formData['setkey']
+                ]
+            );
+
+            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $user->getDomain()->getName() ]);
         }
-        return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+
+        return $this->render(
+            'certificates/_download.html.twig',
+            [
+                'modalTitle' => 'Download certificate',
+                'form' => $form,
+            ]
+        );
     }
 
     #[Route(path: '/{id}/server/new', name: 'server_new', methods: ['GET', 'POST'])]
@@ -190,7 +236,17 @@ class CertificateController extends AbstractController
             unset($certSubject['commonName']);
         }
 
-        $form = $this->createForm(CertType::class, null, ['domain' => $domain, 'subject' => $certSubject, 'certtype' => 'server', 'duration' => '5 years']);
+        $form = $this->createForm(
+            CertType::class,
+            null,
+            [
+                'domain' => $domain,
+                'subject' => $certSubject,
+                'certtype' => 'server',
+                'duration' => '5 years',
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'server_new', ['id' => $domain->getId()]),
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -209,15 +265,16 @@ class CertificateController extends AbstractController
             //$this->repo->add($domain, true);
             $this->repo->updateCAIndex($domain, $indexData);
             $this->addFlash('success', 'Se creo el certificado');
-            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' =>2 ]);
         }
 
-        return $this->render('certificates/_form.html.twig',
-          [
+        return $this->render(
+            'certificates/_form.html.twig',
+            [
               'title' => 'Create server certificate',
               'form' => $form->createView(),
               'entity' => $domain,
-      ]
+            ]
         );
     }
 
@@ -246,13 +303,14 @@ class CertificateController extends AbstractController
         }
         //dump($entities);
 
-        return $this->render('certificates/server_show.html.twig',
-          [
+        return $this->render(
+            'certificates/server_show.html.twig',
+            [
               'title' => 'Show server certificate',
               'domain' => $domain,
               'entities' => $entities,
               'VARS' => self::VARS,
-      ]
+            ]
         );
     }
 
@@ -260,7 +318,7 @@ class CertificateController extends AbstractController
     public function serverDownload(Request $request, ServerCertificate $certificate, $dtype): Response
     {
         if (($dtype == 'chain') || ($dtype == 'certkey')) {
-            $this->addFlash('success', 'Se creo el certificado');
+            //$this->addFlash('success', 'Se creo el certificado');
             return $this->util
             ->certDownload('server', [$certificate, $dtype]);
 

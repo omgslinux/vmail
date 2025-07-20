@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Alias;
 use App\Entity\Domain;
@@ -102,9 +103,6 @@ class AliasController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$em = $this->getDoctrine()->getManager();
-            //$em->persist($alias);
-            //$em->flush();
             $this->repo->add($alias, true);
 
             return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
@@ -124,7 +122,7 @@ class AliasController extends AbstractController
     /**
      * Creates a new alias entity.
      */
-    #[Route(path: '/new/{id}', name: 'domain_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/domain/{id}', name: 'domain_new', methods: ['GET', 'POST'])]
     public function domainNewAction(Request $request, Domain $domain)
     {
         if ($domain->getId()===0) {
@@ -141,27 +139,24 @@ class AliasController extends AbstractController
             UserType::class,
             $alias,
             [
-                'domain' => $domain->getId(),
-                'showList' => true,
-            ]
+                'domainId' => $domain->getId(),
+                'showAlias' => true,
+                'action' => $this->generateUrl(self::PREFIX . 'domain_new', ['id' => $domain->getId()]),
+            ],
         )
         ;
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$em = $this->getDoctrine()->getManager();
-            //$em->persist($alias);
-            //$em->flush();
             $this->repo->add($alias, true);
 
-            return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
+            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ]);
         }
 
-        return $this->render('alias/edit.html.twig', array(
+        return $this->render('tabs/aliases/_form.html.twig', array(
             'domain' => $domain,
-            'form' => $form->createView(),
+            'form' => $form,
             'title' => 'Alias creation',
-            'PREFIX' => self::PREFIX,
         ));
     }
 
@@ -180,12 +175,12 @@ class AliasController extends AbstractController
     /**
      * Displays a form to edit an existing alias entity.
      */
-    #[Route(path: '/{id}/edit/{origin}', name: 'edit', methods: ['GET', 'POST'])]
-    public function editAction(Request $request, User $alias, $origin = null)
+    #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
+    public function editAction(Request $request, User $alias)
     {
-        $ORIGIN = 'aliasedit';
+        $origin = $request->query->get('origin', null);
         $domain=$alias->getDomain();
-        $editForm = $this->createForm(
+        $form = $this->createForm(
             UserType::class,
             $alias,
             [
@@ -196,33 +191,22 @@ class AliasController extends AbstractController
             ]
         );
 
-        $session = $request->getSession();
-        if (null!=$origin) {
-            $session->remove($ORIGIN);
-            $session->set($ORIGIN, $origin);
-        }
-        $editForm->handleRequest($request);
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $origin = $session->get($ORIGIN);
-            $session->remove($ORIGIN);
-
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->repo->add($alias, true);
 
             if (null==$origin) {
                 //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-                return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ], Response::HTTP_SEE_OTHER);
             } else {
-                $session->set('activetab', 'aliases');
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $origin ]);
+                return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
             }
         }
 
         return $this->render('tabs/aliases/_form.html.twig', [
             'domain' => $domain,
             'title' => 'Alias edit',
-            'alias_form' => $editForm->createView(),
-            'jsfieldname' => 'alias',
-            'jsfieldlabel' => 'correo',
+            'form' => $form->createView(),
             'PREFIX' => self::PREFIX,
         ]);
     }
@@ -230,9 +214,16 @@ class AliasController extends AbstractController
     #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, User $entity): Response
     {
+        $domain = $entity->getDomain();
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
             $this->repo->remove($entity, true);
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ], Response::HTTP_SEE_OTHER);
+            }
+
+            return $this->redirectToRoute('manage_user_index');
         }
+
 
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);
     }

@@ -1,0 +1,15 @@
+<div class="data-collection-item" data-collection-item>
+    <div class="row align-items-center collection-items-labels">
+        <div class="col-md-6">{{ form_label(row.addressname) }}</div>
+        <div class="col-md-1">{{ form_label(row.active) }}</div>
+    </div>
+    <div class="row collection-items-widgets">
+        <div class="col-md-6 dropdown">{{ form_widget(row.addressname, { 'attr': {'class': 'dropdown-item'} } ) }}</div>
+        <div class="col-md-1">{{ form_widget(row.active) }}</div>
+        <div class="col-md-2 collection-item-actions">
+            <button type="button" data-action="form-collection#removeItem" class="btn btn-sm btn-danger">
+                Eliminar
+            </button>
+        </div>
+    </div>
+</div>

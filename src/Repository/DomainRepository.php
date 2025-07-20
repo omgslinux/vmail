@@ -26,7 +26,7 @@ class DomainRepository extends ServiceEntityRepository
         parent::__construct($registry, Entity::class);
     }
 
-    public function add(Entity $entity, bool $flush = false): void
+    public function save(Entity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -44,22 +44,28 @@ class DomainRepository extends ServiceEntityRepository
         }
     }
 
-    public function makeMaildir(Entity $entity, bool $add = true)
+    public function manageMaildir(Entity $entity)
     {
-        $oldEntity = $this->find($entity->getId());
-        if ($add) {
-            $this->add($entity, true);
-        }
         $base=$this->config->findParameter('virtual_mailbox_base');
-        if (null!=$oldEntity) {
-            $oldname=$oldEntity->getName();
-            $newName = $entity->getName();
-            if ($oldname!=$newName) {
-                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
-            }
-        } else {
+
+        if (null==$entity->getId()) {
+            $this->save($entity, true);
             mkdir($base.'/'.$entity->getId());
             system("cd $base;ln -sf " . $entity->getId() . " " . $entity->getName());
+        } else {
+            $unitOfWork = $this->getEntityManager()->getUnitOfWork();
+            $unitOfWork->computeChangeSets(); // Calcula cambios pendientes
+            $changes = $unitOfWork->getEntityChangeSet($entity);
+
+            if (isset($changes['name'])) {
+                [$oldName, $newName] = $changes['name'];
+                // Ya sabes si ha cambiado
+                //dd($oldName, $newName);
+                if ($oldName!=$newName) {
+                    system("cd $base;mv $oldName $newName");
+                }
+            }
+            $this->save($entity, true);
         }
     }
 
@@ -82,7 +88,7 @@ class DomainRepository extends ServiceEntityRepository
         $caCertData['serial'] = ++$value['serialNumber'];
         $entity->setCertData($caCertData);
         //dd($entity, $indexData);
-        $this->add($entity, true);
+        $this->save($entity, true);
     }
 
     public function certificateSubmit($form)
@@ -97,7 +103,7 @@ class DomainRepository extends ServiceEntityRepository
             $user->setPassword($this->encodePassword($plainPassword));
             $this->RS->getSession()->getFlashBag()->add('success', 'Password successfully modified');
         }
-        $this->add($user, true);
+        $this->save($user, true);
         if ($user->getSendEmail()) {
             $this->sendWelcomeMail($user);
         }
