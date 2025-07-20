@@ -29,7 +29,7 @@
             </tr>
             <tr>
                 {#}<td><a href="{{ editlink }}">{{ entity.name }}</a></td>#}
-                <td><a title="{% trans %}Edit{% endtrans %}" href="#" data-toggle="modal" data-target="#{{ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
+                <td><a title="{% trans %}Edit{% endtrans %}" href="#" data-bs-toggle="modal" data-bs-target="#{{ modalId ~ 'Modal' }}">{{ entity.name }}</a></td>
                 <td>{{ entity.fullName }}</td>
                 <td>{{ entity.isActive ? '√' : '--' }}</td>
                 <td>{{ entity.isAdmin ? '√' : '--' }}</td>

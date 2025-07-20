@@ -6,8 +6,7 @@
     {% set entity = entity|default(app.user.domain) %}
     <h1>{% trans %}Domain{% endtrans %} {{ entity }}</h1>
 
+    {% set PREFIX = VARS.PREFIX %}
+        <twig:BootstrapTabsComponent :VARS="VARS" :entity="entity" :targetPrefix="targetPrefix" :PREFIX="PREFIX" :tabs="tabs" />
     {# Para la vuelta de las peticiones es origin #}
-    {{ include('_tabs.html.twig', {
-            'tdir': 'tabs',
-            }) }}
 {% endblock %}

@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\CallbackTransformer;
 
 class CertType extends AbstractType
@@ -33,7 +34,8 @@ class CertType extends AbstractType
                 'data' => $options['domain']
             ]
         )
-        ->add('common',
+        ->add(
+            'common',
             CertCommonType::class,
             [
                 'label' => false,
@@ -54,7 +56,6 @@ class CertType extends AbstractType
         ;
 
         if ($options['certtype'] == 'export') {
-
             $builder->add(
                 'plainPassword',
                 RepeatedType::class,
@@ -78,7 +79,19 @@ class CertType extends AbstractType
                 ]
             )
             ;
-
+        }
+        if ($options['download']) {
+            $builder->add(
+                'download',
+                SubmitType::class,
+                [
+                    'label' => 'Download',
+                    'attr' => [
+                        'class' => 'btn-primary',
+                        'data-bs-dismiss' => 'modal',
+                    ]
+                ],
+            );
         }
     }
 
@@ -94,6 +107,7 @@ class CertType extends AbstractType
             'interval' => null,
             'certtype' => null,
             'subject' => null,
+            'download' => false,
         ));
     }
 }

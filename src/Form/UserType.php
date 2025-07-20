@@ -194,6 +194,17 @@ class UserType extends AbstractType
             )
             ;
         }
+        /*
+            $builder
+            ->add(
+                'origin',
+                HiddenType::class,
+                [
+                    'mapped' => false,
+                    'data' => urlencode($options['origin']),
+                ]
+            );
+            */
         /* if ($options['showAutoreply']) {
             $builder
             ->add(
@@ -222,6 +233,7 @@ class UserType extends AbstractType
                 'showAutoreply' => false,
                 'showAlias' => false,
                 'domainId' => false,
+                'origin' => false,
             ]
         );
     }

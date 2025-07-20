@@ -5,9 +5,11 @@ return array(
   'Management' => 'Gestión',
   'Address' => 'Dirección',
   'Addresses' => 'Direcciones',
+  'Certificate' => 'Certificado',
+  'Certificates' => 'Certificados',
   'Create a new alias' => 'Crear un alias',
   'Create a new user' => 'Crear un usuario',
-  'Create a new domain' => 'Crear un dominio',
+  'Create domain' => 'Crear un dominio',
   'Create a new config' => 'Crear una nueva configuración',
   'Create a new distribution list' => 'Crear una lista de distribución',
   'List' => 'Lista',
@@ -99,6 +101,7 @@ return array(
   'emailAddress' => 'Correo electrónico',
   'Certificates management' => 'Gestión de certificados',
   'Create certificate' => 'Crear certificado',
+  'Create server certificate' => 'Crear certificado de servidor',
   'Server' => 'Servidor',
   'Client' => 'Cliente',
   'Manage CA' => 'Administrar CA',
@@ -110,5 +113,7 @@ return array(
   'Back to cert menu' => 'Volver al menú de certificados',
   'Server certificates' => 'Certificados de servidor',
   'Certificate' => 'Certificado',
+  'User certificate download' => 'Descargar certificado del usuario',
+  'Download CA certificate' => 'Descargar certificado de la CA',
 
 );

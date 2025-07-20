@@ -1,3 +1,5 @@
+{% set title = user.reply ? 'edit' : 'create' %}
+<h2>{{ ('Reply ' ~ title)|trans }} {{ user }}</h2>
 {{ form_start(form) }}
 <div class="modal-body">
     <p>
@@ -16,7 +18,7 @@
     </p>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</button>
     <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
 </div>
 {{ form_end(form) }}

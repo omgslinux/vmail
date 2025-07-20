@@ -18,12 +18,12 @@ class AutoreplyRepository extends ServiceEntityRepository
 {
     private $config;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private UserRepository $uRepo)
     {
         parent::__construct($registry, Entity::class);
     }
 
-    public function add(Entity $entity, bool $flush = false): void
+    public function save(Entity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -39,6 +39,32 @@ class AutoreplyRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function manageRequest(array $request): Entity
+    {
+        $user = null;
+        $reply = null;
+dump($request['user']);
+        if (null!=($email=$request['user'])) {
+            $user = $this->uRepo->loadUserByUsername($email);
+            if (null!=$user) {
+                $reply = $user->getReply();
+            }
+        }
+        if (null==$reply) {
+            $reply = new Entity();
+            if (null!=$user) {
+                $reply->setUser($user);
+            }
+            $reply
+            ->setMessage($request['message'])
+            ->setStartDate(new \DateTime($request['startdate']))
+            ->setEndDate(new \DateTime($request['enddate']))
+            ->setActive($request['active']);
+        }
+
+        return $reply;
     }
 
 //    /**

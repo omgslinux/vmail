@@ -1,0 +1,51 @@
+{% set targetPrefix = 'manage' %}
+{% set modalSize = 'modal-xl' %}
+
+{% set modalTarget = targetPrefix ~ 'CA' %}
+{% set modalTitle = (entity.certData ? 'Manage' : 'Create') ~ ' CA' %}
+<a class="btn btn-primary" href="#" data-url="{{ path('admin_certificate_ca', { 'id': entity.id } )}}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}Modal">{{ modalTitle }}</a>
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'targetPrefix': targetPrefix ~ 'CA',
+      'modalTarget': targetPrefix ~ 'CAModal',
+      'modalSize': modalSize,
+    })
+    }}
+
+{% if entity.certData %}
+    <hr>
+
+    {% if entities|length %}
+        <h2>{% trans %}Server certificates{% endtrans %}</h2>
+
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th class="text-center">{% trans %}NotBefore{% endtrans %}</th>
+                    <th class="text-center">{% trans %}NotAfter{% endtrans %}</th>
+                    <th class="text-center">{% trans %}Download{% endtrans %}</th>
+                </tr>
+                {% for cert in entities %}
+                <tr>
+                    <td>{{ cert.description }} ({{ cert.certdata.subject.commonName }})</a></td>
+                    <td class="text-center">{{ cert.interval.notBefore|date('d/m/Y') }}</td>
+                    <td class="text-center">{{ cert.interval.notAfter|date('d/m/Y') }}</td>
+                    <td class="d-flex justify-content-evenly"><a class="btn btn-primary" href="{{ path('admin_certificate_server_download', {'id': cert.entity.id, 'dtype': 'certkey'}) }}">{% trans %}Download cert and key{% endtrans %}</a>&nbsp;
+                    <a class="btn btn-primary" href="{{ path('admin_certificate_server_download', {'id': cert.entity.id, 'dtype': 'chain'}) }}">{% trans %}Download full chain{% endtrans %}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% set modalTarget = targetPrefix ~ 'certificates' %}
+    {% set modalTitle = 'Create server certificate' %}
+    <a class="btn btn-primary" href="#" data-url="{{ path('admin_certificate_server_new', { 'id': entity.id } )}}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}Modal">{{ modalTitle|trans }}</a>
+        {{ include('_modal.html.twig', {
+          'nobutton': true,
+          'targetPrefix': targetPrefix ~ 'certificates',
+          'modalTarget': targetPrefix ~ 'certificatesModal',
+          'modalSize': modalSize,
+        })
+        }}
+{% endif %}

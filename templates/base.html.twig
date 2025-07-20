@@ -5,20 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {#}<title>{% block title %}VMAIL{% if title is defined %} - {{ title }}{% endif %}{% if is_granted('ROLE_USER') %} - ({{ app.user.username }}/{{ app.user.getRol }}/id:{{ app.user.id }}){% endif %}{% endblock %}</title>#}
         {% block stylesheets %}
-          <!-- Bootstrap core CSS -->
-        <link rel="stylesheet" href="{{ asset('components/css/bootstrap.css') }}" />
-        {#}<!-- Documentation extras -->
-        <link href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" rel="stylesheet">
-        <link href="https://getbootstrap.com/docs/4.3/assets/css/docs.min.css" rel="stylesheet"> #}
-        <!-- Your custom styles (optional) -->
-        <link rel="stylesheet" href="{{ asset('custom/css/style.css') }}">
-            {# encore_entry_link_tags('app') #}
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('custom/img/vmaillogo.png') }}" />
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('custom/img/vmaillogo.png') }}" sizes="16x16" />
-        <script src="{{ asset('components/jquery.slim.js') }}"></script>
     </head>
-    <body>
+    <body data-turbo="false">
         <header class="nav bg-info mb-3 flex-align-center">
         {# Start left side #}
         {% set liclass = "nav-item" %}{% set aclass = "nav-link" %}
@@ -44,12 +35,7 @@
         </footer>
 
         {% block javascripts %}
-          <!-- Optional JavaScript -->
-          <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-          {#<script src="{{ asset('components/jquery.slim.js') }}"></script>#}
-          <!-- The bootstrap bundle includes the optional popper.js -->
-          <script src="{{ asset('components/js/bootstrap.bundle.min.js') }}"></script>
-          {# encore_entry_script_tags('app') #}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </body>
 </html>

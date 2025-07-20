@@ -32,7 +32,6 @@ class CertDownloadType extends AbstractType
         );
 
         if ($options['certtype']=='client') {
-
             $builder
             ->add(
                 'pkcs12',
@@ -57,7 +56,9 @@ class CertDownloadType extends AbstractType
         }
 
 
-        $builder->add('setkey',
+        $builder
+        ->add(
+            'setkey',
             ManagePasswordType::class,
             [
                 'label' => false,
@@ -67,7 +68,6 @@ class CertDownloadType extends AbstractType
         ;
 
         if ($options['certtype'] == 'export') {
-
             $builder->add(
                 'plainPassword',
                 RepeatedType::class,
@@ -91,7 +91,6 @@ class CertDownloadType extends AbstractType
                 ]
             )
             ;
-
         }
     }
 

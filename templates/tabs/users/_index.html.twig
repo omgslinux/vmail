@@ -1,9 +1,9 @@
 <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
-
-{% set tagPrefix = 'edit' %}
-{% set modalId = 'users' %}
-{% set modalSize, included = 'modal-lg', 'tabs/users/_form' %}
-{% if users|length > 0 %}
+<div data-turbo="false">
+{% set targetPrefix = 'edit' %}
+{% set modalTarget = targetPrefix ~ 'users' %}
+{% set modalSize = 'modal-lg' %}
+{% if users|length > 0 %}{% set certActive = 'Download' %}{% set replyActive = 'Edit' %}
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -12,10 +12,11 @@
                 <th>{% trans %}Active{% endtrans %}</th>
                 <th>{% trans %}Admin{% endtrans %}</th>
                 <th>{% trans %}Certificate{% endtrans %}</th>
+                <th>{% trans %}Autoreply{% endtrans %}</th>
             </tr>
             {% for user in users %}{% set email = user.name ~ '@' ~ entity.name %}
             <tr>
-                <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal"
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#{{ targetPrefix }}usersModal"
                 {% if origin is defined %}
                     data-url="{{ path('manage_user_edit', { 'id': user.id, 'origin': origin } ) }}">{{ email }}</a></td>
                 {% else %}
@@ -24,7 +25,24 @@
                 <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
-                <td>{{ user.certdata ? '√' : '--' }}</td>
+                <td>{% if entity.certdata %}
+                        {% if user.certdata %}
+                        <a class="btn btn-secondary" data-url="{{ path('admin_certificate_client_download', { 'id': user.id } ) }}"
+                        {% else %}{% set certActive = 'Create' %}
+                        <a class="btn btn-primary" data-url="{{ path('admin_certificate_client_new', { 'id': user.id } ) }}"
+                        {% endif %}
+                        href="#" data-bs-toggle="modal" data-bs-target="#createcertModal">
+                    {{ certActive|trans }}</a>
+                    {%- else -%}
+                    --</td>
+                    {%- endif %}
+                <td><a data-turbo="false"
+                    {%- if user.reply -%}
+                    {%- else -%}{% set replyActive = 'Create' %}
+                    {%- endif -%} data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}"
+                    class="btn btn-{{ user.reply ? 'secondary' :'primary' }}" 
+                    href="#" data-bs-toggle="modal" data-bs-target="#createreplyModal">
+                {{ replyActive|trans }}</a></td>
         </tr>
             {% endfor %}
         </tbody>
@@ -32,17 +50,44 @@
     {% set modalTitle = 'Edit user' %}
     {{ include('_modal.html.twig', {
       'nobutton': true,
-      'form': user_form,
-      'delete_form': true,
+      'targetPrefix': targetPrefix ~ 'users',
+      'modalTarget': targetPrefix ~ 'usersModal',
+      'modalSize': modalSize,
+      'modalTitle': modalTitle,
       })
     }}
 {% else %}
     <p>{% trans %}No users in domain{% endtrans %}</p>
 {% endif %}
-    {% set tagPrefix = 'create' %}
-    {% set modalTitle = 'Create a new user' %}
+{% set targetPrefix = 'create' %}
+{% set modalTitle = 'Create a new user' %}
+<a class="btn btn-primary" href="#" data-url="{{ path('manage_user_admin_new', { 'id': entity.id } )}}" data-bs-toggle="modal" data-bs-target="#{{ targetPrefix }}usersModal">{{ modalTitle }}</a>
     {{ include('_modal.html.twig', {
-      'noajax': true,
+      'nobutton': true,
+      'targetPrefix': targetPrefix ~ 'users',
+      'modalTarget': targetPrefix ~ 'usersModal',
+      'modalTitle': modalTitle,
+      'modalSize': modalSize,
       })
     }}
-<br>
+
+{% set modalTitle = 'Create a new user certificate' %}
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'targetPrefix': targetPrefix ~ 'cert',
+      'modalTarget': targetPrefix ~ 'certModal',
+      'modalTitle': modalTitle,
+      'modalSize': 'modal-xl',
+      })
+    }}
+
+{% set modalTitle = 'Create autoreply' %}
+    {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'targetPrefix': targetPrefix ~ 'reply',
+      'modalTarget': targetPrefix ~ 'replyModal',
+      'modalTitle': modalTitle,
+      'modalSize': 'modal-xl',
+      })
+    }}
+</div>

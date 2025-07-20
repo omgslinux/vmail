@@ -2,13 +2,13 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Domain;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormFactoryInterface;
-use App\Entity\Domain;
 use App\Form\UserType;
 use App\Repository\UserRepository as REPO;
 use App\Repository\DomainRepository;
@@ -20,17 +20,6 @@ use App\Utils\Certificate;
 #[Route(path: '/manage/user', name: 'manage_user_')]
 class UserController extends AbstractController
 {
-    const TABS = [
-        [
-          'n' => 'users',
-          't' => 'Users',
-        ],
-        [
-          'n' => 'aliases',
-          't' => 'Alias',
-        ],
-      ];
-
     const VARS = [
         'modalSize' => 'modal-lg',
         'PREFIX' => 'manage_user_',
@@ -50,11 +39,12 @@ class UserController extends AbstractController
      * Lists all user entities.
      */
     #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
-    public function index(Request $request, FormFactoryInterface $ff, $activetab = null)
+    public function index(Request $request)
     {
+        $activeTab = $request->query->get('activetab', 0);
+
         $parent=$this->getUser()->getDomain();
         $users=$aliases=[];
-        $reload = false;
 
         foreach ($parent->getUsers() as $user) {
             if ($user->isList()) {
@@ -63,79 +53,35 @@ class UserController extends AbstractController
                 $users[]=$user;
             }
         }
-        $showDomain=($this->isGranted('ROLE_ADMIN'));
-        $entity = (new User())
-        ->setDomain($parent)
-        ->setSendEmail(true)
-        ->setActive(true)
-        ;
-        $userform = $this->createForm(
-            UserType::class,
-            $entity,
+
+        $tabs = [
             [
-                'showDomain' => $showDomain,
-                'showAutoreply' => false,
-            ]
-        );
-
-        $userform->handleRequest($request);
-        if ($userform->isSubmitted() && $userform->isValid()) {
-            $this->repo->formSubmit($userform);
-
-            $reload = true;
-            //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-        }
-
-
-        // Pestaña Alias
-        $alias = (new User())
-        ->setDomain($parent)
-        ->setList(true)
-        ->setPassword(false)
-        ;
-        // createNamed es para dar un nombre al formulario para que no sean ambos 'user'
-        $aliasform = $ff->createNamed(
-            'alias',
-            UserType::class,
-            $alias,
-            [
-                'domainId' => $parent->getId(),
-                'showAlias' => true,
-            ]
-        )
-        ;
-        // Fin pestaña aliases
-
-        // Formulario de los alias
-        $aliasform->handleRequest($request);
-        if ($aliasform->isSubmitted() && $aliasform->isValid()) {
-            $this->repo->add($alias, true);
-
-            $reload = true;
-            $activetab = 'aliases';
-        }
-
-        if ($reload) {
-            return $this->redirectToRoute(
-                self::VARS['PREFIX'] . 'index',
-                [
-                    'id' => $entity->getId(),
-                    'activetab' => $activetab,
+                'template' => 'tabs/users/_index.html.twig',
+                'title' => 'Users',
+                'context' => [
+                    'users' => $users,
+                    'modalSize' => 'modal-lg',
+                    //'VARS' => $VARS,
                 ]
-            );
-        } else {
-            $activetab = $request->get('activetab')??'users';
-        }
+            ],
+            [
+            'template' => 'tabs/aliases/_index.html.twig',
+            'title' => 'Alias',
+            'context' => [
+                'aliases' => $aliases,
+                'modalSize' => 'modal-lg'
+                ]
+            ],
+        ];
 
         return $this->render(self::VARS['BASEDIR'] . 'index.html.twig', array(
-            'tabs' => self::TABS,
-            'activetab' => $activetab,
-            'users' => $users,
-            'aliases' => $aliases,
-            'user_form' => $userform->createView(),
-            'alias_form' => $aliasform->createView(),
+            'tabs' => [
+                'tabId' => 'domainTabs',
+                'activeTab' => $activeTab,
+                'tabs' => $tabs
+            ],
+            'targetPrefix' => 'users',
             'VARS' => self::VARS,
-            'origin' => self::VARS['PREFIX'] . 'index',
         ));
     }
 
@@ -200,53 +146,153 @@ class UserController extends AbstractController
      * Displays a form to edit an existing user entity.
      */
     #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $entity, $origin = null)
+    public function edit(Request $request, User $entity)
     {
-        $user_form = $this->createForm(
+        $origin = $request->request->get('origin', null) ?? $request->query->get('origin', null);
+        $form = $this->createForm(
             UserType::class,
             $entity,
             [
                 'showDomain'  => false,
-                //'domainId' => $entity->getDomain()->getId(),
                 'showAutoreply' => null!==$entity->getReply(),
                 'action' => $this->generateUrl(self::VARS['PREFIX'] . 'edit', ['id' => $entity->getId()]),
             ]
         );
-        $session = $request->getSession();
-        if ($origin) {
-            $session->remove('useredit');
-            $session->set('useredit', $origin);
-        }
-        $user_form->handleRequest($request);
 
-        if ($user_form->isSubmitted() && $user_form->isValid()) {
-            $origin = $session->get('useredit');
-            $session->remove('useredit');
+        $form->handleRequest($request);
 
-            $this->repo->formSubmit($user_form);
+        if ($form->isSubmitted() && $form->isValid()) {
+            //dd($request, $origin);
+            //$origin = $session->get('useredit');
 
-            if (null==$origin) {
-                return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+            $this->repo->formSubmit($form);
+
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $entity->getDomain()->getName() ]);
             } else {
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $origin ]);
-                //return $this->redirectToRoute('admin_domain_show', ['id' => $entity->getDomain()->getId()]);
-                //return $this->redirectToRoute(self::PREFIX . 'edit', array('id' => $entity->getId()));
+                return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
             }
         }
 
         return $this->render(self::VARS['BASEDIR'] . '_form.html.twig', array(
             'entity' => $entity,
-            'form' => $user_form->createView(),
+            'form' => $form->createView(),
             'delete_form' => true,
             'VARS' => self::VARS,
         ));
     }
 
+
+    #[Route(path: '/new/', name: 'new', methods: ['GET', 'POST'])]
+    public function new(Request $request)
+    {
+        $domain = $this->getUser()->getDomain();
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+        }
+
+        $action = $this->generateUrl(self::VARS['PREFIX'] . 'new');
+
+        $entity = (new User())
+        ->setDomain($domain)
+        ->setSendEmail(true)
+        ->setActive(true)
+        ;
+
+        $form = $this->createForm(
+            UserType::class,
+            $entity,
+            [
+                'showDomain'  => false,
+                'showAutoreply' => false,
+                'action' => $action // $this->generateUrl(self::VARS['PREFIX'] . 'new', ['id' => $domain->getId()]),
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->formSubmit($form);
+
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+        }
+
+        return $this->render(self::VARS['BASEDIR'] . '_form.html.twig', array(
+            'entity' => $entity,
+            'form' => $form->createView(),
+            //'ajax' => true,
+            'VARS' => self::VARS,
+            'modalTitle' => 'User creation',
+            'modalSize' => 'modal-xl',
+        ));
+    }
+
+
+    #[Route(path: '/{id}/new/', name: 'admin_new', methods: ['GET', 'POST'])]
+    public function adminNew(Request $request, Domain $domain)
+    {
+        if (null==$domain) {
+            $domain = $this->getUser()->getDomain();
+            $origin = $this->generateUrl(self::VARS['PREFIX'] . 'index');
+        } else {
+            $origin = $this->generateUrl(self::VARS['PREFIX'] . 'admin_new', ['id' => $domain->getId()]);
+        }
+
+        $action = $this->generateUrl(self::VARS['PREFIX'] . 'admin_new', ['id' => $domain->getId(), 'origin' => $origin]);
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $action = $this->generateUrl(self::VARS['PREFIX'] . 'new', ['origin' => $origin]);
+        }
+
+        $entity = (new User())
+        ->setDomain($domain)
+        ->setSendEmail(true)
+        ->setActive(true)
+        ;
+
+        $form = $this->createForm(
+            UserType::class,
+            $entity,
+            [
+                'showDomain'  => false,
+                //'domainId' => $entity->getDomain()->getId(),
+                'showAutoreply' => false,
+                'action' => $action // $this->generateUrl(self::VARS['PREFIX'] . 'new', ['id' => $domain->getId()]),
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->formSubmit($form);
+
+            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+        }
+
+        return $this->render(
+            self::VARS['BASEDIR'] . '_form.html.twig',
+            [
+                'entity' => $entity,
+                'form' => $form->createView(),
+                //'ajax' => true,
+                'VARS' => self::VARS,
+                'modalTitle' => 'User creation',
+                'modalSize' => 'modal-xl',
+            ]
+        );
+    }
+
+
+
     #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, User $entity): Response
     {
+        $origin = $request->request->get('origin', null) ?? $request->query->get('origin', null);
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
+            $name = $entity->getDomain()->getName();
             $this->repo->remove($entity, true);
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $name ]);
+            }
         }
 
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index', [], Response::HTTP_SEE_OTHER);
@@ -255,7 +301,7 @@ class UserController extends AbstractController
     #[Route(path: '/ca/download/', name: 'ca_download', methods: ['GET', 'POST'])]
     public function serverDownload(Request $request, Certificate $util): Response
     {
-        $entity = $this->getUser();
+        $entity = $this->getUser()->getDomain();
         $dtype = 'chain';
         if (($dtype == 'chain')) {
             //$this->addFlash('success', 'Se creo el certificado');

@@ -1,10 +1,9 @@
     <h2>{% trans %}Aliases in domain{% endtrans %} {{ entity.name }}</h2>
+    {% set targetPrefix = 'edit' %}
+    {% set modalTarget = targetPrefix ~ 'aliases' %}
     {% set modalId = 'aliases' %}
-    {% set modalTitle = 'Alias edit' %}
-    {% set modalSize, included = 'modal-lg', 'tabs/aliases/_form' %}
 
     {% if aliases %}
-    {% set tagPrefix = 'edit' %}
 
     <table class="table table-bordered">
         <tbody>
@@ -15,7 +14,7 @@
             </tr>
             {% for alias in aliases %}{% set email = alias.name ~ '@' ~ alias.domain.name %}
             <tr>
-                <td><a href="#" data-toggle="modal" data-target="#{{ tagPrefix ~ modalId }}Modal"
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}Modal"
                 {% if origin is defined %}
                     data-url="{{ path('manage_alias_edit', { 'id': alias.id, 'origin': origin } ) }}">{{ email }}</a></td>
                 {% else %}
@@ -27,18 +26,27 @@
             {% endfor %}
         </tbody>
     </table>
-        {{ include('_modal.html.twig', {
-          'nobutton': true,
-          'delete_form': true,
-        })
-        }}
     {% else %}
       <p>No hay alias definidos</p>
-    {% endif %}
-    {% set tagPrefix = 'create' %}
+  {% endif %}
+      {% set modalTitle = 'Create a new alias' %}
+      <a class="btn btn-primary" href="#" data-url="{{ path('manage_alias_domain_new', { 'id': entity.id } )}}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}Modal">{{ modalTitle|trans }}</a>
+      {{ include('_modal.html.twig', {
+      'nobutton': true,
+      'targetPrefix': targetPrefix ~ 'aliases',
+      'modalTitle': modalTitle,
+      'modalTarget': targetPrefix ~ 'aliasesModal',
+      'modalSize': modalSize,
+      })
+      }}
     {% set modalTitle = 'Create a new alias' %}
+    {% set targetPrefix = 'create' %}
     {{ include('_modal.html.twig', {
-      'noajax': true,
+      'nobutton': true,
+      'targetPrefix': targetPrefix ~ 'aliases',
+      'modalTitle': modalTitle,
+      'modalTarget': modalTarget ~ 'Modal',
+      'modalSize': modalSize,
       })
     }}
 <br>

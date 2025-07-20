@@ -8,7 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Booking>
+ * @extends ServiceEntityRepository<Domain>
  *
  * @method Domain|null find($id, $lockMode = null, $lockVersion = null)
  * @method Domain|null findOneBy(array $criteria, array $orderBy = null)
@@ -26,7 +26,7 @@ class DomainRepository extends ServiceEntityRepository
         parent::__construct($registry, Entity::class);
     }
 
-    public function add(Entity $entity, bool $flush = false): void
+    public function save(Entity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -44,14 +44,29 @@ class DomainRepository extends ServiceEntityRepository
         }
     }
 
-    public function makeMaildir(Entity $entity, bool $add = true)
+    public function manageMaildir(Entity $entity)
     {
-        if ($add) {
-            $this->add($entity, true);
-        }
         $base=$this->config->findParameter('virtual_mailbox_base');
-        mkdir($base.'/'.$entity->getId());
-        system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
+
+        if (null==$entity->getId()) {
+            $this->save($entity, true);
+            mkdir($base.'/'.$entity->getId());
+            system("cd $base;ln -sf " . $entity->getId() . " " . $entity->getName());
+        } else {
+            $unitOfWork = $this->getEntityManager()->getUnitOfWork();
+            $unitOfWork->computeChangeSets(); // Calcula cambios pendientes
+            $changes = $unitOfWork->getEntityChangeSet($entity);
+
+            if (isset($changes['name'])) {
+                [$oldName, $newName] = $changes['name'];
+                // Ya sabes si ha cambiado
+                //dd($oldName, $newName);
+                if ($oldName!=$newName) {
+                    system("cd $base;mv $oldName $newName");
+                }
+            }
+            $this->save($entity, true);
+        }
     }
 
     public function rawsql($rawsql, bool $flush = false): void
@@ -73,28 +88,46 @@ class DomainRepository extends ServiceEntityRepository
         $caCertData['serial'] = ++$value['serialNumber'];
         $entity->setCertData($caCertData);
         //dd($entity, $indexData);
-        $this->add($entity, true);
+        $this->save($entity, true);
+    }
+
+    public function certificateSubmit($form)
+    {
+        $user = $form->getData();
+        if (null==$user->getDomain() && $form->get('domain')) {
+            $domain = $this->dr->find($form->get('domain'));
+            $user->setDomain($domain);
+        }
+        $plainPassword = $user->getPlainpassword();
+        if (!empty($plainPassword)) {
+            $user->setPassword($this->encodePassword($plainPassword));
+            $this->RS->getSession()->getFlashBag()->add('success', 'Password successfully modified');
+        }
+        $this->save($user, true);
+        if ($user->getSendEmail()) {
+            $this->sendWelcomeMail($user);
+        }
     }
 
 //    /**
-//     * @return Booking[] Returns an array of Booking objects
+//     * @return Domain[] Returns an array of Domain objects
 //     */
 //    public function findByExampleField($value): array
 //    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
+//        return $this->createQueryBuilder('d')
+//            ->andWhere('d.exampleField = :val')
 //            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
+//            ->orderBy('d.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Booking
+//    public function findOneBySomeField($value): ?Domain
 //    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
+//        return $this->createQueryBuilder('d')
+//            ->andWhere('d.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()

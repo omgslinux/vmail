@@ -1,88 +1,102 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
+<div class="container">
     {% set tagPrefix = 'create' %}
     <h1>{{ title|trans }}{% if entity is defined %} ({{ entity.name }}){% endif %}</h1>
 
-{% if ajax is defined %}
-    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
-    <div class="modal-header btn-primary">
-        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
-        <span aria-hidden="true">&times;</span>
-        </button>
+    {% if ajax is defined %}
+        {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
+        <div class="modal-header btn-primary">
+            <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
+            </button>
+        </div>
+    {% endif %}
+
+    {{ form_start(form) }}
+    <div class="modal-body" data-turbo="false" >
+    {% if form.common is defined %}
+        {% if form.common.commonName is defined %}
+        <div class="row mb-4">
+            <div class="col-2">{{ form_label(form.common.commonName)}}</div>
+            <div class="col-10">{{ form_widget(form.common.commonName)}}</div>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-2">{{ form_label(form.common.countryName)}}</div>
+            <div class="col-3">{{ form_widget(form.common.countryName)}}</div>
+            <div class="col-2">{{ form_label(form.common.stateOrProvinceName)}}</div>
+            <div class="col-3">{{ form_widget(form.common.stateOrProvinceName)}}</div>
+        </div>
+        <div class="row">
+            <div class="col-2">{{ form_label(form.common.localityName)}}</div>
+            <div class="col-3">{{ form_widget(form.common.localityName)}}</div>
+            <div class="col-2">{{ form_label(form.common.organizationName)}}</div>
+            <div class="col-3">{{ form_widget(form.common.organizationName)}}</div>
+        </div>
+        <div class="row">
+            <div class="col-2">{{ form_label(form.common.organizationalUnitName)}}</div>
+            <div class="col-4">{{ form_widget(form.common.organizationalUnitName)}}</div>
+        </div>
+        {% if form.common.emailAddress is defined %}
+        <div class="row">
+            <div class="col-2">{{ form_label(form.common.emailAddress)}}</div>
+            <div class="col-4">{{ form_widget(form.common.emailAddress)}}</div>
+        </div>
+        {% endif %}
+        {% if form.common.plainPassword is defined %}
+        <hr>
+        <h5>Establecer contraseña para la clave del certificado</h5>
+        <div class="row">
+            <div class="col-4">{{ form_widget(form.common.plainPassword)}}</div>
+            {% do form.common.plainPassword.setRendered %}
+        </div>
+        {% endif %}
+        {% if form.common.customFile is defined %}
+        <hr>
+        <h5>Cargar certificado existente</h5>
+        <div class="row">
+            <div class="col-4">{{ form_widget(form.common.customFile)}}</div>
+            {% do form.common.customFile.setRendered %}
+        </div>
+        {% endif %}
     </div>
-{% endif %}
-
-{{ form_start(form) }}
-<div class="modal-body">
-{% if form.common is defined %}
-  <div class="row">
-    <div class="col-2">{{ form_label(form.common.countryName)}}</div>
-    <div class="col-4">{{ form_widget(form.common.countryName)}}</div>
-  </div>
-  <div class="row">
-    <div class="col-2">{{ form_label(form.common.stateOrProvinceName)}}</div>
-    <div class="col-4">{{ form_widget(form.common.stateOrProvinceName)}}</div>
-  </div>
-  <div class="row">
-    <div class="col-2">{{ form_label(form.common.localityName)}}</div>
-    <div class="col-4">{{ form_widget(form.common.localityName)}}</div>
-  </div>
-  <div class="row">
-    <div class="col-2">{{ form_label(form.common.organizationName)}}</div>
-    <div class="col-4">{{ form_widget(form.common.organizationName)}}</div>
-  </div>
-  <div class="row">
-    <div class="col-2">{{ form_label(form.common.organizationalUnitName)}}</div>
-    <div class="col-4">{{ form_widget(form.common.organizationalUnitName)}}</div>
-  </div>
-  {% if form.common.commonName is defined %}
-  <div class="row">
-    <div class="col-2">{{ form_label(form.common.commonName)}}</div>
-    <div class="col-4">{{ form_widget(form.common.commonName)}}</div>
-  </div>
     {% endif %}
-     {% if form.common.emailAddress is defined %}
+    {% if form.interval is defined %}
+        <hr>
+        <h5>{% trans %}Expiration{% endtrans %}</h5>
+        <div class="row mb-4">
+            <div class="col-2">{{ form_label(form.interval.notBefore)}}</div>
+            <div class="col-4">{{ form_widget(form.interval.notBefore)}}</div>
+            <div class="col-2">{{ form_label(form.interval.notAfter)}}</div>
+            <div class="col-4">{{ form_widget(form.interval.notAfter)}}</div>
+        </div>
+        <div class="row">
+            <div class="col-2">{{ form_label(form.interval.interval.years)}}:</div>
+            <div class="col-2">{{ form_widget(form.interval.interval.years)}}</div>
+            <div class="col-2">{{ form_label(form.interval.interval.months)}}:</div>
+            <div class="col-2">{{ form_widget(form.interval.interval.months)}}</div>
+            <div class="col-2">{{ form_label(form.interval.interval.days)}}:</div>
+            <div class="col-2">{{ form_widget(form.interval.interval.days)}}</div>
+        </div>
+    {% endif %}
+    {% if form.plainPassword is defined %}
+      <hr>
+      <h5>Establecer contraseña para la clave del certificado</h5>
       <div class="row">
-        <div class="col-2">{{ form_label(form.common.emailAddress)}}</div>
-        <div class="col-4">{{ form_widget(form.common.emailAddress)}}</div>
+        <div class="col-2">{{ form_label(form.plainPassword)}}</div>
+        <div class="col-4">{{ form_widget(form.plainPassword)}}</div>
       </div>
+      {% do form.plainPassword.setRendered %}
+      {% endif %}
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+        {% if form.download is defined %}{{ form_row(form.download)}}
+        {% else %}
+        <button class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
+        {% endif %}
+    </div>
+    {{ form_end(form) }}
+
+    {% if delete_form is defined %}
+        {{ include('_delete_form.html.twig') }}
     {% endif %}
-{% endif %}
- {% if form.interval is defined %}
-  <hr>
-  <h2>{% trans %}Expiration{% endtrans %}</h2>
- <div class="row">
-    <div class="col-2">{{ form_label(form.interval.notBefore)}}</div>
-    <div class="col-4">{{ form_widget(form.interval.notBefore)}}</div>
-    <div class="col-2">{{ form_label(form.interval.notAfter)}}</div>
-    <div class="col-4">{{ form_widget(form.interval.notAfter)}}</div>
-  </div>
-  <div class="row">
-    <div class="col-2">{{ form_label(form.interval.interval)}}</div>
-    <div class="col-4">{{ form_widget(form.interval.interval)}}</div>
-  </div>
-  {% endif %}
-  {% if form.plainPassword is defined %}
-  <hr>
-  <h2>Establecer contraseña para la clave del certificado</h2>
-  <div class="row">
-    <div class="col-2">{{ form_label(form.plainPassword)}}</div>
-    <div class="col-4">{{ form_widget(form.plainPassword)}}</div>
-  </div>
-  {% do form.plainPassword.setRendered %}
-  {% endif %}
 </div>
-<div class="modal-footer">
-    <button class="btn btn-secondary" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
-    <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
-</div>
-{{ form_end(form) }}
-
-{% if delete_form is defined %}
-    {{ include('_delete_form.html.twig') }}
-{% endif %}
-
-
-{% endblock %}

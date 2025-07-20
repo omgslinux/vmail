@@ -3,10 +3,10 @@
 {% block body %}
 <style>
 .dashboard {
-    width: 700px;
     height: 700px;
     border-radius: 10px;
     gap: 20px;
+    margin: 20px;
 }
 .item {
     display: flex;
@@ -19,104 +19,104 @@
 #roleadmin {
     background-color: red;
     border-radius: inherit;
+    margin: inherit;
 }
 #rolemanager {
     background: green;
     border-radius: inherit;
+    margin: inherit;
 }
 #roleuser {
     background: orange;
     border-radius: inherit;
+    margin: inherit;
 }
 #usercertificate {
     background: darkcyan;
     border-radius: inherit;
 }
 </style>
-    <div class="dashboard d-flex flex-column">
+    <div class="dashboard">
         {% if is_granted('ROLE_ADMIN') %}
-        <div id="roleadmin" class="item">
-            <li>
+        <div id="roleadmin">
+            <div class="row text-center font-bold">
+                <div class="mt-4 h2">ADMINISTRACION</div>
+            </div>
+            <div class="item d-flex d-column">
                 <a class="btn btn-primary" href="{{ path('admin_domain_index') }}">
                 {% trans %}Domain administration{% endtrans %}
                 </a>
-            </li>
-            <li>
-                <a class="btn btn-primary" href="{{ path('admin_certificate_index') }}">
-                {% trans %}Certificate administration{% endtrans %}
-                </a>
-            </li>
+            </div>
         </div>
         {% endif %}
         {% if is_granted('ROLE_MANAGER') %}
-        <div id="rolemanager" class="item">
-            <li>
+        <div id="rolemanager">
+            <div class="row text-center font-bold">
+                <div class="mt-4 h2">GESTION</div>
+            </div>
+            <div class="item d-flex d-column">
                 <a class="btn btn-primary" href="{{ path('manage_user_index') }}">
                 {% trans %}Users in domain{% endtrans %}
                 </a>
-            </li>
             {% if user.domain.certdata %}
-            <li>
                 <a class="btn btn-primary" href="{{ path('manage_user_ca_download') }}">
                 {% trans %}Download CA certificate{% endtrans %}
                 </a>
-            </li>
             {% endif %}
+            </div>
         </div>
         {% endif %}
         {% if is_granted('ROLE_USER') %}
-            {% set tagPrefix = 'pass' %}
-            {% set modalId = 'userpass' %}
-            {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
-            {% set modalTitle = 'Change password' %}
-            <div id="roleuser" class="item">
-                <li>
-                    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
-                    </a>
-                </li>
-                {% set modalSize, included = 'modal-md', 'user/_pass' %}
+            <div id="roleuser">
+            <div class="row text-center font-bold">
+                <div class="mt-4 h2">PERSONAL</div>
+            </div>
+                <div class="d-column item">
+                {% set targetPrefix = 'pass' %}
+                {% set modalTarget = targetPrefix ~ 'Modal' %}
+                {% set modalTitle = 'Change password' %}
+                {% set modalSize = 'modal-md' %}
                 {{ include('_modal.html.twig', {
                   'nobutton': true,
-                  'form': passform,
-                  'noajax': true,
+                  'targetPrefix': targetPrefix,
+                  'modalTarget': modalTarget,
+                  'modalTitle': modalTitle,
+                  'modalSize': modalSize,
                   })
                 }}
-
-                {% set tagPrefix = 'reply' %}
-                {% set modalId = 'userreply' %}
-                {% set modalSize, included = 'modal-lg', 'reply/_form' %}
-                {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
+                <a class="btn btn-primary" href="#" data-url="{{ path(PREFIX ~ 'pass') }}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ modalTitle|trans }}</a>
+                {% set targetPrefix = 'autoreply' %}
+                {% set modalTarget = targetPrefix ~ 'Modal' %}
                 {% set modalTitle = 'Autoreply' %}
-                <li>
-                    <a class="btn btn-primary" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
-                    </a>
-                </li>
-            {{ include('_modal.html.twig', {
-              'nobutton': true,
-              'form': replyform,
-              'noajax': true,
-              })
-            }}
-        </div>
-            {% if user.certData %}
-                {% set tagPrefix = 'certificate' %}
-                {% set modalId = 'usercertificate' %}
-                {% set modalSize, included = 'modal-lg', 'certificates/_download' %}
-                {% set modalId2 = tagPrefix ~ modalId ~ "Modal" %}
-            <h1>Descarga de certificados</h1>
-            <div id="usercertificate" class="item">
-                {% set modalTitle = 'User certificate download' %}
-                <li>
-                    <a class="btn btn-primary item" role="button" href="#" data-toggle="modal" data-target="#{{ modalId2 }}">{{ modalTitle|trans }}</a>
-                    </a>
-                </li>
-            {{ include('_modal.html.twig', {
-              'nobutton': true,
-              'form': certificateform,
-              'noajax': true,
-              })
-            }}
-            {% endif %}
+                {% set modalSize = 'modal-lg' %}
+                {{ include('_modal.html.twig', {
+                  'nobutton': true,
+                  'targetPrefix': targetPrefix,
+                  'modalTarget': modalTarget,
+                  'modalTitle': modalTitle,
+                  'modalSize': modalSize,
+                  })
+                }}
+                    <a class="btn btn-primary" role="button" href="#" data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ modalTitle|trans }}</a>
+
+                    {% if user.certData %}
+                        {% set modalTitle = 'User certificate download' %}
+                        {% set targetPrefix = 'certificate' %}
+                        {% set modalTarget = targetPrefix ~ 'Modal' %}
+                        {% set modalSize = 'modal-lg' %}
+                    <a class="btn btn-primary" role="button" href="#" data-url="{{ path(PREFIX ~ 'download') }}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ modalTitle|trans }}</a>
+                        {{ include('_modal.html.twig', {
+                          'nobutton': true,
+                          'targetPrefix': targetPrefix,
+                          'modalTarget': modalTarget,
+                          'modalTitle': modalTitle,
+                          'modalSize': modalSize,
+                          })
+                        }}
+                    {% endif %}
+                </div>
+
+                </div>
             </div>
             <hr>
         {% endif %}

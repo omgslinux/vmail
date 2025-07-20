@@ -1,21 +1,12 @@
-{% if app.session.flashBag.has('success') %}
-    <div class="alert alert-success">
-    {% for msg in app.session.flashBag.get('success') %}
-        {{ msg }}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">
+            {{ message }}
+        </div>
     {% endfor %}
-    </div>
+{% endfor %}
+{% if form is defined %}
+{% if form.vars.errors|length %}
+<div class="alert alert-danger">{{ form_errors(form) }}</div>
 {% endif %}
-{% if app.session.flashBag.has('warning') %}
-    <div class="alert alert-warning">
-    {% for msg in app.session.flashBag.get('warning') %}
-        {{ msg }}
-    {% endfor %}
-    </div>
-{% endif %}
-{% if app.session.flashBag.has('error') %}
-    <div class="alert alert-danger">
-    {% for msg in app.session.flashBag.get('error') %}
-        {{ msg }}
-    {% endfor %}
-    </div>
 {% endif %}

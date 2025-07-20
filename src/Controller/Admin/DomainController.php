@@ -10,9 +10,12 @@ use Symfony\Component\Form\FormFactoryInterface as FFI;
 use App\Entity\Alias;
 use App\Entity\Domain;
 use App\Entity\User;
+use App\Utils\Certificate;
 use App\Utils\ReadConfig;
+use App\Form\AutoreplyType;
 use App\Form\UserType;
 use App\Form\DomainType;
+use App\Repository\AutoreplyRepository as AUR;
 use App\Repository\DomainRepository as REPO;
 use App\Repository\UserRepository as UR;
 
@@ -23,19 +26,7 @@ use App\Repository\UserRepository as UR;
 class DomainController extends AbstractController
 {
 
-    const TABS = [
-        [
-          'n' => 'users',
-          't' => 'Users',
-        ],
-        [
-          'n' => 'aliases',
-          't' => 'Alias',
-        ],
-      ];
-
     const VARS = [
-        'modalSize' => 'modal-md',
         'PREFIX' => 'admin_domain_',
         'included' => 'domain/_form',
         'tdir' => 'domain',
@@ -53,27 +44,40 @@ class DomainController extends AbstractController
      * Lists all domain entities.
      */
     #[Route(path: '/', name: 'index', methods: ['GET', 'POST'])]
-    public function index(Request $request, ReadConfig $config): Response
+    public function index(Request $request): Response
     {
         $entity = new Domain();
         $form = $this->createForm(DomainType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->add($entity, true);
-            $base=$config->findParameter('virtual_mailbox_base');
-            mkdir($base.'/'.$entity->getId());
-            system("cd $base;ln -s " . $entity->getId() . " " . $entity->getName());
+            $this->repo->manageMaildir($entity);
 
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
         return $this->render(self::VARS['BASEDIR'] . '/index.html.twig', array(
             'entities' => $this->repo->findAll(),
+            'targetPrefix' => 'domains',
             'title' => 'Domain list',
             'form' => $form->createView(),
             'VARS' => self::VARS,
         ));
+    }
+
+    #[Route(path: '/live', name: 'index_live', methods: ['GET', 'POST'])]
+    public function indexLive(Request $request): Response
+    {
+
+        return $this->render(
+            self::VARS['BASEDIR'] . '/index_live.html.twig',
+            [
+                //'entities' => $this->repo->findAll(),
+                'tagPrefix' => 'admin',
+                'modalId' => 'domains',
+                'title' => 'Domain list',
+            ]
+        );
     }
 
 
@@ -83,13 +87,13 @@ class DomainController extends AbstractController
     #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Domain $entity, ReadConfig $config): Response
     {
-        $form = $this->createForm(DomainType::class, $entity);
+        $form = $this->createForm(DomainType::class, $entity, ['action' => $this->generateUrl(self::VARS['PREFIX'] .'edit', ['id' => $entity->getId()])]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->makeMaildir($entity);
+            $this->repo->manageMaildir($entity);
 
-            return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
+            return $this->redirectToRoute(self::VARS['PREFIX'] . 'showbyname', [ 'name' => $entity->getName() ]);
         }
 
         return $this->render(
@@ -120,14 +124,13 @@ class DomainController extends AbstractController
     }
 
 
-    /**
-     * Creates a form to show a FundBanks entity.
-     */
     #[Route(path: '/show/byname/{name}', name: 'showbyname', methods: ['GET', 'POST'])]
-    public function showByName(Request $request, FFI $ff, $name, UR $ur, ReadConfig $config)
+    public function showByName(Request $request, $name, Certificate $certUtil)
     {
-        $activetab = 'users';
-        $session = $request->getSession();
+        $activeTab = $request->query->get('activetab', 0);
+
+        $reload = false;
+
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -140,96 +143,91 @@ class DomainController extends AbstractController
                 $users[]=$user;
             }
         }
-        //$users=$ur->findBy(['domain' => $entity, 'list' => 0]);
-        //$lists=$ur->findBy(['domain' => $entity, 'list' => 1]);
         $form = $this->createForm(DomainType::class, $entity);
         // Fin de definicion de la entidad
-
-        // Pestaña usuarios
-        $user = (new User())
-        ->setDomain($entity)
-        ->setSendEmail(true)
-        ->setActive(true)
-        ;
-        $userform = $this->createForm(
-            UserType::class,
-            $user,
-            [
-                'showAutoreply' => false,
-            ]
-        );
-
-        // Fin pestaña usuarios
-
-        // Pestaña Alias
-        $alias = (new User())
-        ->setDomain($entity)
-        ->setList(true)
-        ->setPassword(false)
-        ;
-        // createNamed es para dar un nombre al formulario para que no sean ambos 'user'
-        $aliasform = $ff->createNamed(
-            'alias',
-            UserType::class,
-            $alias,
-            [
-                'domainId' => $entity->getId(),
-                'showAlias' => true,
-            ]
-        )
-        ;
-        // Fin pestaña aliases
-
-        // Vamos a ver los POST de los distintos formularios. Sólo puede ser uno
-
-        $reload = false;
 
         // Formulario de la entidad
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->add($entity, true);
-            $newName = $entity->getName();
-            if ($oldname!=$newName) {
-                $base=$config->findParameter('virtual_mailbox_base');
-                system("cd $base;mv $oldname $newName;ln -sf " . $entity->getId() . " " . $newName);
-            }
+            $this->repo->makeMaildir($entity, true);
 
-            $reload = true;
-        }
-
-        // Formulario de los usuarios
-        $userform->handleRequest($request);
-
-        if ($userform->isSubmitted() && $userform->isValid()) {
-            $ur->formSubmit($userform);
-
-            $reload = true;
+            //$reload = true;
         }
 
 
         if ($reload) {
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
-        } else {
-            if (null!=$session->get('activetab')) {
-                $activetab = $session->get('activetab');
-                $session->remove('activetab');
-            }
         }
 
+        $VARS = [
+            'origin' => $this->generateUrl(self::VARS['PREFIX'] . 'showbyname', ['name' => $name ]),
+            'PREFIX' => 'admin_domain_',
+            'modalId' => 'domains',
+        ];
+
+        // Populate certificate tab
+        $certificates = [];
+        foreach ($entity->getServerCertificates() as $certificate) {
+            if (null!=$certData=$entity->getCertData()) {
+                $certout = $certData['certdata']['cert'];
+                $cert = openssl_x509_parse($certout, false);
+                $certInterval = [
+                    'notBefore' => $certUtil::convertUTCTime2Date($cert['validFrom']),
+                    'notAfter'  => $certUtil::convertUTCTime2Date($cert['validTo']),
+                ];
+                //dump($certData, $cert, $certInterval);
+                $data = [
+                    'description' => $certificate->getDescription(),
+                    'domain' => $certificate->getDomain(),
+                    'certdata' => $certUtil->extractX509Data($certificate),
+                    'interval' => $certInterval,
+                    'entity' => $certificate,
+                ];
+                $certificates[] = $data;
+            }
+        }
+        // End of populate certificate tab
+
+        $tabs = [
+            [
+                'template' => 'tabs/users/_index.html.twig',
+                'title' => 'Users',
+                'context' => [
+                    'users' => $users,
+                    'modalSize' => 'modal-lg',
+                    'VARS' => $VARS,
+                ]
+            ],
+            [
+            'template' => 'tabs/aliases/_index.html.twig',
+            'title' => 'Alias',
+            'context' => [
+                'aliases' => $aliases,
+                'modalSize' => 'modal-lg'
+                ]
+            ],
+            [
+            'template' => 'tabs/certificates/_index.html.twig',
+            'title' => 'Certificates',
+            'context' => [
+                'entities' => $certificates,
+                'modalSize' => 'modal-xl'
+                ]
+            ],
+        ];
 
         return $this->render(
             self::VARS['BASEDIR'] . '/show.html.twig',
             [
                 'entity' => $entity,
-                'tabs' => self::TABS,
-                'activetab' => $activetab,
+                'targetPrefix' => 'domains',
+                'tabs' => [
+                    'tabId' => 'domainTabs',
+                    'activeTab' => $activeTab,
+                    'tabs' => $tabs
+                ],
                 'form' => $form->createView(),
-                'user_form' => $userform->createView(),
-                'alias_form' => $aliasform->createView(),
-                'users' => $users,
-                'aliases' => $aliases,
-                'VARS' => self::VARS,
-                'origin' => $this->generateUrl(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]),
+                'VARS' => $VARS,
             ]
         );
     }
