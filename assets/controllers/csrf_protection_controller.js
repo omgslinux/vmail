@@ -33,8 +33,9 @@ export function generateCsrfToken (formElement) {
     if (!csrfCookie && nameCheck.test(csrfToken)) {
         csrfField.setAttribute('data-csrf-protection-cookie-value', csrfCookie = csrfToken);
         csrfField.defaultValue = csrfToken = btoa(String.fromCharCode.apply(null, (window.crypto || window.msCrypto).getRandomValues(new Uint8Array(18))));
-        csrfField.dispatchEvent(new Event('change', { bubbles: true }));
+       //csrfField.dispatchEvent(new Event('change', { bubbles: true })); // Move this after if
     }
+    csrfField.dispatchEvent(new Event('change', { bubbles: true })); // Here
 
     if (csrfCookie && tokenCheck.test(csrfToken)) {
         const cookie = csrfCookie + '_' + csrfToken + '=' + csrfCookie + '; path=/; samesite=strict';

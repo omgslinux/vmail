@@ -1,0 +1,34 @@
+{# templates/components/bootstrap_tabs.html.twig #}
+{% set tabId = tabs.tabId ?? ('tabs_' ~ random()) %}
+{% set activeTab = tabs.activeTab ?? 0 %}
+
+<ul class="nav nav-{{ tab_style|default('tabs') }}{{ (flex == 'column') ? ' flex-column'}}" id="{{ tabId }}" role="tablist">
+    {% for i, tab in tabs.tabs %}
+        {% set active = i == activeTab ? 'active' : '' %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ active }}"
+                    id="{{ tabId }}-tab-{{ i }}"
+                    data-bs-toggle="tab"
+                    data-bs-target="#{{ tabId }}-pane-{{ i }}"
+                    type="button" role="tab"
+                    aria-controls="{{ tabId }}-pane-{{ i }}"
+                    aria-selected="{{ i == 0 ? 'true' : 'false' }}">
+                <strong>{{ tab.title|trans }}</strong>
+            </button>
+        </li>
+    {% endfor %}
+</ul>
+<!-- Tabs navs -->
+
+<!-- Tabs content -->
+<div class="tab-content {{ contentClass }}" id="{{ tabId }}Content">
+    {% for i, tab in tabs.tabs %}
+        {% set active = i == activeTab ? 'show active' : '' %}
+        <div class="tab-pane fade {{ active }}"
+             id="{{ tabId }}-pane-{{ i }}"
+             role="tabpanel"
+             aria-labelledby="{{ tabId }}-tab-{{ i }}">
+            {% include tab.template with tab.context|default({}) %}
+        </div>
+    {% endfor %}
+</div>
