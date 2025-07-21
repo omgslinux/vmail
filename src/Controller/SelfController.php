@@ -76,7 +76,14 @@ class SelfController extends AbstractController
             return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
         }
 
-        $certificateform = $this->createForm(CertDownloadType::class, null, ['certtype' => 'client', 'entity' => $entity]);
+        $certificateform = $this->createForm(
+            CertDownloadType::class,
+            null,
+            [
+                'certtype' => 'client',
+                'entity' => $entity,
+            ]
+        );
         $certificateform->handleRequest($request);
 
         if ($certificateform->isSubmitted() && $certificateform->isValid()) {

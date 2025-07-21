@@ -87,7 +87,13 @@ class DomainController extends AbstractController
     #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Domain $entity, ReadConfig $config): Response
     {
-        $form = $this->createForm(DomainType::class, $entity, ['action' => $this->generateUrl(self::VARS['PREFIX'] .'edit', ['id' => $entity->getId()])]);
+        $form = $this->createForm(
+            DomainType::class,
+            $entity,
+            [
+                'action' => $this->generateUrl(self::VARS['PREFIX'] .'edit', ['id' => $entity->getId()])
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

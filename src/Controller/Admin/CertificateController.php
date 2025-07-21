@@ -318,14 +318,11 @@ class CertificateController extends AbstractController
     public function serverDownload(Request $request, ServerCertificate $certificate, $dtype): Response
     {
         if (($dtype == 'chain') || ($dtype == 'certkey')) {
-            //$this->addFlash('success', 'Se creo el certificado');
             return $this->util
             ->certDownload('server', [$certificate, $dtype]);
-
         } else {
             $this->addFlash('error', "Opción incorrecta $dtype");
         }
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
     }
-
 }

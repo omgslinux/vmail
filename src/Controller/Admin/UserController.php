@@ -238,7 +238,10 @@ class UserController extends AbstractController
             $origin = $this->generateUrl(self::VARS['PREFIX'] . 'admin_new', ['id' => $domain->getId()]);
         }
 
-        $action = $this->generateUrl(self::VARS['PREFIX'] . 'admin_new', ['id' => $domain->getId(), 'origin' => $origin]);
+        $action = $this->generateUrl(
+            self::VARS['PREFIX'] . 'admin_new',
+            ['id' => $domain->getId(), 'origin' => $origin]
+        );
         if (!$this->isGranted('ROLE_ADMIN')) {
             $action = $this->generateUrl(self::VARS['PREFIX'] . 'new', ['origin' => $origin]);
         }
@@ -308,12 +311,9 @@ class UserController extends AbstractController
             return $util
             //->setDomain($domain)
             ->certDownload('ca', [$entity, $dtype]);
-
         } else {
             $this->addFlash('error', "Opción incorrecta $dtype");
         }
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
     }
-
-
 }

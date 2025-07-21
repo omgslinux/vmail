@@ -150,7 +150,13 @@ class AliasController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->repo->add($alias, true);
 
-            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ]);
+            return $this->redirectToRoute(
+                'admin_domain_showbyname',
+                [
+                    'name' => $domain->getName(),
+                    'activetab' => 1,
+                ]
+            );
         }
 
         return $this->render('tabs/aliases/_form.html.twig', array(
@@ -196,8 +202,14 @@ class AliasController extends AbstractController
             $this->repo->add($alias, true);
 
             if (null==$origin) {
-                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute(
+                    'admin_domain_showbyname',
+                    [
+                        'name' => $domain->getName(),
+                        'activetab' => 1,
+                    ],
+                    Response::HTTP_SEE_OTHER
+                );
             } else {
                 return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
             }
@@ -218,7 +230,14 @@ class AliasController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
             $this->repo->remove($entity, true);
             if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute(
+                    'admin_domain_showbyname',
+                    [
+                        'name' => $domain->getName(),
+                        'activetab' => 1
+                    ],
+                    Response::HTTP_SEE_OTHER
+                );
             }
 
             return $this->redirectToRoute('manage_user_index');
