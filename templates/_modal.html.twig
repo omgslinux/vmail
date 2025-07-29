@@ -23,6 +23,7 @@
                     }
                 ) }}
             {% else -%}
+            {# Código js anterior
                 <script>
                     var {{ modalTarget }} = document.getElementById('{{ modalTarget }}');
 
@@ -31,9 +32,57 @@
                         fetch(e.relatedTarget.dataset.url)
                         .then( response => response.text())
                         .then( body => document.getElementById('{{ modalTarget }}-content').innerHTML=body );
-                        //e.relatedTarget.dataset.loaded = true; // Marcar como cargado
                     }
                 );
+
+                </script>
+                #}
+                <script>
+                var {{ modalTarget }} = document.getElementById('{{ modalTarget }}');
+
+                {{ modalTarget }}.addEventListener('show.bs.modal', function (e) {
+                    fetch(e.relatedTarget.dataset.url)
+                        .then(response => response.text())
+                        .then(body => {
+                            document.getElementById('{{ modalTarget }}-content').innerHTML = body;
+
+                            const form = document.querySelector('#{{ modalTarget }}-content form');
+                            if (form) {
+                                form.addEventListener('submit', async (e) => {
+                                    e.preventDefault();
+                                    const submitResponse = await fetch(form.action, {
+                                        method: 'POST',
+                                        body: new FormData(form),
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                    });
+
+                                    if (submitResponse.status === 422) {
+                                        // Mostrar errores
+                                        const errorHtml = await submitResponse.text();
+                                        const newForm = (new DOMParser()).parseFromString(errorHtml, 'text/html').querySelector('form');
+                                        form.replaceWith(newForm);
+                                    } else if (submitResponse.ok) {
+                                        console.log(submitResponse);
+
+                                        const contentType = submitResponse.headers.get('content-type');
+                                        console.log(contentType);
+                                        if (contentType?.includes('application/json')) {
+                                            try {
+                                                const data = await submitResponse.json();
+                                                if (data.redirectUrl) {
+                                                    console.log("redirectUrl", data.redirectUrl);
+                                                    window.location.href = data.redirectUrl;
+                                                    return;
+                                                }
+                                            } catch (error) {
+                                                console.error("JSON inválido:", await submitResponse.text());
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                });
                 </script>
 
                 {% endif %}
