@@ -164,6 +164,22 @@ class SelfController extends AbstractController
         );
     }
 
+    private function getReferer(Request $request, $activetab = 0)
+    {
+        $referer = $request->headers->get('referer');
+        $origin = $_redirect = $request->headers->get('origin');
+
+        if ($referer && $origin && str_starts_with($referer, $origin)) {
+            // Quitar el origin de la URL
+            $_redirect = substr($referer, strlen($origin));
+        }
+        $pos = strcspn($_redirect, "?#");
+        $redirect = substr($_redirect, 0, $pos) ?: '/';
+
+        //return $this->redirect($redirect. ($activetab > 0 ? "?activetab=$activetab" : ''));
+        return $redirect . ($activetab > 0 ? "?activetab=$activetab" : '');
+    }
+
 
     /**
      * Displays a form to change the password.
@@ -225,7 +241,7 @@ class SelfController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $ur->formSubmit($form);
 
-            return $this->redirectToRoute('homepage');
+            return $this->redirect($this->getReferer($request));
         }
 
         return $this->render('user/_self.html.twig', array(

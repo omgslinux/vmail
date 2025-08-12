@@ -1,15 +1,5 @@
-    {% set tagPrefix = 'create' %}
-    <h1>{{ title|trans }}</h1>
-
-{% if ajax is defined %}
-    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
-    <div class="modal-header btn-primary">
-        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
-        <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-{% endif %}
+{% set tagPrefix = 'create' %}
+<h1>{{ title|trans }}</h1>
 
 {{ form_start(form) }}
 <h2>{% trans %}Basic data{% endtrans %}</h2>

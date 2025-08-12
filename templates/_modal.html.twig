@@ -48,13 +48,28 @@
 
                             const form = document.querySelector('#{{ modalTarget }}-content form');
                             if (form) {
+                                // 👇 Captura el botón pulsado en el formulario
+                                let clickedButton = null;
+                                form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(btn => {
+                                    btn.addEventListener('click', function() {
+                                        clickedButton = this; // Almacena el botón pulsado
+                                    });
+                                });
+
                                 form.addEventListener('submit', async (e) => {
                                     e.preventDefault();
+                                    const formData = new FormData(form);
+
+                                    // 👇 Añade el botón pulsado al FormData (clave para Symfony)
+                                    if (clickedButton && clickedButton.name) {
+                                        formData.append(clickedButton.name, clickedButton.value || '');
+                                    }
+                                    
                                     const submitResponse = await fetch(form.action, {
-                                        method: 'POST',
-                                        body: new FormData(form),
-                                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                                    });
+                                            method: 'POST',
+                                            body: formData,
+                                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                        });
 
                                     if (submitResponse.status === 422) {
                                         // Mostrar errores

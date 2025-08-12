@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -204,6 +205,18 @@ class CertificateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
+            $this->util->certDownload(
+                'client',
+                [
+                    'format' => $form->getClickedButton()->getName(),
+                    'setkey' => $formData['setkey']
+                ]
+            );
+                return new JsonResponse([
+                    'success' => true,
+                    'redirectUrl' => $this->generateUrl('admin_domain_showbyname', [ 'name' => $user->getDomain()->getName() ])
+                ]);
+            /*
             return $this->util->certDownload(
                 'client',
                 [
@@ -213,6 +226,7 @@ class CertificateController extends AbstractController
             );
 
             return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $user->getDomain()->getName() ]);
+            */
         }
 
         return $this->render(
@@ -247,34 +261,46 @@ class CertificateController extends AbstractController
                 'action' => $this->generateUrl(self::VARS['PREFIX'] . 'server_new', ['id' => $domain->getId()]),
             ]
         );
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $formData = $form->getData();
-            $this->util->setDomain($domain);
-            $certData = $this->util->createServerCert($formData);
-            //dump($formData, $certData);
-            $d = $formData['common']['commonName'];
-            $serverCertificate = new ServerCertificate();
-            $serverCertificate->setDomain($domain)
-            ->setDescription($d!='*'?$d:'wildcard')
-            ->setCertData($certData);
-            $domain->addServerCertificate($serverCertificate);
-            $indexData = $this->util->addToIndex($certData['certdata']['cert']);
-            //dd($indexData);
-            //$this->repo->add($domain, true);
-            $this->repo->updateCAIndex($domain, $indexData);
-            $this->addFlash('success', 'Se creo el certificado');
-            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' =>2 ]);
+        $form->handleRequest($request);
+        $render = [
+              'title' => 'Create server certificate',
+              'form' => $form,
+              'entity' => $domain,
+            ]
+        ;
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $formData = $form->getData();
+                $this->util->setDomain($domain);
+                $certData = $this->util->createServerCert($formData);
+                //dump($formData, $certData);
+                $d = $formData['common']['commonName'];
+                $serverCertificate = new ServerCertificate();
+                $serverCertificate->setDomain($domain)
+                ->setDescription($d!='*'?$d:'wildcard')
+                ->setCertData($certData);
+                $domain->addServerCertificate($serverCertificate);
+                $indexData = $this->util->addToIndex($certData['certdata']['cert']);
+                //dd($indexData);
+                //$this->repo->add($domain, true);
+                $this->repo->updateCAIndex($domain, $indexData);
+                $this->addFlash('success', 'Se creo el certificado');
+                return new JsonResponse([
+                    'success' => true,
+                    'redirectUrl' => $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' =>2 ])
+                ]);
+            }
+            return $this->render(
+                'certificates/_form.html.twig',
+                $render,
+                new Response(null, 422)
+            );
         }
 
         return $this->render(
             'certificates/_form.html.twig',
-            [
-              'title' => 'Create server certificate',
-              'form' => $form->createView(),
-              'entity' => $domain,
-            ]
+            $render
         );
     }
 

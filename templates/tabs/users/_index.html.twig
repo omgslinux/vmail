@@ -4,6 +4,7 @@
 {% set modalTarget = targetPrefix ~ 'users' %}
 {% set modalSize = 'modal-lg' %}
 {% if users|length > 0 %}{% set certActive = 'Download' %}{% set replyActive = 'Edit' %}
+    <div >
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -16,78 +17,51 @@
             </tr>
             {% for user in users %}{% set email = user.name ~ '@' ~ entity.name %}
             <tr>
-                <td><a href="#" data-bs-toggle="modal" data-bs-target="#{{ targetPrefix }}usersModal"
-                {% if origin is defined %}
+                <td><a href="#" data-action="click->modal-loader#open"
+                {% if origin is defined -%}
                     data-url="{{ path('manage_user_edit', { 'id': user.id, 'origin': origin } ) }}">{{ email }}</a></td>
-                {% else %}
+                {% else -%}
                     data-url="{{ path('manage_user_edit', { 'id': user.id } ) }}">{{ email }}</a></td>
                 {% endif %}
                 <td>{{ user.fullName }}</td>
                 <td>{{ user.isActive ? '√' : '--' }}</td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
-                <td>{% if entity.certdata %}
+                <td>{% if entity.certdata -%}
+                    <a href="#" data-action="click->modal-loader#open"
                         {% if user.certdata %}
-                        <a class="btn btn-secondary" data-url="{{ path('admin_certificate_client_download', { 'id': user.id } ) }}"
+                            class="btn btn-secondary" data-url="{{ path('admin_certificate_client_download', { 'id': user.id } ) }}"
                         {% else %}{% set certActive = 'Create' %}
-                        <a class="btn btn-primary" data-url="{{ path('admin_certificate_client_new', { 'id': user.id } ) }}"
+                            class="btn btn-primary" data-url="{{ path('admin_certificate_client_new', { 'id': user.id } ) }}"
                         {% endif %}
-                        href="#" data-bs-toggle="modal" data-bs-target="#createcertModal">
-                    {{ certActive|trans }}</a>
+                        >
+                        {{ certActive|trans }}
                     {%- else -%}
-                    --</td>
-                    {%- endif %}
-                <td><a data-turbo="false"
+                        --
+                    {%- endif -%}
+                    </a>
+                </td>
+                <td><a href="#" data-action="click->modal-loader#open"
                     {%- if user.reply -%}
                     {%- else -%}{% set replyActive = 'Create' %}
-                    {%- endif -%} data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}"
-                    class="btn btn-{{ user.reply ? 'secondary' :'primary' }}" 
-                    href="#" data-bs-toggle="modal" data-bs-target="#createreplyModal">
-                {{ replyActive|trans }}</a></td>
+                    {%- endif %} data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}"
+                    class="btn btn-{{ user.reply ? 'secondary' :'primary' }}"
+                    >{{ replyActive|trans }}</a>
+                </td>
         </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% set modalTitle = 'Edit user' %}
-    {{ include('_modal.html.twig', {
-      'nobutton': true,
-      'targetPrefix': targetPrefix ~ 'users',
-      'modalTarget': targetPrefix ~ 'usersModal',
-      'modalSize': modalSize,
-      'modalTitle': modalTitle,
-      })
-    }}
+    </div>
 {% else %}
     <p>{% trans %}No users in domain{% endtrans %}</p>
 {% endif %}
 {% set targetPrefix = 'create' %}
 {% set modalTitle = 'Create a new user' %}
-<a class="btn btn-primary" href="#" data-url="{{ path('manage_user_admin_new', { 'id': entity.id } )}}" data-bs-toggle="modal" data-bs-target="#{{ targetPrefix }}usersModal">{{ modalTitle }}</a>
-    {{ include('_modal.html.twig', {
-      'nobutton': true,
-      'targetPrefix': targetPrefix ~ 'users',
-      'modalTarget': targetPrefix ~ 'usersModal',
-      'modalTitle': modalTitle,
-      'modalSize': modalSize,
-      })
-    }}
-
-{% set modalTitle = 'Create a new user certificate' %}
-    {{ include('_modal.html.twig', {
-      'nobutton': true,
-      'targetPrefix': targetPrefix ~ 'cert',
-      'modalTarget': targetPrefix ~ 'certModal',
-      'modalTitle': modalTitle,
-      'modalSize': 'modal-xl',
-      })
-    }}
-
-{% set modalTitle = 'Create autoreply' %}
-    {{ include('_modal.html.twig', {
-      'nobutton': true,
-      'targetPrefix': targetPrefix ~ 'reply',
-      'modalTarget': targetPrefix ~ 'replyModal',
-      'modalTitle': modalTitle,
-      'modalSize': 'modal-xl',
-      })
-    }}
+<a class="btn btn-primary"  data-action="modal-loader#open" href="#"
+{% if is_granted('ROLE_ADMIN') %}
+data-url="{{ path('manage_user_admin_new', { 'id': entity.id } )}}"
+{% else %}
+data-url="{{ path('manage_user_new') }}"
+{% endif %}
+>{{ modalTitle }}</a>
 </div>
