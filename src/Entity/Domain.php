@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\Traits\ActivableEntityTrait;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Domain
@@ -27,9 +28,9 @@ class Domain
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @var string
-     */
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Hostname(requireTld: false, message: 'The domain name must be a valid domain name.')]
     #[ORM\Column(name: 'name', type: 'string', length: 255, unique: true)]
     private $name;
 

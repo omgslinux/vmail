@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Domain;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -159,29 +160,43 @@ class UserController extends AbstractController
             ]
         );
 
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            //dd($request, $origin);
-            //$origin = $session->get('useredit');
-
-            $this->repo->formSubmit($form);
-
-            if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $entity->getDomain()->getName() ]);
-            } else {
-                return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-            }
-        }
-
-        return $this->render(self::VARS['BASEDIR'] . '_form.html.twig', array(
+        $render = [
             'entity' => $entity,
-            'form' => $form->createView(),
+            'form' => $form,
             'delete_form' => true,
             'VARS' => self::VARS,
-        ));
-    }
+        ];
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->repo->formSubmit($form);
+                $redirectUrl = $this->generateUrl('admin_domain_showbyname', [ 'name' => $entity->getDomain()->getName() ]);
+                if (!$this->isGranted('ROLE_ADMIN')) {
+                    $redirectUrl = $this->generateUrl(self::VARS['PREFIX'] . 'index');
+                }
+                $redirectUrl = $this->getReferer($request);
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+                return $this->redirect($redirectUrl);
+            }
+            return $this->render(
+                self::VARS['BASEDIR'] . '_form.html.twig',
+                $render,
+                new Response(null, 422)
+            );
+        } else {
+            return $this->render(
+                self::VARS['BASEDIR'] . '_form.html.twig',
+                $render
+            );
+        }
+    }
 
     #[Route(path: '/new/', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request)
@@ -204,6 +219,72 @@ class UserController extends AbstractController
             $entity,
             [
                 'showDomain'  => false,
+                'passRequired' => true,
+                'showAutoreply' => false,
+                'action' => $action // $this->generateUrl(self::VARS['PREFIX'] . 'new', ['id' => $domain->getId()]),
+            ]
+        );
+
+        $form->handleRequest($request);
+        $render = [
+            'template' => self::VARS['BASEDIR'] . '_form.html.twig',
+            'args' => [
+                'entity' => $entity,
+                'form' => $form,
+                'VARS' => self::VARS,
+                'modalTitle' => 'User creation',
+                'modalSize' => 'modal-xl',
+            ]
+        ];
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->repo->formSubmit($form);
+                //$redirectUrl = $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+                $redirectUrl = $this->getReferer($request);
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+                return $this->redirect($redirectUrl);
+            }
+            return $this->render(
+                $render['template'],
+                $render['args'],
+                new Response(null, 422)
+            );
+        }
+            return $this->render(
+                $render['template'],
+                $render['args']
+            );
+    }
+
+
+    public function newOLD(Request $request)
+    {
+        $domain = $this->getUser()->getDomain();
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+        }
+
+        $action = $this->generateUrl(self::VARS['PREFIX'] . 'new');
+
+        $entity = (new User())
+        ->setDomain($domain)
+        ->setSendEmail(true)
+        ->setActive(true)
+        ;
+
+        $form = $this->createForm(
+            UserType::class,
+            $entity,
+            [
+                'showDomain'  => false,
+                'passRequired' => true,
                 'showAutoreply' => false,
                 'action' => $action // $this->generateUrl(self::VARS['PREFIX'] . 'new', ['id' => $domain->getId()]),
             ]
@@ -238,7 +319,10 @@ class UserController extends AbstractController
             $origin = $this->generateUrl(self::VARS['PREFIX'] . 'admin_new', ['id' => $domain->getId()]);
         }
 
-        $action = $this->generateUrl(self::VARS['PREFIX'] . 'admin_new', ['id' => $domain->getId(), 'origin' => $origin]);
+        $action = $this->generateUrl(
+            self::VARS['PREFIX'] . 'admin_new',
+            ['id' => $domain->getId(), 'origin' => $origin]
+        );
         if (!$this->isGranted('ROLE_ADMIN')) {
             $action = $this->generateUrl(self::VARS['PREFIX'] . 'new', ['origin' => $origin]);
         }
@@ -254,6 +338,7 @@ class UserController extends AbstractController
             $entity,
             [
                 'showDomain'  => false,
+                'passRequired' => true,
                 //'domainId' => $entity->getDomain()->getId(),
                 'showAutoreply' => false,
                 'action' => $action // $this->generateUrl(self::VARS['PREFIX'] . 'new', ['id' => $domain->getId()]),
@@ -261,27 +346,60 @@ class UserController extends AbstractController
         );
 
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->formSubmit($form);
-
-            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
-        }
-
-        return $this->render(
-            self::VARS['BASEDIR'] . '_form.html.twig',
-            [
+        $render = [
+            'template' => self::VARS['BASEDIR'] . '_form.html.twig',
+            'args' => [
                 'entity' => $entity,
-                'form' => $form->createView(),
-                //'ajax' => true,
+                'form' => $form,
                 'VARS' => self::VARS,
                 'modalTitle' => 'User creation',
                 'modalSize' => 'modal-xl',
             ]
+        ];
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->repo->formSubmit($form);
+                //$redirectUrl = $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+                $redirectUrl = $this->getReferer($request);
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+                return $this->redirect($redirectUrl);
+            }
+            return $this->render(
+                //self::VARS['BASEDIR'] . '_form.html.twig',
+                $render['template'],
+                $render['args'],
+                new Response(null, 422)
+            );
+        }
+
+        return $this->render(
+            //self::VARS['BASEDIR'] . '_form.html.twig',
+            $render['template'],
+            $render['args']
         );
     }
 
+    private function getReferer(Request $request, $activetab = 0)
+    {
+        $referer = $request->headers->get('referer');
+        $origin = $_redirect = $request->headers->get('origin');
 
+        if ($referer && $origin && str_starts_with($referer, $origin)) {
+            // Quitar el origin de la URL
+            $_redirect = substr($referer, strlen($origin));
+        }
+        $pos = strcspn($_redirect, "?#");
+        $redirect = substr($_redirect, 0, $pos) ?: '/';
+
+        //return $this->redirect($redirect. ($activetab > 0 ? "?activetab=$activetab" : ''));
+        return $redirect . ($activetab > 0 ? "?activetab=$activetab" : '');
+    }
 
     #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, User $entity): Response
@@ -291,7 +409,8 @@ class UserController extends AbstractController
             $name = $entity->getDomain()->getName();
             $this->repo->remove($entity, true);
             if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $name ]);
+                //return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $name ]);
+                return $this->redirect($this->getReferer($request));
             }
         }
 
@@ -308,12 +427,9 @@ class UserController extends AbstractController
             return $util
             //->setDomain($domain)
             ->certDownload('ca', [$entity, $dtype]);
-
         } else {
             $this->addFlash('error', "Opción incorrecta $dtype");
         }
         return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
     }
-
-
 }

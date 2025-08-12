@@ -16,7 +16,7 @@
     {% endif %}
 
     <div class="row">
-      <div class="col-md-2">
+      <div class="col-md-4">
         {{ form_row(form.name) }}
       </div>
       {% if form.domain is defined %}
@@ -48,24 +48,9 @@
       </div>
     </div>
 
-    {#}
-    {% if form.reply is not defined and entity.id is defined %}
-        {% if entity.reply|length == 0 %}
-            <p><a href="{{ path('user_autoreply_new', { id: entity.id })}}">{% trans %}Create autoreply{% endtrans %}</a></p>
-        {% endif %}
-    {% else %}
-        {% if entity.id is defined %}
-            <hr>
-            <h3>{% trans %}Autoreply{% endtrans %}</h3>
-            {{ form_widget(form.reply) }}
-            {% do form.reply.setRendered %}
-            <hr>
-        {% endif %}
-    {% endif %}
-    #}
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
+        <button type="button" data-action="modal-loader#close" class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans}}</button>
     </div>
 {{ form_end(form) }}

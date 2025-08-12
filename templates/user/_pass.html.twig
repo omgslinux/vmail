@@ -11,13 +11,13 @@
 {{ form_start(form) }}
     <div class="modal-body">
         <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-12">
                 {{ form_widget(form.plainPassword) }}
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close')|trans }}</button>
+        <button class="btn btn-secondary" data-action="modal-loader#close">{{ closeMessage|default('Close')|trans }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
 {{ form_end(form) }}

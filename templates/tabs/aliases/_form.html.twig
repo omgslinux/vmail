@@ -1,13 +1,3 @@
-{% if ajax is defined %}
-    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
-    <div class="modal-header btn-primary">
-        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
-        <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-{% endif %}
-
 {{ form_start(form) }}
     <div class="modal-body">
 
@@ -45,10 +35,10 @@
             {{ include('prototypes/alias_prototype.html.twig', { 'row': address }) }}
         {%- endfor %}
     </ul>
-    <button type="button" class="btn btn-primary" data-action="form-collection#addCollectionElement">Add an alias</button>
+    <button type="button" class="btn btn-primary" data-action="form-collection#addCollectionElement">Add an address</button>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ closeMessage|default('Close') }}</button>
+        <button type="button" class="btn btn-secondary" data-action="modal-loader#close">{{ closeMessage|default('Close') }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
     {{ form_end(form) }}

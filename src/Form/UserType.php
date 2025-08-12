@@ -169,18 +169,21 @@ class UserType extends AbstractType
                 RepeatedType::class,
                 [
                     'type' => PasswordType::class,
-                    'required' => false!==$options['showAlias'],
+                    'required' => $options['passRequired'],
                     'first_options' =>
                     [
                         'label' => 'Password',
+                        'attr' => [
+                            'autocomplete' => $options['passRequired'] ? 'off' : 'new-password',
+                        ]
                     ],
                         'second_options' =>
                     [
                         'label' => 'Confirm password',
+                        'attr' => [
+                            'autocomplete' => 'new-password'
+                        ]
                     ],
-                    'attr' => [
-                        'autocomplete' => 'off'
-                    ]
                 ]
             )
             ;
@@ -194,36 +197,8 @@ class UserType extends AbstractType
             )
             ;
         }
-        /*
-            $builder
-            ->add(
-                'origin',
-                HiddenType::class,
-                [
-                    'mapped' => false,
-                    'data' => urlencode($options['origin']),
-                ]
-            );
-            */
-        /* if ($options['showAutoreply']) {
-            $builder
-            ->add(
-                'reply',
-                AutoreplyType::class,
-                [
-                    //'entry_type' => AutoreplyType::class,
-                    'by_reference' => true,
-                    'label' => false
-                ]
-            )
-            ;
-        }
-        ; */
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -234,6 +209,7 @@ class UserType extends AbstractType
                 'showAlias' => false,
                 'domainId' => false,
                 'origin' => false,
+                'passRequired' => false,
             ]
         );
     }

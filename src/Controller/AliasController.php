@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -126,6 +127,69 @@ class AliasController extends AbstractController
     public function domainNewAction(Request $request, Domain $domain)
     {
         if ($domain->getId()===0) {
+            // return $this->redirectToRoute(self::PREFIX . 'new', ['id' => $this->getUser()->getDomain()->getId()]);
+        }
+
+        $alias = new User();
+        $alias
+        ->setDomain($domain)
+        ->setList(true)
+        ->setPassword(false)
+        ;
+        $form = $this->createForm(
+            UserType::class,
+            $alias,
+            [
+                'domainId' => $domain->getId(),
+                'showAlias' => true,
+                'action' => $this->generateUrl(self::PREFIX . 'domain_new', ['id' => $domain->getId()]),
+            ],
+        )
+        ;
+
+        $form->handleRequest($request);
+        $render = [
+                'domain' => $domain,
+                'form' => $form,
+                'title' => 'Alias creation',
+            ]
+        ;
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->repo->add($alias, true);
+
+                $redirectUrl = $this->generateUrl('manage_user_index', ['activetab' => 1]);
+                if ($this->isGranted('ROLE_ADMIN')) {
+                    $redirectUrl = $this->generateUrl(
+                        'admin_domain_showbyname',
+                        [
+                            'name' => $domain->getName(),
+                            'activetab' => 1,
+                        ]
+                    );
+                }
+                return new JsonResponse([
+                    'success' => true,
+                    //'redirectUrl' => $redirectUrl
+                    'redirectUrl' => $this->getReferer($request, 1)//$redirectUrl
+                ]);
+            }
+            return $this->render(
+                'tabs/aliases/_form.html.twig',
+                $render,
+                new Response(null, 422)
+            );
+        }
+
+        return $this->render(
+            'tabs/aliases/_form.html.twig',
+            $render
+        );
+    }
+
+    public function domainNewActionOLD(Request $request, Domain $domain)
+    {
+        if ($domain->getId()===0) {
             return $this->redirectToRoute(self::PREFIX . 'new', ['id' => $this->getUser()->getDomain()->getId()]);
         }
 
@@ -150,7 +214,13 @@ class AliasController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->repo->add($alias, true);
 
-            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ]);
+            return $this->redirectToRoute(
+                'admin_domain_showbyname',
+                [
+                    'name' => $domain->getName(),
+                    'activetab' => 1,
+                ]
+            );
         }
 
         return $this->render('tabs/aliases/_form.html.twig', array(
@@ -186,29 +256,68 @@ class AliasController extends AbstractController
             [
                 'domainId' => $domain->getId(),
                 'showAlias' => true,
-                //'showList' => true
                 'action' => $this->generateUrl(self::PREFIX . 'edit', ['id' => $alias->getId()]),
             ]
         );
 
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->add($alias, true);
-
-            if (null==$origin) {
-                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ], Response::HTTP_SEE_OTHER);
-            } else {
-                return $this->redirectToRoute(self::PREFIX . 'show', array('id' => $alias->getId()));
+        $render = [
+            'domain' => $domain,
+            'entity' => $alias,
+            'title' => 'Alias edit',
+            'delete_form' => true,
+            'form' => $form,
+            'PREFIX' => self::PREFIX,
+            'VARS' => [
+                'PREFIX' => self::PREFIX,
+            ]
+            ]
+        ;
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->repo->add($alias, true);
+                $redirectUrl = $this->generateUrl('manage_user_index', ['activetab' => 1]);
+                if ($this->isGranted('ROLE_ADMIN')) {
+                    $redirectUrl = $this->generateUrl(
+                        'admin_domain_showbyname',
+                        [
+                            'name' => $domain->getName(),
+                            'activetab' => 1,
+                        ]
+                    );
+                }
+                return new JsonResponse([
+                    'success' => true,
+                    'redirectUrl' => $this->getReferer($request, 1)//$redirectUrl
+                ]);
             }
+            return $this->render(
+                'tabs/aliases/_form.html.twig',
+                $render,
+                new Response(null, 422)
+            );
         }
 
-        return $this->render('tabs/aliases/_form.html.twig', [
-            'domain' => $domain,
-            'title' => 'Alias edit',
-            'form' => $form->createView(),
-            'PREFIX' => self::PREFIX,
-        ]);
+        return $this->render(
+            'tabs/aliases/_form.html.twig',
+            $render
+        );
+    }
+
+    private function getReferer(Request $request, $activetab = 1)
+    {
+        $referer = $request->headers->get('referer');
+        $origin = $_redirect = $request->headers->get('origin');
+
+        if ($referer && $origin && str_starts_with($referer, $origin)) {
+            // Quitar el origin de la URL
+            $_redirect = substr($referer, strlen($origin));
+        }
+        $pos = strcspn($_redirect, "?#");
+        $redirect = substr($_redirect, 0, $pos) ?: '/';
+
+        //return $this->redirect($redirect. ($activetab > 0 ? "?activetab=$activetab" : ''));
+        return $redirect . ($activetab > 0 ? "?activetab=$activetab" : '');
     }
 
     #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
@@ -217,11 +326,20 @@ class AliasController extends AbstractController
         $domain = $entity->getDomain();
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
             $this->repo->remove($entity, true);
+            return $this->redirect($this->getReferer($request, 1));
+
             if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' => 1 ], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute(
+                    'admin_domain_showbyname',
+                    [
+                        'name' => $domain->getName(),
+                        'activetab' => 1
+                    ],
+                    Response::HTTP_SEE_OTHER
+                );
             }
 
-            return $this->redirectToRoute('manage_user_index');
+            return $this->redirectToRoute('manage_user_index', ['activetab' => 1]);
         }
 
 
