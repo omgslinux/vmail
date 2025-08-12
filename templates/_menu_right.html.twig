@@ -1,5 +1,5 @@
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-        <a class="btn btn-secondary" href="{{ path('logout') }}">{% trans %}Logout{% endtrans %} {{ app.user }}</a></li>
+        <li><a class="btn btn-secondary" href="{{ path('logout') }}">{% trans %}Logout{% endtrans %} {{ app.user }}</a></li>
     {% else %}
-        <a href="{{ path('login') }}">{% trans %}Log in{% endtrans %}</a></li>
+        <li><a href="{{ path('login') }}">{% trans %}Log in{% endtrans %}</a></li>
     {% endif %}

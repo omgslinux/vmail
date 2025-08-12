@@ -12,3 +12,16 @@ body {
 input {
     border-style: groove;
 }
+dialog {
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  border: none;
+  border-radius: 1rem;
+  background-color: white;
+  padding: 1.5rem;
+}
+
+dialog.modal::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}

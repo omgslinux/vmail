@@ -72,49 +72,18 @@
                 <div class="mt-4 h2">PERSONAL</div>
             </div>
                 <div class="d-column item">
-                {% set targetPrefix = 'pass' %}
-                {% set modalTarget = targetPrefix ~ 'Modal' %}
                 {% set modalTitle = 'Change password' %}
                 {% set modalSize = 'modal-md' %}
-                {{ include('_modal.html.twig', {
-                  'nobutton': true,
-                  'targetPrefix': targetPrefix,
-                  'modalTarget': modalTarget,
-                  'modalTitle': modalTitle,
-                  'modalSize': modalSize,
-                  })
-                }}
-                <a class="btn btn-primary" href="#" data-url="{{ path(PREFIX ~ 'pass') }}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ modalTitle|trans }}</a>
-                {% set targetPrefix = 'autoreply' %}
-                {% set modalTarget = targetPrefix ~ 'Modal' %}
+                <a data-action="click->modal-loader#open" class="btn btn-primary" href="#" data-url="{{ path(PREFIX ~ 'pass') }}">{{ modalTitle|trans }}</a>
                 {% set modalTitle = 'Autoreply' %}
                 {% set modalSize = 'modal-lg' %}
-                {{ include('_modal.html.twig', {
-                  'nobutton': true,
-                  'targetPrefix': targetPrefix,
-                  'modalTarget': modalTarget,
-                  'modalTitle': modalTitle,
-                  'modalSize': modalSize,
-                  })
-                }}
-                    <a class="btn btn-primary" role="button" href="#" data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ modalTitle|trans }}</a>
+                    <a data-action="click->modal-loader#open" class="btn btn-primary" role="button" href="#" data-url="{{ path('user_autoreply_edit', { 'id': user.id } ) }}">{{ modalTitle|trans }}</a>
 
                     {% if user.certData %}
                         {% set modalTitle = 'User certificate download' %}
-                        {% set targetPrefix = 'certificate' %}
-                        {% set modalTarget = targetPrefix ~ 'Modal' %}
                         {% set modalSize = 'modal-lg' %}
-                    <a class="btn btn-primary" role="button" href="#" data-url="{{ path(PREFIX ~ 'download') }}" data-bs-toggle="modal" data-bs-target="#{{ modalTarget }}">{{ modalTitle|trans }}</a>
-                        {{ include('_modal.html.twig', {
-                          'nobutton': true,
-                          'targetPrefix': targetPrefix,
-                          'modalTarget': modalTarget,
-                          'modalTitle': modalTitle,
-                          'modalSize': modalSize,
-                          })
-                        }}
+                    <a data-action="click->modal-loader#open" class="btn btn-primary" role="button" href="#" data-url="{{ path(PREFIX ~ 'download') }}">{{ modalTitle|trans }}</a>
                     {% endif %}
-                </div>
 
                 </div>
             </div>

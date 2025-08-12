@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Domain;
@@ -37,6 +38,22 @@ class AutoreplyController extends AbstractController
         ));
     }
 
+    private function getReferer(Request $request, $activetab = 0)
+    {
+        $referer = $request->headers->get('referer');
+        $origin = $_redirect = $request->headers->get('origin');
+
+        if ($referer && $origin && str_starts_with($referer, $origin)) {
+            // Quitar el origin de la URL
+            $_redirect = substr($referer, strlen($origin));
+        }
+        $pos = strcspn($_redirect, "?#");
+        $redirect = substr($_redirect, 0, $pos) ?: '/';
+
+        //return $this->redirect($redirect. ($activetab > 0 ? "?activetab=$activetab" : ''));
+        return $redirect . ($activetab > 0 ? "?activetab=$activetab" : '');
+    }
+
     #[Route(path: '/edit/{id}', name: 'edit', methods: ['GET', 'POST'])]
     public function editAction(Request $request, UR $ur, ?User $user = null)
     {
@@ -60,28 +77,49 @@ class AutoreplyController extends AbstractController
                 'action' => $this->generateUrl(self::PREFIX . 'edit', $options),
             ]
         );
+
+
+
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user->setReply($reply);
-            $ur->add($user, true);
-            if (null==$origin) {
-                if ($this->isGranted('ROLE_ADMIN')) {
-                    return $this->redirectToRoute('admin_domain_showbyname', ['name' => $user->getDomain()->getName()]);
-                } elseif ($this->isGranted('ROLE_MANAGER')) {
-                    return $this->redirectToRoute('manage_user_index');
-                } else {
-                    return $this->redirectToRoute('user_self_index');
-                }
-            } else {
-                return $this->redirectToRoute($origin);
-            }
-        }
-
-        return $this->render('reply/_form.html.twig', array(
+        $render = [
             'user' => $user,
             'form' => $form,
             'PREFIX' => self::PREFIX,
-        ));
+        ]
+        ;
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $user->setReply($reply);
+                $ur->add($user, true);
+                /*
+                $redirectUrl = $origin;
+                if (null==$origin) {
+                    if ($this->isGranted('ROLE_ADMIN')) {
+                        $redirectUrl = $this->generateUrl('admin_domain_showbyname', ['name' => $user->getDomain()->getName()]);
+                    } elseif ($this->isGranted('ROLE_MANAGER')) {
+                        $redirectUrl = $this->generateUrl('manage_user_index');
+                    } else {
+                        $redirectUrl = $this-generateUrl('user_self_index');
+                    }
+                }
+                */
+                $redirectUrl = $this->getReferer($request);
+                return new JsonResponse([
+                    'success' => true,
+                    'redirectUrl' => $redirectUrl
+                ]);
+            }
+            return $this->render(
+                'reply/_form.html.twig',
+                $render,
+                new Response(null, 422)
+            );
+        }
+
+        return $this->render(
+            'reply/_form.html.twig',
+            $render
+        );
     }
 }

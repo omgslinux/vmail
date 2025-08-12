@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User
@@ -36,6 +37,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string
      */
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
     #[ORM\Column(name: 'user', type: 'string', length: 32)]
     private $name;
 
@@ -203,6 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getDomain()->getName();
     }
 
+    #[Assert\Length(max: 254, maxMessage: 'La dirección no puede superar los 254 caracteres.')]
     public function getEmail()
     {
         return $this->getName() . '@' . $this->getDomainName();

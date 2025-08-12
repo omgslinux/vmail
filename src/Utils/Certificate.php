@@ -601,7 +601,6 @@ class Certificate
     public function streamDownload($output, $filename): Response
     {
             $response = new Response($output);
-            //dd($output, $filename);
             // Create the disposition of the file
             $disposition = $response->headers->makeDisposition(
                 ResponseHeaderBag::DISPOSITION_ATTACHMENT,

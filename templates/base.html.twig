@@ -22,9 +22,17 @@
         </header>
 
         <main>
-            <div class="container">
-            {{ include('_flash.html.twig') }}
-                {% block body %}{% endblock %}
+            <div data-controller="modal-loader" class="d-flex justify-between">
+                <div class="container">
+                {{ include('_flash.html.twig') }}
+                    {% block body %}{% endblock %}
+                </div>
+                <dialog data-modal-loader-target="dialog"
+                    class="shadow"
+                    data-action="close->modal-loader#close"
+                    >
+                    <!-- contenido AJAX -->
+                </dialog>
             </div>
         </main>
 
@@ -33,9 +41,9 @@
 
 
         </footer>
-
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
+
     </body>
 </html>

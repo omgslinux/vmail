@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -87,7 +88,56 @@ class DomainController extends AbstractController
     #[Route(path: '/{id}/edit/', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Domain $entity, ReadConfig $config): Response
     {
-        $form = $this->createForm(DomainType::class, $entity, ['action' => $this->generateUrl(self::VARS['PREFIX'] .'edit', ['id' => $entity->getId()])]);
+        $form = $this->createForm(
+            DomainType::class,
+            $entity,
+            [
+                'action' => $this->generateUrl(self::VARS['PREFIX'] .'edit', ['id' => $entity->getId()])
+            ]
+        );
+        $form->handleRequest($request);
+        $render = [
+                'entity' => $entity,
+                'modalTitle' => 'Domain edit',
+                'form' => $form,
+                'VARS' => self::VARS,
+                'delete_form' => true,
+        ]
+        ;
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->repo->manageMaildir($entity);
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $this->generateUrl(self::VARS['PREFIX'] . 'showbyname', [ 'name' => $entity->getName() ])
+                    ]);
+                }
+                return $this->redirectToRoute(self::VARS['PREFIX'] . 'showbyname', [ 'name' => $entity->getName() ]);
+            }
+            return $this->render(
+                self::VARS['BASEDIR'] . '/_form.html.twig',
+                $render,
+                new Response(null, 422)
+            );
+        }
+
+        return $this->render(
+            self::VARS['BASEDIR'] . '/_form.html.twig',
+            $render
+        );
+    }
+
+    public function editOLD(Request $request, Domain $entity, ReadConfig $config): Response
+    {
+        $form = $this->createForm(
+            DomainType::class,
+            $entity,
+            [
+                'action' => $this->generateUrl(self::VARS['PREFIX'] .'edit', ['id' => $entity->getId()])
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -109,7 +159,6 @@ class DomainController extends AbstractController
         );
     }
 
-
     #[Route(path: '/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Domain $entity, REPO $repo, ReadConfig $config): Response
     {
@@ -129,8 +178,6 @@ class DomainController extends AbstractController
     {
         $activeTab = $request->query->get('activetab', 0);
 
-        $reload = false;
-
         // Para la entidad (el dominio)
         $entity=$this->repo->findOneByName($name);
         $oldname=$entity->getName();
@@ -143,21 +190,8 @@ class DomainController extends AbstractController
                 $users[]=$user;
             }
         }
-        $form = $this->createForm(DomainType::class, $entity);
         // Fin de definicion de la entidad
 
-        // Formulario de la entidad
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->repo->makeMaildir($entity, true);
-
-            //$reload = true;
-        }
-
-
-        if ($reload) {
-            return $this->redirectToRoute(self::VARS['PREFIX'] . 'show', ['id' => $entity->getId()]);
-        }
 
         $VARS = [
             'origin' => $this->generateUrl(self::VARS['PREFIX'] . 'showbyname', ['name' => $name ]),
@@ -168,14 +202,13 @@ class DomainController extends AbstractController
         // Populate certificate tab
         $certificates = [];
         foreach ($entity->getServerCertificates() as $certificate) {
-            if (null!=$certData=$entity->getCertData()) {
+            if (null!=$certData=$certificate->getCertData()) {
                 $certout = $certData['certdata']['cert'];
                 $cert = openssl_x509_parse($certout, false);
                 $certInterval = [
                     'notBefore' => $certUtil::convertUTCTime2Date($cert['validFrom']),
                     'notAfter'  => $certUtil::convertUTCTime2Date($cert['validTo']),
                 ];
-                //dump($certData, $cert, $certInterval);
                 $data = [
                     'description' => $certificate->getDescription(),
                     'domain' => $certificate->getDomain(),
@@ -226,7 +259,6 @@ class DomainController extends AbstractController
                     'activeTab' => $activeTab,
                     'tabs' => $tabs
                 ],
-                'form' => $form->createView(),
                 'VARS' => $VARS,
             ]
         );

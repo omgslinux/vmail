@@ -1,18 +1,10 @@
-<div class="container">
+<div data-modal-loader-default-size-value="modal-xl" class="container">
     {% set tagPrefix = 'create' %}
     <h1>{{ title|trans }}{% if entity is defined %} ({{ entity.name }}){% endif %}</h1>
 
-    {% if ajax is defined %}
-        {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
-        <div class="modal-header btn-primary">
-            <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')}}">
-            </button>
-        </div>
-    {% endif %}
 
     {{ form_start(form) }}
-    <div class="modal-body" data-turbo="false" >
+    <div class="modal-body">
     {% if form.common is defined %}
         {% if form.common.commonName is defined %}
         <div class="row mb-4">
@@ -88,7 +80,7 @@
       {% do form.plainPassword.setRendered %}
       {% endif %}
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+        <button type="button" class="btn btn-secondary" data-action="modal-loader#close">{% trans %}Close{% endtrans %}</button>
         {% if form.download is defined %}{{ form_row(form.download)}}
         {% else %}
         <button class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
