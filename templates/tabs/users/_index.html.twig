@@ -1,10 +1,6 @@
 <h2>{% trans %}Users in domain{% endtrans %} {{ entity.name }}</h2>
-<div data-turbo="false">
-{% set targetPrefix = 'edit' %}
-{% set modalTarget = targetPrefix ~ 'users' %}
-{% set modalSize = 'modal-lg' %}
 {% if users|length > 0 %}{% set certActive = 'Download' %}{% set replyActive = 'Edit' %}
-    <div >
+    <div>
     <table class="table table-bordered">
         <tbody>
             <tr>
@@ -55,13 +51,10 @@
 {% else %}
     <p>{% trans %}No users in domain{% endtrans %}</p>
 {% endif %}
-{% set targetPrefix = 'create' %}
-{% set modalTitle = 'Create a new user' %}
 <a class="btn btn-primary"  data-action="modal-loader#open" href="#"
 {% if is_granted('ROLE_ADMIN') %}
 data-url="{{ path('manage_user_admin_new', { 'id': entity.id } )}}"
 {% else %}
 data-url="{{ path('manage_user_new') }}"
 {% endif %}
->{{ modalTitle }}</a>
-</div>
+>{{ 'Create a new user'|trans }}</a>
