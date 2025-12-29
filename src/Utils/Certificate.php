@@ -358,7 +358,7 @@ class Certificate
                 //    $common[$dk] = ' ';
                 }
             }
-            dump($data, $common, $plainPassword);
+            //dump($data, $common, $plainPassword);
             //$csr = openssl_csr_new($data['common'], $privKey);
             $csr = openssl_csr_new($common, $privKey);
 
