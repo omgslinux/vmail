@@ -28,18 +28,30 @@
             <div class="col-2">{{ form_label(form.common.organizationalUnitName)}}</div>
             <div class="col-4">{{ form_widget(form.common.organizationalUnitName)}}</div>
         </div>
+    {% if form.interval is defined %}
+        <hr>
+        <h5>{% trans %}Expiration{% endtrans %}</h5>
+        <div class="row mb-4">
+            <div class="col-2">{{ form_label(form.interval.notBefore)}}</div>
+            <div class="col-4">{{ form_widget(form.interval.notBefore)}}</div>
+            <div class="col-2">{{ form_label(form.interval.notAfter)}}</div>
+            <div class="col-4">{{ form_widget(form.interval.notAfter)}}</div>
+        </div>
+        {% if form.interval.interval is defined %}
+            <div class="row">
+                <div class="col-2">{{ form_label(form.interval.interval.years)}}:</div>
+                <div class="col-2">{{ form_widget(form.interval.interval.years)}}</div>
+                <div class="col-2">{{ form_label(form.interval.interval.months)}}:</div>
+                <div class="col-2">{{ form_widget(form.interval.interval.months)}}</div>
+                <div class="col-2">{{ form_label(form.interval.interval.days)}}:</div>
+                <div class="col-2">{{ form_widget(form.interval.interval.days)}}</div>
+            </div>
+        {% endif %}
+    {% endif %}
         {% if form.common.emailAddress is defined %}
         <div class="row">
             <div class="col-2">{{ form_label(form.common.emailAddress)}}</div>
             <div class="col-4">{{ form_widget(form.common.emailAddress)}}</div>
-        </div>
-        {% endif %}
-        {% if form.common.plainPassword is defined %}
-        <hr>
-        <h5>Establecer contraseña para la clave del certificado</h5>
-        <div class="row">
-            <div class="col-4">{{ form_widget(form.common.plainPassword)}}</div>
-            {% do form.common.plainPassword.setRendered %}
         </div>
         {% endif %}
         {% if form.common.customFile is defined %}
@@ -50,38 +62,19 @@
             {% do form.common.customFile.setRendered %}
         </div>
         {% endif %}
+        {% if form.common.plainPassword is defined %}
+            <hr>
+            <h5>Establecer contraseña para la clave del certificado</h5>
+            <div class="row">
+            <div class="col-4">{{ form_widget(form.common.plainPassword)}}</div>
+            {% do form.common.plainPassword.setRendered %}
+            </div>
+        {% endif %}
     </div>
     {% endif %}
-    {% if form.interval is defined %}
-        <hr>
-        <h5>{% trans %}Expiration{% endtrans %}</h5>
-        <div class="row mb-4">
-            <div class="col-2">{{ form_label(form.interval.notBefore)}}</div>
-            <div class="col-4">{{ form_widget(form.interval.notBefore)}}</div>
-            <div class="col-2">{{ form_label(form.interval.notAfter)}}</div>
-            <div class="col-4">{{ form_widget(form.interval.notAfter)}}</div>
-        </div>
-        <div class="row">
-            <div class="col-2">{{ form_label(form.interval.interval.years)}}:</div>
-            <div class="col-2">{{ form_widget(form.interval.interval.years)}}</div>
-            <div class="col-2">{{ form_label(form.interval.interval.months)}}:</div>
-            <div class="col-2">{{ form_widget(form.interval.interval.months)}}</div>
-            <div class="col-2">{{ form_label(form.interval.interval.days)}}:</div>
-            <div class="col-2">{{ form_widget(form.interval.interval.days)}}</div>
-        </div>
-    {% endif %}
-    {% if form.plainPassword is defined %}
-      <hr>
-      <h5>Establecer contraseña para la clave del certificado</h5>
-      <div class="row">
-        <div class="col-2">{{ form_label(form.plainPassword)}}</div>
-        <div class="col-4">{{ form_widget(form.plainPassword)}}</div>
-      </div>
-      {% do form.plainPassword.setRendered %}
-      {% endif %}
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-action="modal-loader#close">{% trans %}Close{% endtrans %}</button>
-        {% if form.download is defined %}{{ form_row(form.download)}}
+        {% if form.download is defined %}{# form_row(form.download) #}{% do form.download.setRendered %}
         {% else %}
         <button class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
         {% endif %}

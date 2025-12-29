@@ -2,10 +2,13 @@
 
 namespace App\Form;
 
+use App\Dto\CertDto;
 use App\Entity\Domain;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -23,76 +26,27 @@ class CertType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $notAfter = new \DateTime();
-        $notAfter->add(\DateInterval::createFromDateString($options['duration']));
+        //$notAfter = new \DateTime();
+        //$notAfter->add(\DateInterval::createFromDateString($options['duration']));
         //dump($options);
         $builder
-        ->add(
-            'domain',
-            HiddenType::class,
-            [
-                'data' => $options['domain']
-            ]
-        )
         ->add(
             'common',
             CertCommonType::class,
             [
                 'label' => false,
-                'certtype' => $options['certtype'],
-                'subject' => $options['subject'],
-                'domain' => $options['domain'],
+                'dto' => $options['dto'],
+                //'certtype' => $options['dto']->getCerttype(),
             ]
         )
         ->add(
             'interval',
             CertIntervalType::class,
             [
-                'duration' => $options['duration'],
-                'interval' => $options['interval'],
-                'label' => false,
+                'dto' => $options['dto'],
             ]
         )
         ;
-
-        if ($options['certtype'] == 'export') {
-            $builder->add(
-                'plainPassword',
-                RepeatedType::class,
-                [
-                    'type' => PasswordType::class,
-                    'label' => false,
-                    'first_options' =>
-                    [
-                        'label' => 'Password',
-                        'attr' => [
-                            'autocomplete' => 'new-password'
-                        ]
-                    ],
-                    'second_options' =>
-                    [
-                        'label' => 'Confirm password',
-                        'attr' => [
-                            'autocomplete' => 'new-password'
-                        ]
-                    ],
-                ]
-            )
-            ;
-        }
-        if ($options['download']) {
-            $builder->add(
-                'download',
-                SubmitType::class,
-                [
-                    'label' => 'Download',
-                    'attr' => [
-                        'class' => 'btn-primary',
-                        'data-bs-dismiss' => 'modal',
-                    ]
-                ],
-            );
-        }
     }
 
     /**
@@ -101,12 +55,39 @@ class CertType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
-            'data_class' => null,
-            'domain' => null,
-            'duration' => '1 years',
-            'interval' => null,
-            'certtype' => null,
-            'subject' => null,
+            'data_class' => CertDto::class,
+            'dto' => null,
+            'validation_groups' => function (FormInterface $form): array {
+                $data = $form->getData();
+                $common = $data->getCommon();
+                $groups = ['Default'];
+                if ($data->getCerttype()=='ca') {
+                    if (null != $common->getCustomFile()) {
+                        $groups [] = 'with_file';
+                        return $groups;
+                    }
+
+                    if (null==$common->getCommonName()) {
+                        $groups [] = 'group_cn';
+                    } elseif (null==$common->getCountryName()) {
+                        $groups[]='group_co';
+                    } elseif (null==$common->getStateOrProvinceName()) {
+                        $groups[]='group_st';
+                    } elseif (null==$common->getLocalityName()) {
+                        $groups[]='group_loc';
+                    } elseif (null==$common->getOrganizationName()) {
+                        $groups[]='group_org';
+                    } elseif (null==$common->getOrganizationalUnitName()) {
+                        $groups[]='group_orgun';
+                    } else {
+                        $groups[]='password';
+                    }
+                } elseif ($data->getCerttype()=='server') {
+                    $groups[]= 'group_cn';
+                }
+
+                return $groups;
+            },
             'download' => false,
         ));
     }

@@ -25,16 +25,16 @@
                 <td>{% if entity.certdata -%}
                     <a href="#" data-action="click->modal-loader#open"
                         {% if user.certdata %}
-                            class="btn btn-secondary" data-url="{{ path('admin_certificate_client_download', { 'id': user.id } ) }}"
-                        {% else %}{% set certActive = 'Create' %}
-                            class="btn btn-primary" data-url="{{ path('admin_certificate_client_new', { 'id': user.id } ) }}"
+                            class="btn btn-secondary" data-url="{{ path('admin_certificate_client_new', { 'id': user.id, 'new': 0 } ) }}">{% trans %}View{% endtrans %}</a>
+                            <a href="#" data-action="click->modal-loader#open" class="btn btn-secondary" data-url="{{ path('admin_certificate_client_download', { 'id': user.id } ) }}">{% trans %}Download{% endtrans %}</a>
+                        {% else %}
+                            class="btn btn-primary"
+                            data-url="{{ path('admin_certificate_client_new', { 'id': user.id } ) }}"
+                            >{% trans %}Create{% endtrans %}</a>
                         {% endif %}
-                        >
-                        {{ certActive|trans }}
                     {%- else -%}
-                        --
+                        --</a>
                     {%- endif -%}
-                    </a>
                 </td>
                 <td><a href="#" data-action="click->modal-loader#open"
                     {%- if user.reply -%}

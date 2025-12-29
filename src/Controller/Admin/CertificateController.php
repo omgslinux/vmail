@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Dto\CertDto;
 use App\Entity\Domain;
 use App\Entity\ServerCertificate;
 use App\Entity\User;
@@ -32,7 +33,6 @@ class CertificateController extends AbstractController
         'BASEDIR' => 'certificates/',
         'modalId' => 'certs',
     ];
-
 
     public function __construct(private Certificate $util, private REPO $repo)
     {
@@ -64,127 +64,191 @@ class CertificateController extends AbstractController
         );
     }
 
+    #[Route(path: '/{id}/cadownload', name: 'cadownload', methods: ['GET', 'POST'])]
+    public function cadownload(Request $request, Domain $domain): Response
+    {
+        return $this->util
+        ->certDownload('ca', [$domain, 'pem']);
+    }
+
+
+
     #[Route(path: '/{id}/ca', name: 'ca', methods: ['GET', 'POST'])]
     public function ca(Request $request, Domain $domain): Response
     {
-        $certSubject = $certInterval = null;
+        $dto = new CertDto();
+        $dto->setDownload(false)
+        ->setCertType('ca')
+        ->setCAInherit(false)
+        ;
+        $title = 'Create CA certificate';
         if (null!=$certData=$domain->getCertData()) {
             $certout = $certData['certdata']['cert'];
             $cert = openssl_x509_parse($certout, false);
-            $certSubject = $cert['subject'];
             $certInterval = [
                 'NotBefore' => $this->util::convertUTCTime2Date($cert['validFrom']),
                 'NotAfter'  => $this->util::convertUTCTime2Date($cert['validTo']),
             ];
-            //dump($certData, $cert, $certInterval);
+            $dto->setSubject($cert['subject'])
+            ->setNew(false)
+            ->setCAInherit(true)
+            ->setInterval($certInterval)
+            ->setDownload(true);
+            ;
+            $title = 'Manage CA certificate';
         }
+        $dto->setDomain($domain)
+
+        ;
         $form = $this->createForm(
             CertType::class,
-            null,
+            $dto,
             [
-                'domain' => $domain,
-                'subject' => $certSubject,
-                'certtype' => 'ca',
-                'interval' => $certInterval,
-                'duration' => '10 years',
-                'download' => null !=$certSubject,
+                'dto' => $dto,
                 'action' => $this->generateUrl(self::VARS['PREFIX'] . 'ca', ['id' => $domain->getId()]),
 
             ]
         );
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (null==$certSubject) {
-                $files = $request->files->all();
-                $csvcontents = null;
-                foreach ($files as $file) {
-                    $csvfile = $file['common']['customFile'];
-                    if (null!=$csvfile) {
-                        $csvcontents = file_get_contents($csvfile);
+        $render = [
+            'template' => 'certificates/_form.html.twig',
+            'args' => [
+                'title' => $title,
+                'modalTitle' => $title,
+                'form' => $form,
+                'entity' => $domain,
+                'VARS' => self::VARS,
+            ]
+        ];
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                if (null==$dto->getSubject()) {
+                    $files = $request->files->all();
+                    $csvcontents = null;
+                    foreach ($files as $file) {
+                        $csvfile = $file['common']['customFile'];
+                        if (null!=$csvfile) {
+                            $csvcontents = file_get_contents($csvfile);
+                        }
                     }
+                    $formData = $form->getData();
+                    //dump($formData);
+                    $certData = $this->util->createCACert($formData, $csvcontents);
+                    //dd($certData);
                 }
-                $formData = $form->getData();
-                $certData = $this->util->createCACert($formData, $csvcontents);
-                //dd($certData);
                 if (!empty($certData['error'])) {
                     $this->addFlash('error', $certData['error']);
                 } else {
                     $domain->setCertData($certData);
                     $this->repo->save($domain, true);
-                    $this->addFlash('success', 'Se creó el certificado');
+                    $this->addFlash('success', 'Se creó el certificado de la CA '. $domain->getName());
                 }
 
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
-                //return $this->redirectToRoute(self::VARS['PREFIX'] . 'index');
-            } else {
-                return $this->util
-                ->certDownload('ca', [$domain, 'pem']);
+
+                $redirectUrl = $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+                return $this->redirect($redirectUrl);
             }
+            return $this->render(
+                $render['template'],
+                $render['args'],
+                new Response(null, 422)
+            );
         }
 
         return $this->render(
-            'certificates/_form.html.twig',
-            [
-                'ajax' => true,
-                'title' => 'Create CA certificate',
-                'modalTitle' => 'Create CA certificate',
-                'form' => $form->createView(),
-                'entity' => $domain,
-                'VARS' => self::VARS,
-            ]
+            $render['template'],
+            $render['args']
         );
     }
 
-    #[Route(path: '/{id}/client/new', name: 'client_new', methods: ['GET', 'POST'])]
-    public function clientNew(Request $request, UR $userRepo, User $user): Response
+    #[Route(path: '/{id}/client/new/{new}', name: 'client_new', methods: ['GET', 'POST'])]
+    public function clientNew(Request $request, UR $userRepo, User $user, int $new = 1): Response
     {
+        $dto = new CertDto();
         $domain = $user->getDomain();
-        $certSubject = null;
-        if (null!=$certData=$domain->getCertData()) {
-            $certout = $certData['certdata']['cert'];
+        if ($new) {
+            $caCertData=$domain->getCertData();
+            $caCertout = $caCertData['certdata']['cert'];
+            $caCert = openssl_x509_parse($caCertout, false);
+            $subject = $caCert['subject'];
+            $subject['emailAddress'] = $user->getEmail();
+            $subject['commonName'] = $user->getFullname();
+        } else {
+            $certdata = $user->getCertData();
+            $certout = $certdata['certdata']['cert'];
             $cert = openssl_x509_parse($certout, false);
-            $certSubject = $cert['subject'];
+            $subject = $cert['subject'];
         }
+        $dto->setDownload(false)
+        ->setNew((bool) $new)
+        ->setSubject($subject)
+        ->setCertType('client')
+        ->setDuration('5 years')
+        ;
 
         $form = $this->createForm(
             CertType::class,
-            null,
+            $dto,
             [
-                'domain' => $domain->getId(),
-                'subject' => $certSubject,
-                'certtype' => 'client',
-                'duration' => '5 years',
+                'dto' => $dto,
                 'action' => $this->generateUrl(self::VARS['PREFIX'] . 'client_new', ['id' => $user->getId()]),
             ]
         );
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $formData = $form->getData();
-            $this->util->setDomain($domain);
-            $user = $formData['common']['emailAddress'];
-            $certData = $this->util->createClientCert($formData);
-            $indexData = $this->util->addToIndex($certData['certdata']['cert']);
-            //dd($certData, $indexData);
-            $user->setCertData($certData);
-            $userRepo->add($user, true);
-            $this->repo->updateCAIndex($domain, $indexData);
-            $this->addFlash('success', 'Se creo el certificado');
-            if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
-            }
+        $render = [
+            'template' => 'certificates/_form.html.twig',
+            'args' => [
+                'title' => ($new?'Create':'View'). ' client certificate',
+                'form' => $form,
+                'entity' => $domain,
+            ]
+        ];
 
-            return $this->redirectToRoute('manage_user_index');
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $formData = $form->getData();
+                $this->util->setDomain($domain);
+                $certData = $this->util->createClientCert($formData);
+                $indexData = $this->util->addToIndex($certData['certdata']['cert']);
+                //dd($certData, $indexData);
+                $user->setCertData($certData);
+                $userRepo->add($user, true);
+                $this->repo->updateCAIndex($domain, $indexData);
+                $this->addFlash('success', 'Se creo el certificado para '. $user->getFullname() . ' ('.$user->getEmail() . ')');
+
+                $redirectUrl = $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+                if (!$this->isGranted('ROLE_ADMIN')) {
+                    $redirectUrl = $this->generateUrl('manage_user_index');
+                }
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+                return $this->redirect($redirectUrl);
+            }
+            return $this->render(
+                $render['template'],
+                $render['args'],
+                new Response(null, 422)
+            );
         }
 
         return $this->render(
-            'certificates/_form.html.twig',
-            [
-              'title' => 'Create client certificate',
-              'form' => $form->createView(),
-              'entity' => $domain,
-            ]
+            $render['template'],
+            $render['args']
         );
     }
 
@@ -205,18 +269,6 @@ class CertificateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
-            $this->util->certDownload(
-                'client',
-                [
-                    'format' => $form->getClickedButton()->getName(),
-                    'setkey' => $formData['setkey']
-                ]
-            );
-                return new JsonResponse([
-                    'success' => true,
-                    'redirectUrl' => $this->generateUrl('admin_domain_showbyname', [ 'name' => $user->getDomain()->getName() ])
-                ]);
-            /*
             return $this->util->certDownload(
                 'client',
                 [
@@ -224,9 +276,6 @@ class CertificateController extends AbstractController
                     'setkey' => $formData['setkey']
                 ]
             );
-
-            return $this->redirectToRoute('admin_domain_showbyname', [ 'name' => $user->getDomain()->getName() ]);
-            */
         }
 
         return $this->render(
@@ -241,41 +290,45 @@ class CertificateController extends AbstractController
     #[Route(path: '/{id}/server/new', name: 'server_new', methods: ['GET', 'POST'])]
     public function serverNew(Request $request, Domain $domain): Response
     {
-        $certSubject = null;
-        if (null!=$certData=$domain->getCertData()) {
-            $certout = $certData['certdata']['cert'];
-            $cert = openssl_x509_parse($certout, false);
-            $certSubject = $cert['subject'];
-            // Eliminamos el commonName
-            unset($certSubject['commonName']);
-        }
+        $caCertData=$domain->getCertData();
+        $caCertout = $caCertData['certdata']['cert'];
+        $caCert = openssl_x509_parse($caCertout, false);
+        $dto = new CertDto();
+        $dto->setDownload(false)
+        ->setSubject($caCert['subject'])
+        ->setDomain($domain)
+        ->setCertType('server')
+        ->setDuration('10 years')
+        ->setNew(true)
+        ->getCommon()->setCommonName(null)
+        ;
 
         $form = $this->createForm(
             CertType::class,
-            null,
+            $dto,
             [
-                'domain' => $domain,
-                'subject' => $certSubject,
-                'certtype' => 'server',
-                'duration' => '5 years',
+                'dto' => $dto,
                 'action' => $this->generateUrl(self::VARS['PREFIX'] . 'server_new', ['id' => $domain->getId()]),
             ]
         );
 
         $form->handleRequest($request);
         $render = [
-              'title' => 'Create server certificate',
-              'form' => $form,
-              'entity' => $domain,
+            'template' => 'certificates/_form.html.twig',
+            'args' => [
+                'title' => 'Create server certificate',
+                'form' => $form,
+                'entity' => $domain,
             ]
-        ;
+        ];
+
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 $formData = $form->getData();
                 $this->util->setDomain($domain);
                 $certData = $this->util->createServerCert($formData);
                 //dump($formData, $certData);
-                $d = $formData['common']['commonName'];
+                $d = $formData->getCommon()->getCommonName();
                 $serverCertificate = new ServerCertificate();
                 $serverCertificate->setDomain($domain)
                 ->setDescription($d!='*'?$d:'wildcard')
@@ -285,22 +338,33 @@ class CertificateController extends AbstractController
                 //dd($indexData);
                 //$this->repo->add($domain, true);
                 $this->repo->updateCAIndex($domain, $indexData);
-                $this->addFlash('success', 'Se creo el certificado');
-                return new JsonResponse([
-                    'success' => true,
-                    'redirectUrl' => $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName(), 'activetab' =>2 ])
-                ]);
+                $this->addFlash('success', "Se creo el certificado de servidor '".$d."'");
+
+
+                $redirectUrl = $this->generateUrl('admin_domain_showbyname', [ 'name' => $domain->getName() ]);
+                if (!$this->isGranted('ROLE_ADMIN')) {
+                    $redirectUrl = $this->generateUrl('manage_user_index');
+                }
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+                return $this->redirect($redirectUrl);
             }
+
             return $this->render(
-                'certificates/_form.html.twig',
-                $render,
+                $render['template'],
+                $render['args'],
                 new Response(null, 422)
             );
         }
 
         return $this->render(
-            'certificates/_form.html.twig',
-            $render
+            $render['template'],
+            $render['args']
         );
     }
 

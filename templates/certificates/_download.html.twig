@@ -7,7 +7,7 @@
     </div>
 {% endif %}
 
-{{ form_start(form) }}
+{{ form_start(form, { 'attr': { 'class': 'noajax' } } ) }}
     <div class="modal-body">
         <div class="row">
             <div class="col-6">{{ form_widget(form.pkcs12, { 'attr': { 'data-bs-dismiss': 'modal' } } )}}</div>

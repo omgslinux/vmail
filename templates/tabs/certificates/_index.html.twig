@@ -6,6 +6,7 @@
 <a class="btn btn-primary" href="#" data-action="click->modal-loader#open" data-url="{{ path('admin_certificate_ca', { 'id': entity.id } )}}">{{ modalTitle }}</a>
 
 {% if entity.certData %}
+<a class="btn btn-primary" href="{{ path('admin_certificate_cadownload', { 'id': entity.id } )}}">{% trans %}Download CA{% endtrans %}</a>
     <hr>
 
     {% if entities|length %}

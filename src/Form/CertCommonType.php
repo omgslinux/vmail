@@ -2,11 +2,14 @@
 
 namespace App\Form;
 
+use App\Dto\CertDto;
+use App\Dto\CertCommonDto;
 use App\Entity\Domain;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
@@ -26,19 +29,18 @@ class CertCommonType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $domain = $options['domain'];
-        $notAfter = new \DateTime();
-        $notAfter->add(\DateInterval::createFromDateString($options['duration']));
+        $readonly = !$options['dto']->isNew();
+        $disabled = $options['dto']->isCAInherit();
         $builder
         ->add(
             'countryName',
             CountryType::class,
             [
                 'label' => 'countryName',
-                'data' => 'ES',
                 'required' => true,
                 'attr' => [
-                    'readonly' => null!=$options['subject'],
+                    'class' => 'form-select',
+                    'disabled' => $disabled,
                 ]
             ]
         )
@@ -47,10 +49,9 @@ class CertCommonType extends AbstractType
             TextType::class,
             [
                 'label' => 'stateOrProvinceName',
-                'data' => $options['subject']['stateOrProvinceName']??null,
-                'required' => true,
+                'required' => false,
                 'attr' => [
-                    'readonly' => null!=$options['subject'],
+                    'disabled' => $disabled,
                     'autocomplete' => 'new-password'
                 ]
             ]
@@ -60,10 +61,9 @@ class CertCommonType extends AbstractType
             TextType::class,
             [
                 'label' => 'localityName',
-                'data' => $options['subject']['localityName']??null,
-                'required' => true,
+                'required' => false,
                 'attr' => [
-                    'readonly' => null!=$options['subject'],
+                    'disabled' => $disabled,
                     'autocomplete' => 'new-password'
                 ]
             ]
@@ -73,10 +73,9 @@ class CertCommonType extends AbstractType
             TextType::class,
             [
                 'label' => 'organizationalUnitName',
-                'data' => $options['subject']['organizationalUnitName']??null,
                 'required' => false,
                 'attr' => [
-                    'readonly' => null!=$options['subject'],
+                    'disabled' => $disabled,
                     'autocomplete' => 'new-password'
                 ]
             ]
@@ -86,42 +85,39 @@ class CertCommonType extends AbstractType
             TextType::class,
             [
                 'label' => 'organizationName',
-                'required' => true,
-                'data' => $options['subject']['organizationName']??null,
+                'required' => false,
                 'attr' => [
                     'autocomplete' => 'new-password',
-                    'readonly' => null!=$options['subject'],
+                    'disabled' => $disabled,
                 ]
             ]
         );
-        if ($options['certtype']!='client') {
+        if ($options['dto']->getCerttype()!='client' || $readonly) {
             $builder
             ->add(
                 'commonName',
                 TextType::class,
                 [
                     'label' => 'commonName',
-                    'required' => true,
-                    'data' => $options['subject']['commonName']??null,
+                    'required' => false,
                     'attr' => [
-                        'readonly' => null!=$options['subject']&&$options['certtype']=='ca',
+                        'disabled' => $disabled && $readonly,
                         'autocomplete' => 'new-password'
                     ]
                 ]
             )
             ;
-            if ($options['certtype']=='ca' && null==$options['subject']) {
+            if ($options['dto']->getCerttype()!='client' && null==$options['dto']->getSubject()) {
                 $builder
                 ->add(
                     'customFile',
                     FileType::class,
                     [
-                        'mapped' => false,
                         'required' => false,
                         'constraints' => [
                             new File(
                                 [
-                                    'maxSize' => '1M'
+                                    'maxSize' => '10K'
                                 ]
                             )
                         ]
@@ -129,37 +125,45 @@ class CertCommonType extends AbstractType
                 )
                 ->add(
                     'plainPassword',
-                    CertDownloadType::class,
+                    RepeatedType::class,
                     [
-                        'label' => 'Private key password'
+                        'type' => PasswordType::class,
+                        'label' => false,
+                        'required' => false,
+                        'first_options' =>
+                        [
+                            'label' => 'Password',
+                            'attr' => [
+                                'autocomplete' => 'new-password'
+                            ]
+                        ],
+                        'second_options' =>
+                        [
+                            'label' => 'Confirm password',
+                            'attr' => [
+                                'autocomplete' => 'new-password'
+                            ]
+                        ],
                     ]
                 )
                 ;
             }
         }
-        if ($options['certtype']=='client') {
+        if ($options['dto']->getCerttype()=='client') {
             $builder
             ->add(
                 'emailAddress',
-                EntityType::class,
+                TextType::class,
                 [
-                    'class' => User::class,
                     'label' => 'emailAddress',
-                    'query_builder' => function (EntityRepository $er) use ($domain) {
-                        $qb = $er->createQueryBuilder('u');
-                        $qb
-                        ->where('u.list = 0');
-                        if ($domain!=0) {
-                            $qb
-                              ->andWhere('u.domain = :domain')
-                              ->andWhere('u.certdata IS NULL')
-                              ->setParameter('domain', $domain)
-                            ;
-                        }
-                        return $qb;
-                    },
+                    'required' => false,
+                    'attr' => [
+                        'disabled' => $disabled && $readonly,// && $options['dto']->getCerttype()=='ca',
+                        //'autocomplete' => 'new-password'
+                    ]
                 ]
-            );
+            )
+            ;
         }
     }
 
@@ -168,12 +172,11 @@ class CertCommonType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => null,
-            'domain' => null,
-            'duration' => '1 years',
-            'certtype' => null,
-            'subject' => null,
-        ));
+        $resolver->setDefaults(
+            [
+                'data_class' => CertCommonDto::class,
+                'dto' => null,
+            ]
+        );
     }
 }

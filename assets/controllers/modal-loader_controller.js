@@ -49,7 +49,9 @@ export default class extends Controller {
 
         const form = this.dialogTarget.querySelector('form')
         if (form) {
-          form.addEventListener('submit', this.handleFormSubmit.bind(this))
+            if (!form.classList.contains('noajax')) {
+                form.addEventListener('submit', this.handleFormSubmit.bind(this))
+            }
         }
       })
       .catch(err => console.error('Modal fetch error:', err))

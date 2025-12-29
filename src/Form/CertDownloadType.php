@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Dto\CertDto;
 use App\Entity\Domain;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

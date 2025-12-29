@@ -2,6 +2,8 @@
 
 namespace App\Utils;
 
+use App\Dto\CertCommonDto;
+use App\Dto\CertIntervalDto;
 use App\Entity\Domain;
 use App\Entity\User;
 use App\Entity\ServerCertificate;
@@ -138,7 +140,7 @@ class Certificate
             array $args = ?
         ): bool
         */
-        //dump($params);
+        dump($params);
         $f = $params['filename'];
         unset($params['filename']);
         if (!empty($params['filename'])) {
@@ -157,7 +159,7 @@ class Certificate
                 $params['certdata']['privKey'],
                 $params['plainpassword'],
                 // AÑADIR CA PROVOCA ERROR DESCONOCIDO AL IMPORTAR
-                //[ 'extracerts' => $params['cacertdata']['cert']]
+                [ 'extracerts' => [$params['cacertdata']['cert']]]
             );
             openssl_pkcs12_read($pfx, $pfxout, $params['plainpassword']);
             //file_put_contents($f, $pfx);
@@ -167,15 +169,42 @@ class Certificate
         return $pfx;
     }
 
-    private function extractFormCommonData($commonData): array
+    private function extractFormCommonData($commonData): array|CertCommonDto
     {
         return $commonData;
+    }
+
+    private function extractFormIntervalDataDTO($dto): array|CertIntervalDto
+    {
+        $intervalData = $dto;
+        $interval = $dto->getInterval();
+        if ($interval->d != "0" || $interval->m != "0" || $interval->y != "0") {
+            $end = new \DateTime($dto->getNotBefore()->format('Y-m-d'));
+            $str="";
+            if ($interval->d!="0") {
+                $str=$interval->d . ' day ';
+            }
+            if ($interval->m!="0") {
+                $str .= $interval->m .' months ';
+            }
+            if ($interval->y!="0") {
+                $str .=$interval->y .' years';
+            }
+            $end->add(\DateInterval::createFromDateString($str));
+            $intervalData->setNotAfter($end);
+        }
+
+        $duration = $end->diff($dto->getNotBefore());
+        $intervalData->setDuration($duration->format('%a'));
+
+        return $intervalData;
     }
 
     private function extractFormIntervalData($form): array
     {
         $intervalData = $form;
         $interval = $form['interval'];
+        $end = new \DateTime();
         if ($interval->d != "0" || $interval->m != "0" || $interval->y != "0") {
             $end = new \DateTime($form['notBefore']->format('Y-m-d'));
             $str="";
@@ -202,10 +231,15 @@ class Certificate
     {
         //$commonData = $this->extractFormCommonData($form['common']);
         //$intervalData = $this->extractFormIntervalData($form['interval']);
-
+/*
         $data = [
             'common' => $this->extractFormCommonData($form['common']), //commonData,
             'interval' => $this->extractFormIntervalData($form['interval']), //$intervalData,
+        ];
+*/
+        $data = [
+            'common' => $this->extractFormCommonData($form->getCommon()->toArray()), //commonData,
+            'interval' => $this->extractFormIntervalData($form->getInterval()->toArray()), //$intervalData,
         ];
 
         return $data;
@@ -255,7 +289,13 @@ class Certificate
         $data = $this->extractFormData($form);
         $certout="";
         if (null!=$contents) {
-            $plainPassword = $form['common']['plainPassword']['setkey']->getPlainPassword();
+            if (is_array($data['common']['plainPassword'])) {
+                $u = $data['common']['plainPassword']['setkey'];
+                $plainPassword = $u->getPlainPassword();
+            } else {
+                $plainPassword = $data['common']['plainPassword'];
+            }
+            //$plainPassword = $form->getCommon()->getPlainPassword()['setkey']->getPlainPassword();
             $crypted = ' ENCRYPTED';
             if (!strpos($contents, $crypted)) {
                 $crypted =' RSA';
@@ -271,6 +311,7 @@ class Certificate
             $pem_data = substr($contents, strpos($contents, $begin)+strlen($begin));
             $end = '-----END' . $crypted . ' PRIVATE KEY-----';
             $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+            //dump($plainPassword);
             $privKey = $begin. $pem_data . $end;
             if ($crypted) {
                 $privKeyObject = openssl_pkey_get_private($privKey, $plainPassword);
@@ -300,18 +341,24 @@ class Certificate
 
         if (!$certout) {
             $privKey = $this->newPrivateKey();
-            $u = $data['common']['plainPassword']['setkey'];
-            $plainPassword = $u->getPlainPassword();
+            if (is_array($data['common']['plainPassword'])) {
+                $u = $data['common']['plainPassword']['setkey'];
+                $plainPassword = $u->getPlainPassword();
+            } else {
+                $plainPassword = $data['common']['plainPassword'];
+            }
             unset($data['common']['plainPassword']);
+            //$data->getCommon()->setPlainPassword(null);
+            //dump($data->getCommon());
             $common=[];
             foreach ($data['common'] as $dk => $dv) {
-                if (null!=$dv) {
+                if (null!=$dv&&!is_array($dv)) {
                     $common[$dk] = $dv;
-                } else {
-                    $common[$dk] = ' ';
+                //} else {
+                //    $common[$dk] = ' ';
                 }
             }
-            dump($data, $common, $u, $plainPassword);
+            dump($data, $common, $plainPassword);
             //$csr = openssl_csr_new($data['common'], $privKey);
             $csr = openssl_csr_new($common, $privKey);
 
@@ -365,18 +412,35 @@ class Certificate
             $extensions = 'server_ext';
             $data['common']['commonName'] .= '.' . $this->domain->getName();
         } elseif ($type=='client') {
+            /*
+            dump($data['common']);
             $eUser = $data['common']['emailAddress'];
             $data['common']['commonName'] = $eUser->getFullName();
             $data['common']['emailAddress'] = $eUser->getEmail();
+            $userData = [
+                "emailAddress" => $data['common']['emailAddress']
+            ];*/
             $extensions = 'client_ext';
         }
+        $userData["commonName"]= $data['common']['commonName'];
+
+        //$data['common']['organizationName'] = $caCertData['organizationName'];
 
         // Creamos una contraseña para cifrar la clave privada
         $plainPassword=$this->genPass();
 
         $privKey = $this->newPrivateKey();
-        dump($data['common']);
-        $csr = openssl_csr_new($data['common'], $privKey);
+        $dnRaw = $userData + $data['common']['subject'];
+        $dn = [];
+        foreach ($data['common']['subject'] as $key => $value) {
+            if (is_string($value)) {
+                // Forzamos la conversión a UTF-8 y eliminamos caracteres no válidos
+                $dn[$key] = mb_convert_encoding($value, 'UTF-8', 'auto');
+            }
+        }
+        //dd($dnRaw, $dn);
+
+        $csr = openssl_csr_new($dn, $privKey);
         $serial = 100;
         if (!empty($this->domain->getCertData()['serial'])) {
             $serial = intval($this->domain->getCertData()['serial']);
@@ -564,16 +628,18 @@ class Certificate
             $certData = $this->extractCertData($user->getCertData());
             $caCertData = $this->extractCAData($user->getDomain());
             if ($format=='pem') {
-                //dump($certData);
+                //dd($caCertData, $certData);
                 $stream = $certData['cert'] . $certData['privKey'][0];
             } else {
+                $caResource = openssl_x509_read($caCertData['cert']);
                 openssl_pkcs12_export(
                     $certData['cert'],
                     $stream,
                     $certData['privKey'],
                     $plainPassword,
                     // AÑADIR CA PROVOCA ERROR DESCONOCIDO AL IMPORTAR
-                    //[ 'extracerts' => $caCertData['cert']]
+                    //[ 'extracerts' => [$caCertData['cert']]]
+                    [ 'extracerts' => [$caResource]]
                 );
             }
             //dd($caCertData, $certData, ($format=='pem'?$stream:''));
@@ -594,8 +660,6 @@ class Certificate
         }
 
         return $this->streamDownload($stream, $filename);
-
-        return $message;
     }
 
     public function streamDownload($output, $filename): Response

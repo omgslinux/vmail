@@ -2,6 +2,8 @@
 
 namespace App\Form;
 
+use App\Dto\CertDto;
+use App\Dto\CertIntervalDto;
 use App\Entity\Domain;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,7 +18,8 @@ class CertIntervalType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        if (null==$options['interval']) {
+        //dump($options);
+        /*if (null==$options['interval']) {
             $notBefore = new \DateTime();
             $notAfter = new \DateTime();
             $notAfter->add(\DateInterval::createFromDateString($options['duration']));
@@ -24,20 +27,20 @@ class CertIntervalType extends AbstractType
         } else {
             $notBefore = $options['interval']['NotBefore'];
             $notAfter = $options['interval']['NotAfter'];
-        }
+        }*/
         $builder
         ->add(
             'notBefore',
             DateType::class,
             [
                 'label' => 'NotBefore',
-                'disabled' => null!=$options['interval'],
+                'disabled' => !$options['dto']->isNew(),
                 'widget' => 'single_text',
                 //'data' => \DateInterval::createFromDateString($options['interval']['NotBefore']),
                 //'data'  => new \DateTime()
                 //'data'  => $options['interval']['NotBefore']
                 //'data' => (null!=$options['interval']?$options['interval']['NotBefore']:null),
-                'data' => $notBefore
+                //'data' => $notBefore
             ]
         )
         ->add(
@@ -46,20 +49,24 @@ class CertIntervalType extends AbstractType
             [
                 'label' => 'NotAfter',
                 'widget' => 'single_text',
-                'disabled' => null!=$options['interval'],
+                'disabled' => !$options['dto']->isNew(),
+                //'disabled' => null!=$options['interval'],
                 //'data' => (null!=$options['interval']?$options['interval']['NotAfter']:null),
-                'data'  => $notAfter
-            ]
-        )
-        ->add(
-            'interval',
-            DateIntervalType::class,
-            [
-                'label' => 'Interval',
-                'disabled' => null!=$options['interval'],
-                'data' => \DateInterval::createFromDateString($options['duration'])??null,
+                //'data'  => $notAfter
             ]
         );
+        if ($options['dto']->isNew()) {
+            $builder
+            ->add(
+                'interval',
+                DateIntervalType::class,
+                [
+                    'label' => 'Interval',
+                    //'disabled' => !$options['dto']->isNew(),
+                    //'data' => \DateInterval::createFromDateString($options['duration'])??null,
+                ]
+            );
+        }
     }
 
     /**
@@ -68,9 +75,10 @@ class CertIntervalType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
-            'data_class' => null,
-            'duration' => '1 years',
-            'interval' => null,
+            'data_class' => CertIntervalDto::class,
+            'dto' => null,
+            //'duration' => '1 years',
+            //'interval' => null,
         ));
     }
 }
