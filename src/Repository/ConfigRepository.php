@@ -60,7 +60,7 @@ class ConfigRepository extends ServiceEntityRepository
     public function rawsql($rawsql, bool $flush = false): void
     {
         $conn=$this->getEntityManager()->getConnection();
-        $conn->exec($rawsql);
+        $conn->executeStatement($rawsql);
 
         if ($flush) {
             $this->getEntityManager()->flush();
