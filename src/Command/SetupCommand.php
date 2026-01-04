@@ -57,7 +57,7 @@ class SetupCommand extends Command
         if (empty($domain)) {
             $domain=new Domain();
             $domain->setName('default')->setActive(0);
-            $this->DR->add($domain, true);
+            $this->DR->save($domain, true);
             $this->DR->rawsql('UPDATE domain SET id=0 WHERE name="default"');
             $domain=$this->DR->findOneBy(['name' => 'default']);
         }
