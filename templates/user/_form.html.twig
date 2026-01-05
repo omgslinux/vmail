@@ -1,12 +1,3 @@
-{% if ajax is defined %}
-    {% set modalId2 = tagPrefix|default('edit') ~ modalId|default(VARS.modalId) ~ "Modal" %}
-    <div class="modal-header btn-primary">
-        <h5 class="modal-title" id="{{ modalId2 }}Label">{{ modalTitle|trans }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeMessage|default('Close')|trans}}">
-        </button>
-    </div>
-{% endif %}
-
 {{ form_start(form) }}
     <div class="modal-body">
     {% if entity.id %}
@@ -30,19 +21,25 @@
     </div>
     <div class="row">
       <div class="col-md-3">
-        {{ form_row(form.quota) }}
-      </div>
-      <div class="col-md-3">
         {{ form_widget(form.admin) }}
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         {{ form_widget(form.active) }}
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
+        {{ form_widget(form.imap) }}
+      </div>
+      <div class="col-md-2">
+        {{ form_widget(form.smtp) }}
+      </div>
+      <div class="col-md-2">
         {{ form_widget(form.sendEmail) }}
       </div>
     </div>
     <div class="row">
+    <div class="col-md-3">
+    {{ form_row(form.quota) }}
+    </div>
       <div class="col-md-5">
         {{ form_widget(form.plainPassword) }}
       </div>

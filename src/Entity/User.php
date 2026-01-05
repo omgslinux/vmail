@@ -96,10 +96,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var boolean
      *
      */
-    private $sendEmail = false;
+    private ?bool $sendEmail = false;
 
     #[ORM\Column(nullable: true)]
     private ?array $certdata = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $imap = true;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $smtp = true;
 
 
     public function __construct()
@@ -243,7 +249,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return users
      */
-    public function setAdmin($admin)
+    public function setAdmin(?bool $admin)
     {
         $this->admin = $admin;
 
@@ -255,7 +261,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return boolean
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->admin;
     }
@@ -267,7 +273,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return users
      */
-    public function setList($bool)
+    public function setList(?bool $bool)
     {
         $this->list = $bool;
 
@@ -279,7 +285,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return boolean
      */
-    public function isList()
+    public function isList(): bool
     {
         return $this->list;
     }
@@ -289,7 +295,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return User
      */
-    public function setSendEmail($value)
+    public function setSendEmail(?bool $value)
     {
         $this->sendEmail=$value;
         return $this;
@@ -300,7 +306,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return boolean
      */
-    public function getSendEmail()
+    public function getSendEmail(): bool
     {
         return $this->sendEmail;
     }
@@ -439,6 +445,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCertdata(?array $certdata): static
     {
         $this->certdata = $certdata;
+
+        return $this;
+    }
+
+    public function isImap(): ?bool
+    {
+        return $this->imap;
+    }
+
+    public function setImap(?bool $imap): static
+    {
+        $this->imap = $imap;
+
+        return $this;
+    }
+
+    public function isSmtp(): ?bool
+    {
+        return $this->smtp;
+    }
+
+    public function setSmtp(?bool $smtp): static
+    {
+        $this->smtp = $smtp;
 
         return $this;
     }

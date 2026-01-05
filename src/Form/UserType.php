@@ -85,34 +85,10 @@ class UserType extends AbstractType
 
             $builder
             ->get('admin')
-            ->addModelTransformer(
-                new CallbackTransformer(
-                    function ($booleanAsString) {
-                        // transform the string to boolean
-                        return (bool)(int)$booleanAsString;
-                    },
-                    function ($stringAsBoolean) {
-                        // transform the boolean to string
-                        return (string)(int)$stringAsBoolean;
-                    }
-                )
-            )
             ;
 
             $builder
             ->get('sendEmail')
-            ->addModelTransformer(
-                new CallbackTransformer(
-                    function ($booleanAsString) {
-                        // transform the string to boolean
-                        return (bool)(int)$booleanAsString;
-                    },
-                    function ($stringAsBoolean) {
-                        // transform the boolean to string
-                        return (string)(int)$stringAsBoolean;
-                    }
-                )
-            )
             ;
         }
         $builder
@@ -146,21 +122,26 @@ class UserType extends AbstractType
                 'required' => false,
             ]
         )
+        ->add(
+            'imap',
+            CheckboxType::class,
+            [
+                'label' => 'IMAP Access',
+                'required' => false,
+            ]
+        )
+        ->add(
+            'smtp',
+            CheckboxType::class,
+            [
+                'label' => 'SMTP Access',
+                'required' => false,
+            ]
+        )
         ;
         $builder
         ->get('active')
-        ->addModelTransformer(
-            new CallbackTransformer(
-                function ($booleanAsString) {
-                    // transform the string to boolean
-                    return (bool)(int)$booleanAsString;
-                },
-                function ($stringAsBoolean) {
-                    // transform the boolean to string
-                    return (string)(int)$stringAsBoolean;
-                }
-            )
-        );
+        ;
 
         if ($managePassword===true) {
             $builder

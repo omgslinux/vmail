@@ -35,12 +35,13 @@
             {{ include('prototypes/alias_prototype.html.twig', { 'row': address }) }}
         {%- endfor %}
     </ul>
-    <button type="button" class="btn btn-primary" data-action="form-collection#addCollectionElement">Add an address</button>
+    <button type="button" class="btn btn-primary" data-action="form-collection#addCollectionElement">{% trans %}Add an address{% endtrans %}</button>
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-action="modal-loader#close">{{ closeMessage|default('Close') }}</button>
         <button type="submit" class="btn btn-primary">{{ saveMessage|default('Save changes')|trans }}</button>
     </div>
+    {% do form.imap.setRendered %}{% do form.smtp.setRendered %}
     {{ form_end(form) }}
 {% if delete_form is defined %}
     {{ include('_delete_form.html.twig') }}

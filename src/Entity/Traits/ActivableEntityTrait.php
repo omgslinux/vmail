@@ -10,7 +10,7 @@ trait ActivableEntityTrait
     #[ORM\Column(name: 'is_active', type: 'boolean', nullable: true)]
     private bool $active=true;
 
-    public function setActive(bool $active): self
+    public function setActive(?bool $active): self
     {
         $this->active = $active;
         return $this;

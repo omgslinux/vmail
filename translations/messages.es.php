@@ -115,5 +115,7 @@ return array(
   'Certificate' => 'Certificado',
   'User certificate download' => 'Descargar certificado del usuario',
   'Download CA certificate' => 'Descargar certificado de la CA',
+  'IMAP Access' => 'Acceso IMAP',
+  'SMTP Access' => 'Acceso SMTP',
 
 );

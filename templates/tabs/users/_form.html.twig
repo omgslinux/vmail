@@ -32,20 +32,26 @@
     </div>
     <div class="row">
       <div class="col-lg-2">
-        {{ form_row(user_form.quota) }}
-      </div>
-      <div class="col-lg-3">
         {{ form_row(user_form.admin) }}
       </div>
-      <div class="col-lg-3">
+      <div class="col-lg-2">
         {{ form_row(user_form.active) }}
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-2">
+        {{ form_row(user_form.imap) }}
+      </div>
+      <div class="col-lg-2">
+        {{ form_row(user_form.smtp) }}
+      </div>
+      <div class="col-lg-2">
         {{ form_row(user_form.sendEmail) }}
       </div>
     </div>
     <div class="row">
-      <div class="col-lg-5">
+    <div class="col-lg-2">
+    {{ form_row(user_form.quota) }}
+    </div>
+      <div class="col-lg-2">
         {{ form_widget(user_form.plainPassword) }}
       </div>
     </div>

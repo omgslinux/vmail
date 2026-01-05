@@ -20,7 +20,8 @@
                     data-url="{{ path('manage_user_edit', { 'id': user.id } ) }}">{{ email }}</a></td>
                 {% endif %}
                 <td>{{ user.fullName }}</td>
-                <td>{{ user.isActive ? '√' : '--' }}</td>
+                <td><button class="btn btn-{{ user.imap ? 'success': 'danger' }}">IMAP</button>
+                <button class="btn btn-{{ user.smtp ? 'success' : 'danger'}}">SMTP</button></td>
                 <td>{{ user.isAdmin ? '√' : '--' }}</td>
                 <td>{% if entity.certdata -%}
                     <a href="#" data-action="click->modal-loader#open"
