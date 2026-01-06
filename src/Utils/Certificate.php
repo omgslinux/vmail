@@ -140,7 +140,7 @@ class Certificate
             array $args = ?
         ): bool
         */
-        dump($params);
+        //dump($params);
         $f = $params['filename'];
         unset($params['filename']);
         if (!empty($params['filename'])) {
@@ -411,6 +411,7 @@ class Certificate
         if ($type=='server') {
             $extensions = 'server_ext';
             $data['common']['commonName'] .= '.' . $this->domain->getName();
+            $data['common']['subject']['commonName'] = $data['common']['commonName'];
         } elseif ($type=='client') {
             /*
             dump($data['common']);
@@ -423,7 +424,7 @@ class Certificate
             $extensions = 'client_ext';
         }
         $userData["commonName"]= $data['common']['commonName'];
-
+        //dump($data, $userData);
         //$data['common']['organizationName'] = $caCertData['organizationName'];
 
         // Creamos una contraseña para cifrar la clave privada
@@ -445,7 +446,7 @@ class Certificate
         if (!empty($this->domain->getCertData()['serial'])) {
             $serial = intval($this->domain->getCertData()['serial']);
         }
-        //dump($csr, $caCertData, $serial);
+        //dd($csr, $caCertData, $serial);
         $creqOptions = array_merge(
             self::BASICCERTCONFIG,
             ['config' => self::CONFFILE],
