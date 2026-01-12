@@ -16,7 +16,7 @@ use Twig\Environment;
     name: 'app:dovecot:conf',
     description: 'Extrae datos de DB, detecta versión de Dovecot y despliega plantillas Twig en /etc/dovecot',
 )]
-class DovecotSetupCommand extends Command
+class DovecotConfCommand extends Command
 {
     public function __construct(
         private ParameterBagInterface $params,
