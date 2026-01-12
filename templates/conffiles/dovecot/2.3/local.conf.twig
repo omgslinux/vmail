@@ -1,0 +1,53 @@
+protocols = imap lmtp sieve
+mail_home = /var/lib/vmail/%d/%n
+mail_location = maildir:~/Maildir
+
+#mail_driver = maildir
+#mail_path = ~/Maildir
+
+mail_privileged_group = vmail
+
+#auth_debug = yes
+namespace inbox {
+   separator = .
+   prefix = INBOX.
+   inbox = yes
+
+    mailbox Sent {
+        special_use = \Sent
+        auto = subscribe
+    }
+    mailbox Drafts {
+        special_use = \Drafts
+        auto = subscribe
+    }
+    mailbox Junk {
+        special_use = \Junk
+        auto = subscribe
+    }
+
+    mailbox Trash {
+        special_use = \Trash
+        auto = subscribe
+    }
+}
+
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0660
+    user = vmail
+    group = postfix
+  }
+}
+
+service lmtp {
+  unix_listener /var/spool/postfix/private/dovecot-lmtp {
+    mode = 0660
+    group = postfix
+    user = postfix
+  }
+}
+
+protocol lmtp {
+  mail_plugins = quota sieve
+}

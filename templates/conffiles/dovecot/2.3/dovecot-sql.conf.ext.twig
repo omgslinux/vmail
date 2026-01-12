@@ -1,0 +1,30 @@
+driver = mysql
+connect = host={{ dbhost }} dbname={{ dbname }} user={{ dbuser }} password={{ dbpass }}
+default_pass_scheme = {{ enctype }} {% SHA512-CRYPT %}
+
+# password_query: Autentica y devuelve TODOS los datos (Prefetch + Cuotas)
+pasword_query = SELECT CONCAT(u.user, '@', d.name) AS user, u.password, \
+  CONCAT('{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS userdb_home, \
+  {{ UID }} AS userdb_uid, \
+  {{ GID }} AS userdb_gid, \
+  CONCAT('maildir:{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS userdb_mail, \
+  CONCAT('*:storage=', u.quota, 'B') AS userdb_quota_rule \
+  FROM user u JOIN domain d ON u.domain_id=d.id \
+  WHERE u.user='%u' AND d.name='%d' \
+    AND d.is_active=1 \
+    AND ( \
+      CASE \
+        WHEN '%s' IN ('imap', 'pop3', 'doveadm') THEN u.imap \
+        WHEN '%s' IN ('auth', 'smtp', 'lmtp') THEN u.smtp \
+        ELSE 0 \
+      END \
+    ) = 1
+
+
+# user_query: Fallback para entregas locales (LDA/LMTP) o cuando no hay passdb
+user_query = SELECT CONCAT('{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS home, \
+  {{ UID }} AS uid, {{ GID }} AS gid, \
+  CONCAT('*:storage=', u.quota, 'B') AS quota_rule \
+  FROM user u JOIN domain d ON u.domain_id=d.id \
+  WHERE u.user='%n' AND d.name='%d' \
+    AND u.is_active=1 AND d.is_active=1
