@@ -14,7 +14,7 @@ use Twig\Environment;
 
 #[AsCommand(
     name: 'app:dovecot:conf',
-    description: 'Extrae datos de DB, detecta versión de Dovecot y despliega plantillas Twig en /etc/dovecot',
+    description: 'Deploy dovecot templates for setup in /etc/dovecot',
 )]
 class DovecotConfCommand extends Command
 {
@@ -30,8 +30,6 @@ class DovecotConfCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        // 1. Extraer parámetros de conexión a variables
-        // Buscamos DATABASE_URL en variables de entorno o parámetros
         $dbUrl = $_ENV['DATABASE_URL'] ?? $this->params->get('database_url');
 
         $dbParams = parse_url($dbUrl);
@@ -43,7 +41,7 @@ class DovecotConfCommand extends Command
             'db_name' => isset($dbParams['path']) ? ltrim($dbParams['path'], '/') : '',
         ];
 
-        // 2. Averiguar versión de Dovecot
+        // Find dovecot version
         $process = new Process(['/usr/sbin/dovecot', '--version']);
         $process->run();
 
@@ -52,23 +50,20 @@ class DovecotConfCommand extends Command
             return Command::FAILURE;
         }
 
-        // Obtenemos los 3 primeros caracteres (ej: "2.3")
         $version = substr(trim($process->getOutput()), 0, 3);
-        $io->note("Versión de Dovecot detectada: $version");
+        $io->note("Versión de Dovecot detected: $version");
 
         $vars['dovecot_version'] = $version;
 
-        // 3. Rutas de origen y destino
         $projectDir = $this->kernel->getProjectDir();
-        $templateDir = $projectDir . "/templates/dovecot/$version";
+        $templateDir = $projectDir . "/templates/conffiles/dovecot/$version";
         $targetDir = '/etc/dovecot';
 
         if (!is_dir($templateDir)) {
-            $io->error("El directorio de plantillas no existe: $templateDir");
+            $io->error("Template directory does not exist: $templateDir");
             return Command::FAILURE;
         }
 
-        // Recorrido recursivo de archivos y directorios
         $directoryIterator = new \RecursiveDirectoryIterator($templateDir, \RecursiveDirectoryIterator::SKIP_DOTS);
         $iterator = new \RecursiveIteratorIterator($directoryIterator, \RecursiveIteratorIterator::SELF_FIRST);
 
@@ -79,7 +74,7 @@ class DovecotConfCommand extends Command
             if ($file->isDir()) {
                 if (!is_dir($destination)) {
                     mkdir($destination, 0755, true);
-                    $io->writeln("Directorio creado: $destination");
+                    $io->writeln("Directory created: $destination");
                 }
             } else {
                 $content = file_get_contents($file->getRealPath());
@@ -92,7 +87,7 @@ class DovecotConfCommand extends Command
                         $template = $this->twig->createTemplate($content);
                         $content = $template->render($vars);
                     } catch (\Exception $e) {
-                        $io->error("Error procesando twig en " . $file->getFilename() . ": " . $e->getMessage());
+                        $io->error("Error processing twig in " . $file->getFilename() . ": " . $e->getMessage());
                         continue;
                     }
                 }
@@ -106,7 +101,7 @@ class DovecotConfCommand extends Command
             }
         }
 
-        $io->success("Configuración de Dovecot $version desplegada correctamente.");
+        $io->success("Dovecot Configuration successful $version.");
 
         return Command::SUCCESS;
     }
