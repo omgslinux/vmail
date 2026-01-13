@@ -60,7 +60,7 @@ mysql  {{ dbhost }} {
 }
 
 passdb sql {
-    default_password_scheme = SHA512-CRYPT
+    default_password_scheme = {{ enctype | default 'SHA512-CRYPT' }}
 
     # Autentica y devuelve TODOS los datos (Prefetch + Cuotas)
     query = SELECT CONCAT(u.user, '@', d.name) AS user, u.password, \

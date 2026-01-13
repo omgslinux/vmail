@@ -1,8 +1,12 @@
+passdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
 userdb {
   driver = prefetch
 }
-
-#userdb {
-#  driver = sql
-#  args = /etc/dovecot/dovecot-sql.conf.ext
-#}
+# The userdb below is used only by lda.
+userdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}

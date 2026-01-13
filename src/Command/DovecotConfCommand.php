@@ -33,12 +33,20 @@ class DovecotConfCommand extends Command
         $dbUrl = $_ENV['DATABASE_URL'] ?? $this->params->get('database_url');
 
         $dbParams = parse_url($dbUrl);
+        $UGID = 5000;
+        $user = 'vmail';
         $vars = [
-            'db_user' => $dbParams['user'] ?? '',
-            'db_pass' => $dbParams['pass'] ?? '',
-            'db_host' => $dbParams['host'] ?? '',
-            'db_port' => $dbParams['port'] ?? '',
-            'db_name' => isset($dbParams['path']) ? ltrim($dbParams['path'], '/') : '',
+            'dbuser' => $dbParams['user'] ?? '',
+            'dbpass' => $dbParams['pass'] ?? '',
+            'dbhost' => $dbParams['host'] ?? '',
+            'dbport' => $dbParams['port'] ?? '',
+            'dbname' => isset($dbParams['path']) ? ltrim($dbParams['path'], '/') : '',
+            'enctype' => 'SHA512-CRYPT',
+            'virtual_mailbox_base' => '/var/lib/vmail',
+            'UID' => $UGID,
+            'GID' => $UGID,
+            'user' => $user,
+            'group' => $user,
         ];
 
         // Find dovecot version
