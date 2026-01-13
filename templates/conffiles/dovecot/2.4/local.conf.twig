@@ -3,7 +3,7 @@ protocols = imap lmtp sieve
 mail_driver = maildir
 mail_path = ~/Maildir
 
-mail_privileged_group = {{ GID }}
+mail_privileged_group = {{ group|default('vmail') }}
 
 
 #In the first namespace section, make sure the following lines are uncommented:
@@ -33,7 +33,7 @@ mailbox Trash {
 service auth {
   unix_listener /var/spool/postfix/private/auth {
     mode = 0660
-    user = {{ UID }}
+    user = {{ user|default('vmail') }}
     group = postfix
   }
 }
@@ -60,14 +60,13 @@ mysql  {{ dbhost }} {
 }
 
 passdb sql {
-    default_password_scheme = {{ enctype | default 'SHA512-CRYPT' }}
+    default_password_scheme = {{ enctype | default('SHA512-CRYPT') }}
 
     # Autentica y devuelve TODOS los datos (Prefetch + Cuotas)
     query = SELECT CONCAT(u.user, '@', d.name) AS user, u.password, \
       CONCAT('{{ virtual_mailbox_base }}', d.name, '/', u.user) AS userdb_home, \
       {{ UID }} AS userdb_uid, \
       {{ GID }} AS userdb_gid, \
-      CONCAT('maildir:{{ virtual_mailbox_base }}', d.name, '/', u.user) AS userdb_mail, \
       CONCAT('*:storage=', u.quota, 'B') AS userdb_quota_rule \
       FROM user u JOIN domain d ON u.domain_id=d.id \
       WHERE u.user='%{user | username}' AND d.name='%{user | domain}' \
@@ -120,7 +119,7 @@ mysql  {{ dbhost }} {
 service auth {
   unix_listener /var/spool/postfix/private/auth {
     mode = 0660
-    user = postfix
+    user = {{ user|default('vmail') }}
     group = postfix
   }
 }

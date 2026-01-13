@@ -7,7 +7,6 @@ password_query = SELECT CONCAT(u.user, '@', d.name) AS user, u.password, \
   CONCAT('{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS userdb_home, \
   {{ UID|default('5000') }} AS userdb_uid, \
   {{ GID|default('5000') }} AS userdb_gid, \
-  CONCAT('maildir:{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS userdb_mail, \
   CONCAT('*:storage=', u.quota, 'B') AS userdb_quota_rule \
   FROM user u JOIN domain d ON u.domain_id=d.id \
   WHERE u.user='%n' AND d.name='%d' \
