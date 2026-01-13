@@ -1,6 +1,6 @@
 driver = mysql
 connect = host={{ dbhost }} dbname={{ dbname }} user={{ dbuser }} password={{ dbpass }}
-default_pass_scheme = {{ enctype | default 'SHA512-CRYPT' }} {# SHA512-CRYPT #}
+default_pass_scheme = {{ enctype | default('SHA512-CRYPT') }} {# SHA512-CRYPT #}
 
 # password_query: Autentica y devuelve TODOS los datos (Prefetch + Cuotas)
 password_query = SELECT CONCAT(u.user, '@', d.name) AS user, u.password, \
