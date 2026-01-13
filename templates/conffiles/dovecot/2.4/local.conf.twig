@@ -73,7 +73,7 @@ passdb sql {
         AND d.is_active=1 \
         AND ( \
           CASE \
-            WHEN '%{protocol}' IN ('imap', 'pop3') THEN u.imap \
+            WHEN '%{protocol}' IN ('imap', 'pop3', 'doveadm') THEN u.imap \
             WHEN '%{protocol}' IN ('auth', 'smtp', 'lmtp') THEN u.smtp \
             ELSE 0 \
           END \
@@ -87,77 +87,4 @@ userdb static {
     gid = {{ GID }}
     home = {{ virtual_mailbox_base }}%{user | domain}/%{user | username}
   }
-}
-
-
-
-
-
-
-
-
-
-#In the first namespace section, make sure the following lines are uncommented:
-namespace inbox {
-   separator = .
-   prefix = INBOX.
-   inbox = yes
-}
-mail_privileged_group = {{ GID }}
-
-mail_uid = {{ UID }}
-mail_gid = {{ GID }}
-
-sql_driver = mysql
-
-mysql  {{ dbhost }} {
-   user = {{ dbuser }}
-   password = {{ dbpass }}
-   dbname = {{ dbname }}
-}
-
-service auth {
-  unix_listener /var/spool/postfix/private/auth {
-    mode = 0660
-    user = {{ user|default('vmail') }}
-    group = postfix
-  }
-}
-
-service lmtp {
-  unix_listener /var/spool/postfix/private/dovecot-lmtp {
-    mode = 0660
-    group = postfix
-    user = postfix
-  }
-}
-
-protocol lmtp {
-  mail_plugins = $mail_plugins quota
-}
-
-passdb sql {
-default_password_scheme = {{ enctype }}
-
-# password_query: Autentica y devuelve TODOS los datos (Prefetch + Cuotas)
-query = SELECT u.user, u.password, \
-  CONCAT('{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS userdb_home, \
-  {{ UID }} AS userdb_uid, \
-  {{ GID }} AS userdb_gid, \
-  CONCAT('maildir:{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS userdb_mail, \
-  CONCAT('*:storage=', u.quota, 'B') AS userdb_quota_rule \
-  FROM user u JOIN domain d ON u.domain_id=d.id \
-  WHERE u.user='%{user | username}' AND d.name='%{user | domain}' \
-    AND u.is_active=1 AND d.is_active=1
-
-}
-
-userdb sql {
-# user_query: Fallback para entregas locales (LDA/LMTP) o cuando no hay passdb
-query = SELECT CONCAT('{{ virtual_mailbox_base }}/', d.name, '/', u.user) AS home, \
-  {{ UID }} AS uid, {{ GID }} AS gid, \
-  CONCAT('*:storage=', u.quota, 'B') AS quota_rule \
-  FROM user u JOIN domain d ON u.domain_id=d.id \
-  WHERE u.user='%{user | username}' AND d.name='%{user | domain}' \
-    AND u.is_active=1 AND d.is_active=1
 }
