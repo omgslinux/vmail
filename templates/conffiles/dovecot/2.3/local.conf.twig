@@ -35,7 +35,7 @@ namespace inbox {
 service auth {
   unix_listener /var/spool/postfix/private/auth {
     mode = 0660
-    user = {{ UID|default '5000' }}
+    user = {{ UID|default('5000') }}
     group = postfix
   }
 }
