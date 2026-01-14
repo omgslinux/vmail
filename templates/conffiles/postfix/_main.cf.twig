@@ -1,16 +1,44 @@
 # Este fichero contiene solo la parte de gestion de dominios virtuales gestionados por vmail.
 # Debe añadirse al final de main.cf
+inet_interfaces = all
+myorigin = /etc/mailname
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
 
 receive_override_options =
-alias_maps = hash:/etc/aliases, mysql:/etc/postfix/vmail/mysql-alias_maps.cf
 mailbox_size_limit = 0
+alias_maps = hash:/etc/aliases, proxy:mysql:/etc/postfix/vmail/mysql-alias_maps.cf
 
-
-transport_maps = mysql:/etc/postfix/vmail/mysql-virtual_transport.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_transport.cf
-virtual_alias_domains =
+{# virtual_alias_domains = #}
 virtual_alias_maps = proxy:mysql:/etc/postfix/vmail/mysql-virtual_autoreply_mailboxes.cf, proxy:mysql:/etc/postfix/vmail/mysql-virtual_alias_maps.cf
-virtual_gid_maps = static:{{ GID }}
+virtual_mailbox_domains = proxy:mysql:/etc/postfix/vmail/mysql-virtual_mailbox_domains.cf, proxy:mysql:/etc/postfix/vmail/mysql-virtual_autoreply_domains.cf
+
+smtpd_sasl_auth_enable = yes
+smtpd_use_tls=yes
+
+{% if dovecot %}
+smtpd_tls_cert_file = /etc/dovecot/private/dovecot.pem
+smtpd_tls_key_file = /etc/dovecot/private/dovecot.key
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+{% else %}
+transport_maps = proxy:mysql:/etc/postfix/vmail/mysql-virtual_transport.cf, proxy:mysql:/etc/postfix/vmail/mysql-virtual_autoreply_transport.cf
+virtual_mailbox_maps = proxy:mysql:/etc/postfix/vmail/mysql-virtual_mailbox_maps.cf
 virtual_mailbox_base = {{ virtual_mailbox_base }}
-virtual_mailbox_domains = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_domains.cf, mysql:/etc/postfix/vmail/mysql-virtual_autoreply_domains.cf
-virtual_mailbox_maps = mysql:/etc/postfix/vmail/mysql-virtual_mailbox_maps.cf
 virtual_uid_maps = static:{{ UID }}
+virtual_gid_maps = static:{{ GID }}
+{% endif %}
+
+{% if has_amavis %}
+# Integración con Amavis
+content_filter = smtp-amavis:[127.0.0.1]:10024
+receive_override_options = no_address_mappings
+{% endif %}
+
+{% if has_opendkim %}
+# Configuración DKIM (Milter)
+# Postfix se conecta a OpenDKIM en el puerto 8891 (o el puerto configurado)
+smtpd_milters           = inet:127.0.0.1:8891
+non_smtpd_milters       = $smtpd_milters
+milter_default_action   = accept
+{% endif %}
