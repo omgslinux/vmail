@@ -85,6 +85,6 @@ userdb static {
   fields {
     uid = {{ UID }}
     gid = {{ GID }}
-    home = {{ virtual_mailbox_base }}%{user | domain}/%{user | username}
+    home = {{ virtual_mailbox_base }}/%{user | domain}/%{user | username}
   }
 }
