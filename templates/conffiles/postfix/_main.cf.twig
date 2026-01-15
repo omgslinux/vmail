@@ -21,6 +21,10 @@ smtpd_tls_key_file = /etc/dovecot/private/dovecot.key
 smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 virtual_transport = lmtp:unix:private/dovecot-lmtp
+transport_maps =
+virtual_mailbox_base =
+virtual_uid_maps =
+virtual_gid_maps =
 {% else %}
 transport_maps = proxy:mysql:/etc/postfix/vmail/mysql-virtual_transport.cf, proxy:mysql:/etc/postfix/vmail/mysql-virtual_autoreply_transport.cf
 virtual_mailbox_maps = proxy:mysql:/etc/postfix/vmail/mysql-virtual_mailbox_maps.cf
@@ -38,7 +42,7 @@ receive_override_options = no_address_mappings
 {% if has_opendkim %}
 # Configuración DKIM (Milter)
 # Postfix se conecta a OpenDKIM en el puerto 8891 (o el puerto configurado)
-smtpd_milters           = inet:127.0.0.1:8891
+smtpd_milters           = {{ opendkim_socket | default('inet:127.0.0.1:8891') }}
 non_smtpd_milters       = $smtpd_milters
 milter_default_action   = accept
 {% endif %}

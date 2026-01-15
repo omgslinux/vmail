@@ -86,6 +86,7 @@ class PostfixConfCommand extends Command
         }
 
         $isOpendkimPresent = false;
+        $opendkimSocket = null;
         $opendkimDir = '/etc/opendkim';
 
         // 1. Comprobar existencia del directorio
@@ -96,10 +97,17 @@ class PostfixConfCommand extends Command
 
             if ($process->isSuccessful()) {
                 $isOpendkimPresent = true;
+
+                // 3. Detectar el socket configurado usando awk
+                // Buscamos la línea que empieza por Socket y extraemos el segundo parámetro
+                $awkProcess = new Process(['awk', '/^Socket/ {print $2}', '/etc/opendkim.conf']);
+                $awkProcess->run();
+
+                if ($awkProcess->isSuccessful()) {
+                    $opendkimSocket = trim($awkProcess->getOutput());
+                }
             }
         }
-
-
 
         $vars = [
             'dbuser' => $dbParams['user'] ?? '',
@@ -116,6 +124,7 @@ class PostfixConfCommand extends Command
             'dovecot' => $isDovecotPresent,
             'has_amavis' => $isAmavisPresent,
             'has_opendkim' => $isOpendkimPresent,
+            'opendkim_socket' => $opendkimSocket,
         ];
 
 
@@ -137,17 +146,30 @@ class PostfixConfCommand extends Command
             file_put_contents($targetMysqlDir . '/' . $targetName, $content);
         }
 
+
         $renderedMain = $this->twig->render('conffiles/postfix/_main.cf.twig', $vars);
         $lines = explode("\n", $renderedMain);
 
         foreach ($lines as $line) {
             $line = trim($line);
+
             // Saltamos comentarios y líneas vacías
             if (empty($line) || str_starts_with($line, '#')) continue;
 
-            // Ejecutamos postconf -e "parametro = valor"
             if (str_contains($line, '=')) {
-                $process = new Process(['postconf', '-e', $line]);
+                // Dividimos la línea en máximo 2 partes: parámetro y valor
+                $parts = explode('=', $line, 2);
+                $parameter = trim($parts[0]);
+                $value = isset($parts[1]) ? trim($parts[1]) : '';
+
+                // Si el valor está vacío, o son comillas vacías, usamos -# para resetear
+                if ($value === '' || $value === '""' || $value === "''") {
+                    $process = new Process(['postconf', '-#', $parameter]);
+                } else {
+                    // Si hay valor, usamos el -e (edit) con la línea completa
+                    $process = new Process(['postconf', '-e', $line]);
+                }
+
                 $process->run();
             }
         }
