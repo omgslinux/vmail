@@ -51,6 +51,7 @@ service lmtp {
 
 protocol lmtp {
   mail_plugins = quota sieve
+  auth_username_format = %{user | lower}
 }
 
 sql_driver = mysql
@@ -71,7 +72,7 @@ passdb sql {
       {{ GID }} AS userdb_gid, \
       CONCAT('*:storage=', u.quota, 'B') AS userdb_quota_rule \
       FROM user u JOIN domain d ON u.domain_id=d.id \
-      WHERE u.user='%{user | username}' AND d.name='%{user | domain}' \
+      WHERE CONCAT(u.user, '@', d.name) = '%{user}' \
         AND d.is_active=1 \
         AND ( \
           CASE \
