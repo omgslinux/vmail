@@ -6,9 +6,11 @@ cp /tmp/1-*sh $HOME
 git clone https://github.com/omgslinux/vmail.git
 
 cd vmail
-umask 002
+echo 'APP_ENV=prod
+DATABASE_URL="mysql://vmail:vmail@mysql:3306/vmail?serverVersion=11.8.3-MariaDB&charset=utf8mb4"'>>.env
+
 composer install
+bin/console asset-map:compile
 
 bin/console doctrine:schema:update --force
 bin/console vmail:setup
-
