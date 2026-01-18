@@ -13,7 +13,7 @@ password_query = SELECT CONCAT(u.user, '@', d.name) AS user, u.password, \
     AND d.is_active=1 \
     AND ( \
       CASE \
-        WHEN '%s' IN ('imap', 'pop3', 'doveadm') THEN u.imap \
+        WHEN '%s' IN ('imap', 'pop3', 'doveadm', 'sieve') THEN u.imap \
         WHEN '%s' IN ('auth', 'smtp', 'lmtp') THEN u.smtp \
         ELSE 0 \
       END \

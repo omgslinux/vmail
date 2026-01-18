@@ -76,7 +76,7 @@ passdb sql {
         AND d.is_active=1 \
         AND ( \
           CASE \
-            WHEN '%{protocol}' IN ('imap', 'pop3', 'doveadm') THEN u.imap \
+            WHEN '%{protocol}' IN ('imap', 'pop3', 'doveadm', 'sieve') THEN u.imap \
             WHEN '%{protocol}' IN ('auth', 'smtp', 'lmtp') THEN u.smtp \
             ELSE 0 \
           END \
