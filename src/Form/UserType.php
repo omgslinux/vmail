@@ -54,6 +54,14 @@ class UserType extends AbstractType
                   ]
                 ]
             )
+            ->add(
+                'isPublic',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    //'label' => false
+                ]
+            )
             ;
         } else {
             $builder

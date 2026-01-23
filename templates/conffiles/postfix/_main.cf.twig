@@ -2,7 +2,7 @@
 # Debe añadirse al final de main.cf
 inet_interfaces = all
 myorigin = /etc/mailname
-smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, check_sender_access mysql:/etc/postfix/vmail/mysql-check_alias_access.cf
 
 receive_override_options =
 mailbox_size_limit = 0

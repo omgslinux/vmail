@@ -50,38 +50,13 @@ class AliasType extends AbstractType
             ]
         )
         ;
-        $builder
-        ->get('active')
-        ->addModelTransformer(
-            new CallbackTransformer(
-                function ($booleanAsString) {
-                    // transform the string to boolean
-                    return (bool)(int)$booleanAsString;
-                },
-                function ($stringAsBoolean) {
-                    // transform the boolean to string
-                    return (string)(int)$stringAsBoolean;
-                }
-            )
-        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
             'data_class' => Alias::class,
             'domainId' => 0,
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix(): string
-    {
-        return 'vmailbundle_aliasname';
     }
 }

@@ -107,6 +107,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?bool $smtp = true;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isPublic = null;
+
 
     public function __construct()
     {
@@ -469,6 +472,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSmtp(?bool $smtp): static
     {
         $this->smtp = $smtp;
+
+        return $this;
+    }
+
+    public function isPublic(): ?bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(?bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
 
         return $this;
     }

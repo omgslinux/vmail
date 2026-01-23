@@ -1,0 +1,6 @@
+user = {{ dbuser }}
+password = {{ dbpass }}
+dbname = {{ dbname }}
+hosts = {{ dbhost }}
+
+query = SELECT 'REJECT' FROM user u_dest JOIN domain d_dest ON u_dest.domain_id = d_dest.id WHERE CONCAT(u_dest.user, '@', d_dest.name) = '%s' AND u_dest.is_list = 1 AND u_dest.is_active = 1 AND u_dest.is_public = 0 AND NOT EXISTS (SELECT 1 FROM user u_sender JOIN domain d_sender ON u_sender.domain_id = d_sender.id WHERE CONCAT(u_sender.user, '@', d_sender.name) = '%u' AND d_sender.id = d_dest.id AND u_sender.is_active = 1)

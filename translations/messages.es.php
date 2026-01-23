@@ -117,5 +117,5 @@ return array(
   'Download CA certificate' => 'Descargar certificado de la CA',
   'IMAP Access' => 'Acceso IMAP',
   'SMTP Access' => 'Acceso SMTP',
-
+  'Is public' => 'Público'
 );
