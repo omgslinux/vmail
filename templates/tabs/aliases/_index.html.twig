@@ -11,6 +11,7 @@
                 <th>{% trans %}List{% endtrans %}</th>
                 <th>{% trans %}Description{% endtrans %}</th>
                 <th>{% trans %}Active{% endtrans %}</th>
+                <th>{% trans %}isPublic{% endtrans %}</th>
             </tr>
             {% for alias in aliases %}{% set email = alias.name ~ '@' ~ alias.domain.name %}
             <tr>
@@ -22,6 +23,7 @@
                 {% endif %}
                 <td>{{ alias.fullname }}</td>
                 <td>{{ alias.isActive ? '√' : '--' }}</td>
+                <td>{{ alias.isPublic ? '√' : '--' }}</td>
             </tr>
             {% endfor %}
         </tbody>
