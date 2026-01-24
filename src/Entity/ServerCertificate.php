@@ -10,7 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[UniqueConstraint(name: 'cert_description_unique', columns: ['domain_id', 'description'])]
 #[ORM\Entity(repositoryClass: ServerCertificateRepository::class)]
-#[UniqueEntity(fields: ['domain', 'description'], message: 'Ya existe ese para ese dominio', errorPath: 'description')]
+#[UniqueEntity(fields: ['domain', 'description'], message: 'Ya existe ese certificado para ese dominio', errorPath: 'description')]
 class ServerCertificate
 {
     #[ORM\Id]

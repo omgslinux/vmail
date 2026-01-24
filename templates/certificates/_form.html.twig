@@ -1,9 +1,11 @@
 <div data-modal-loader-default-size-value="modal-xl" class="container">
     {% set tagPrefix = 'create' %}
-    <h1>{{ title|trans }}{% if entity is defined %} ({{ entity.name }}){% endif %}</h1>
+<h1>{{ title|trans }}{% if entity is defined %} ({{ entity.name }}){% endif %}</h1>
 
 
     {{ form_start(form) }}
+    <div class="danger">{{ form_errors(form) }}</div>
+
     <div class="modal-body">
     {% if form.common is defined %}
         {% if form.common.commonName is defined %}

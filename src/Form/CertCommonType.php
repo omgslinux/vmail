@@ -31,19 +31,36 @@ class CertCommonType extends AbstractType
     {
         $readonly = !$options['dto']->isNew();
         $disabled = $options['dto']->isCAInherit();
-        $builder
-        ->add(
-            'countryName',
-            CountryType::class,
-            [
-                'label' => 'countryName',
-                'required' => true,
-                'attr' => [
-                    'class' => 'form-select',
-                    'disabled' => $disabled,
+        if ($disabled) {
+            $builder
+            ->add(
+                'countryName',
+                TextType::class,
+                [
+                    'label' => 'countryName',
+                    'required' => true,
+                    'attr' => [
+                        'readonly' => true,
+                        'class' => 'bg-secondary text-white',
+                    ]
                 ]
-            ]
-        )
+            );
+        } else {
+            $builder
+            ->add(
+                'countryName',
+                CountryType::class,
+                [
+                    'label' => 'countryName',
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'form-select',
+                    ]
+                ]
+            );
+        }
+
+        $builder
         ->add(
             'stateOrProvinceName',
             TextType::class,
@@ -51,8 +68,9 @@ class CertCommonType extends AbstractType
                 'label' => 'stateOrProvinceName',
                 'required' => false,
                 'attr' => [
-                    'disabled' => $disabled,
-                    'autocomplete' => 'new-password'
+                    'readonly' => $disabled,
+                    'autocomplete' => 'new-password',
+                    'class' => $disabled?'bg-secondary text-white':'',
                 ]
             ]
         )
@@ -63,8 +81,9 @@ class CertCommonType extends AbstractType
                 'label' => 'localityName',
                 'required' => false,
                 'attr' => [
-                    'disabled' => $disabled,
-                    'autocomplete' => 'new-password'
+                    'readonly' => $disabled,
+                    'autocomplete' => 'new-password',
+                    'class' => $disabled?'bg-secondary text-white':'',
                 ]
             ]
         )
@@ -75,8 +94,9 @@ class CertCommonType extends AbstractType
                 'label' => 'organizationalUnitName',
                 'required' => false,
                 'attr' => [
-                    'disabled' => $disabled,
-                    'autocomplete' => 'new-password'
+                    'readonly' => $disabled,
+                    'autocomplete' => 'new-password',
+                    'class' => $disabled?'bg-secondary text-white':'',
                 ]
             ]
         )
@@ -88,7 +108,8 @@ class CertCommonType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'autocomplete' => 'new-password',
-                    'disabled' => $disabled,
+                    'readonly' => $disabled,
+                    'class' => $disabled?'bg-secondary text-white':'',
                 ]
             ]
         );
@@ -158,8 +179,9 @@ class CertCommonType extends AbstractType
                     'label' => 'emailAddress',
                     'required' => false,
                     'attr' => [
-                        'disabled' => $disabled && $readonly,// && $options['dto']->getCerttype()=='ca',
+                        'readonly' => $disabled,// && $options['dto']->getCerttype()=='ca',
                         //'autocomplete' => 'new-password'
+                    'class' => $disabled?'bg-secondary text-white':'',
                     ]
                 ]
             )

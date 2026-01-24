@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Dto\CertDto;
 use App\Entity\Domain;
@@ -17,6 +18,7 @@ use App\Form\CertDownloadType;
 use App\Utils\Certificate;
 use App\Repository\DomainRepository as REPO;
 use App\Repository\UserRepository as UR;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Domain controller.
@@ -288,7 +290,7 @@ class CertificateController extends AbstractController
     }
 
     #[Route(path: '/{id}/server/new', name: 'server_new', methods: ['GET', 'POST'])]
-    public function serverNew(Request $request, Domain $domain): Response
+    public function serverNew(Request $request, Domain $domain, ValidatorInterface $validator): Response
     {
         $caCertData=$domain->getCertData();
         $caCertout = $caCertData['certdata']['cert'];
@@ -333,6 +335,16 @@ class CertificateController extends AbstractController
                 $serverCertificate->setDomain($domain)
                 ->setDescription($d!='*'?$d:'wildcard')
                 ->setCertData($certData);
+
+                $errors = $validator->validate($serverCertificate);
+                if (count($errors)>0) {
+                    $form->addError(new FormError($errors[0]->getMessage()));
+                    return $this->render(
+                        $render['template'],
+                        $render['args'],
+                        new Response(null, 422)
+                    );
+                }
                 $domain->addServerCertificate($serverCertificate);
                 $indexData = $this->util->addToIndex($certData['certdata']['cert']);
                 //dd($indexData);
