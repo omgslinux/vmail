@@ -3,11 +3,13 @@
 # 6 - OpenDKIM (opcional)
 
 apt install -y opendkim
+
 # Generar la llave
-mkdir -p /etc/opendkim/keys
-chown -R opendkim:opendkim /etc/opendkim
-opendkim-genkey -s ${SELECTOR:-default} -d ${DOMAIN:-example.org} -D /etc/opendkim/keys/
-cat /etc/opendkim/keys/${SELECTOR:-default}.txt
+cd /etc/dkimkeys
+mkdir ${DOMAIN:-example.org}
+opendkim-genkey -s ${SELECTOR:-mail} -d ${DOMAIN:-example.org} -D ${DOMAIN:-example.org}
+cat /etc/dkimkeys/${DOMAIN:-example.org}/${SELECTOR:-mail}.txt
+chown -R opendkim:opendkim /etc/dkimkeys
 
 cd /home/vmail/vmail
 
@@ -32,7 +34,7 @@ pushd roundcube/public_html
 ln -s ../installer
 popd
 
-# Add this to the end of the public_html/config/config.inc.php file
+# Add this at the end of the public_html/config/config.inc.php file
 RCONFIG="
 $config['imap_conn_options'] = $config['smtp_conn_options'] = [
     'ssl' => [
@@ -41,4 +43,6 @@ $config['imap_conn_options'] = $config['smtp_conn_options'] = [
         'allow_self_signed' => true,
     ],
 ];
+
+$config['enable_installer'] = false;
 "

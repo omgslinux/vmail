@@ -33,11 +33,11 @@ echo "vmail.exmaple.org">/etc/mailname
 
 
 # 1 - Packages installation. SQL database packages not included.
-BASIC="wget git bash-completion ca-certificates vim-tiny iputils-ping"
+BASIC="wget git bash-completion ca-certificates vim-tiny iputils-ping curl"
 IMAP="dovecot-core dovecot-mysql dovecot-imapd dovecot-sieve dovecot-lmtpd dovecot-managesieved $SQLSERVER"
 SMTP="postfix-mysql"
 ANTISPAM="amavisd-new"
-PHP="php-cli php-xml php-mysql php-zip php-mbstring php-intl"
+PHP="php-cli php-xml php-mysql php-zip php-mbstring php-intl php-curl"
 #CERTBOT="python-certbot-nginx"
 WEBSERVER="nginx php-fpm"
 apt install -y $BASIC $CERTBOT $IMAP $SMTP $ANTISPAM $PHP $WEBSERVER
@@ -94,6 +94,7 @@ EOF
 ./mkvhost.sh vmail roundcube
 nginx -t && service nginx restart
 
+cd
 
 # 5 - Setup extra php-fpm
 PHP_VER=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
@@ -106,8 +107,6 @@ sed -i "s|^listen =.*|listen = /run/php/vmail-fpm.sock|" /etc/php/$PHP_VER/fpm/p
 systemctl restart php$PHP_VER-fpm
 
 echo "192.168.12.100 mysql">>/etc/hosts
-
-cd ~
 
 echo "PLEASE INSTALL mariadb-server AND/OR CONFIGURE ACCESS FOR VMAIL AND ROUNDCUBE APPS"
 
