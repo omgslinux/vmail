@@ -14,7 +14,7 @@ final class Version20260105093744 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Add IMAP and SMTP capabilities for users';
     }
 
     public function up(Schema $schema): void
