@@ -245,7 +245,7 @@ class Certificate
         return $data;
     }
 
-    private function genCsr($dn, $privKey)
+    private function genCsrOLD($dn, $privKey)
     {
         $csr = openssl_csr_new($dn, $privKey);
 
@@ -408,10 +408,23 @@ class Certificate
         if (null==$data['common']['organizationalUnitName']) {
             unset($data['common']['organizationalUnitName']);
         }
+        $configFile = self::CONFFILE;
         if ($type=='server') {
             $extensions = 'server_ext';
             $data['common']['commonName'] .= '.' . $this->domain->getName();
             $data['common']['subject']['commonName'] = $data['common']['commonName'];
+
+            // The following is for recreating the DNS option for server certificates in a temporal conf file
+            $configTemplate = file_get_contents(self::CONFFILE);
+            $sanLine = "subjectAltName = DNS:" . $data['common']['commonName'];
+
+            $configFinal = preg_replace(
+                '/subjectAltName\s*=\s*DNS:cn:copy/',
+                $sanLine,
+                $configTemplate
+            );
+            $configFile = tempnam(sys_get_temp_dir(), 'openssl_');
+            file_put_contents($configFile, $configFinal);
         } elseif ($type=='client') {
             /*
             dump($data['common']);
@@ -449,7 +462,7 @@ class Certificate
         //dd($csr, $caCertData, $serial);
         $creqOptions = array_merge(
             self::BASICCERTCONFIG,
-            ['config' => self::CONFFILE],
+            ['config' => $configFile],
             ['x509_extensions' => $extensions]
         );
         $signcert = openssl_csr_sign(
@@ -476,6 +489,10 @@ class Certificate
             ],
             $cryptedPass
         );
+        // Cleanup temporary config file, if exists
+        if ($configFile != self::CONFFILE) {
+            unlink($configFile);
+        }
         //dump($data);
 
         return $data;
