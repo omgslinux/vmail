@@ -632,8 +632,8 @@ class Certificate
             $filename .= '-' . $dtype . '.pem';
             if ($dtype=='chain') {
                 $caCertData = $this->extractCAData($certificate->getDomain());
-                $stream .= $caCertData['cert'];
                 $stream .= $certData['cert'];
+                $stream .= $caCertData['cert'];
             } else {
                 $stream .= $certData['cert'] . $certData['privKey'][0];
             }
