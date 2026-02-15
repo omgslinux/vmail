@@ -15,6 +15,9 @@ virtual_mailbox_domains = proxy:mysql:/etc/postfix/vmail/mysql-virtual_mailbox_d
 smtpd_sasl_auth_enable = yes
 smtpd_use_tls=yes
 
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+
 {% if dovecot %}
 smtpd_tls_cert_file = /etc/dovecot/private/dovecot.pem
 smtpd_tls_key_file = /etc/dovecot/private/dovecot.key
@@ -46,3 +49,8 @@ smtpd_milters           = {{ opendkim_socket | default('inet:127.0.0.1:8891') }}
 non_smtpd_milters       = $smtpd_milters
 milter_default_action   = accept
 {% endif %}
+
+# Check alias public and from the same server. TODO: same domain
+smtpd_restriction_classes = inside_only
+inside_only = permit_sasl_authenticated, check_recipient_access mysql:/etc/postfix/vmail/mysql-check_is_internal.cf, reject 5.1.1 User unknown in virtual alias table
+smtpd_recipient_restrictions = permit_mynetworks, check_recipient_access mysql:/etc/postfix/vmail/mysql-check_alias_access.cf, permit_sasl_authenticated, reject_unauth_destination
