@@ -27,6 +27,10 @@ framework:
     annotations:
         enabled: false
 
+    # Deprecation from symfony 7.4 on
+    profiler:
+        collect_serializer_data: true
+
 when@test:
     framework:
         test: true
