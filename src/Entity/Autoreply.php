@@ -53,7 +53,7 @@ class Autoreply
     /**
      * @var ArrayCollection
      */
-    #[ORM\OneToMany(targetEntity: 'AutoreplyCache', mappedBy: 'reply')]
+    #[ORM\OneToMany(targetEntity: 'AutoreplyCache', mappedBy: 'reply', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private $replys;
 
 
