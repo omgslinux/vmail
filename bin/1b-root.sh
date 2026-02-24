@@ -1,15 +1,20 @@
 # Post install as root user
 
-# 6 - OpenDKIM (opcional)
+# 6 - OpenDKIM (optional)
 
 apt install -y opendkim
 
-# Generar la llave
+# Generate the keys
 cd /etc/dkimkeys
+# Set DOMAIN if necessary
+#DOMAIN="example.org"
 mkdir ${DOMAIN:-example.org}
 opendkim-genkey -s ${SELECTOR:-mail} -d ${DOMAIN:-example.org} -D ${DOMAIN:-example.org}
 cat /etc/dkimkeys/${DOMAIN:-example.org}/${SELECTOR:-mail}.txt
 chown -R opendkim:opendkim /etc/dkimkeys
+
+# This is mandatory if not using TCP/IP socket in /etc/opendkim.conf
+adduser postfix opendkim
 
 cd /home/vmail/vmail
 
@@ -34,7 +39,8 @@ pushd roundcube/public_html
 ln -s ../installer
 popd
 
-# Add this at the end of the public_html/config/config.inc.php file
+# Add the php code inside RCONFIG at the end of the public_html/config/config.inc.php file
+
 RCONFIG="
 $config['imap_conn_options'] = $config['smtp_conn_options'] = [
     'ssl' => [
@@ -44,5 +50,6 @@ $config['imap_conn_options'] = $config['smtp_conn_options'] = [
     ],
 ];
 
+// Set to false only when installation is finished
 $config['enable_installer'] = false;
 "
