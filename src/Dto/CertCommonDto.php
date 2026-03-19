@@ -186,7 +186,6 @@ class CertCommonDto
 
     public function setPlainPassword(?string $text): self
     {
-        dump($text);
         if (is_array($text)) {
             $this->plainPassword = $text['setkey']->getPlainPassword();
         } else {
