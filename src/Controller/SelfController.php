@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -188,6 +189,7 @@ class SelfController extends AbstractController
     public function password(Request $request, UR $ur)
     {
         $user=$this->getUser();
+
         $form = $this->createForm(
             ManagePasswordType::class,
             $user,
@@ -196,18 +198,40 @@ class SelfController extends AbstractController
             ]
         );
         $form->handleRequest($request);
+        $render = [
+            'template' => 'user/_pass.html.twig',
+            'args' => [
+                'user' => $user,
+                'form' => $form,
+                'VARS' => self::VARS,
+            ]
+        ];
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $ur->formSubmit($form);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $ur->formSubmit($form);
+                $redirectUrl = $this->generateUrl('homepage');
 
-            return $this->redirectToRoute('homepage');
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => true,
+                        'redirectUrl' => $redirectUrl
+                    ]);
+                }
+
+                return $this->redirect($redirectUrl);
+            }
+            return $this->render(
+                $render['template'],
+                $render['args'],
+                new Response(null, 422)
+            );
         }
 
-        return $this->render('user/_pass.html.twig', array(
-            'user' => $user,
-            'form' => $form->createView(),
-            'VARS' => self::VARS,
-        ));
+        return $this->render(
+            $render['template'],
+            $render['args']
+        );
     }
 
     /**
