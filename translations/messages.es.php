@@ -29,6 +29,7 @@ return array(
   'User creation' => 'Creación de usuario',
   'Users in domain' => 'Usuarios en el dominio',
   'User profile' => 'Perfil del usuario',
+  'Add an address' => 'Añadir una dirección',
   'Alias' => 'Alias',
   'Aliases' => 'Alias',
   'Alias edit' => 'Editar alias',
