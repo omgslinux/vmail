@@ -108,7 +108,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $smtp = true;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $isPublic = null;
+    private ?bool $isPublic = true;
 
 
     public function __construct()

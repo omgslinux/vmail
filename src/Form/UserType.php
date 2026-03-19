@@ -54,14 +54,6 @@ class UserType extends AbstractType
                   ]
                 ]
             )
-            ->add(
-                'isPublic',
-                CheckboxType::class,
-                [
-                    'required' => false,
-                    //'label' => false
-                ]
-            )
             ;
         } else {
             $builder
@@ -144,6 +136,14 @@ class UserType extends AbstractType
             [
                 'label' => 'SMTP Access',
                 'required' => false,
+            ]
+        )
+        ->add(
+            'isPublic',
+            CheckboxType::class,
+            [
+                'required' => false,
+                //'label' => false
             ]
         )
         ;
